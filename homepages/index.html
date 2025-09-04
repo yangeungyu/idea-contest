@@ -8,29 +8,95 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    .dropdown:hover .dropdown-menu {
+      display: block;
+    }
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 100%;
+      background-color: white;
+      min-width: 160px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+      z-index: 1;
+      border-radius: 0.5rem;
+      overflow: hidden;
+    }
+    .dropdown-menu a {
+      color: #4B5563;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      transition: background-color 0.2s;
+    }
+    .dropdown-menu a:hover {
+      background-color: #F3F4F6;
+      color: #111827;
+    }
+  </style>
 </head>
-<body class="bg-gray-50">
+<body class="bg-green-100">
   <!-- 헤더 -->
-  <header class="bg-white shadow-md">
+  <header class="bg-green-200 shadow-md fixed w-full z-50 top-0">
     <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-      <div class="flex items-center space-x-8">
-        <a href="/" class="text-2xl font-bold text-red-600">홍천학당</a>
-        <nav class="hidden md:flex space-x-6">
-          <a href="#" class="text-gray-700 hover:text-red-600">행사</a>
-          <a href="#" class="text-gray-700 hover:text-red-600">모임</a>
-          <a href="#" class="text-gray-700 hover:text-red-600">커뮤니티</a>
-          <a href="#" class="text-gray-700 hover:text-red-600">고객센터</a>
-        </nav>
-      </div>
+      <a href="/" class="flex items-center space-x-2">
+        <img src="image/hongschool.png" alt="홍숲쿨링" class="h-24 w-auto">
+        <span class="text-4xl font-bold text-green-700">홍숲쿨링</span>
+      </a>
+      
+      <!-- 왼쪽 메뉴 -->
+      <nav class="hidden md:flex space-x-1">
+        <a href="#" class="px-4 py-2 text-gray-700 hover:text-green-600 font-medium">이벤트</a>
+        <a href="studies.html" class="px-4 py-2 text-green-600 font-medium">모임관리</a>
+        <a href="community.html" class="px-4 py-2 text-gray-700 hover:text-green-600 font-medium">커뮤니티</a>
+        <a href="notices.html" class="px-4 py-2 text-gray-700 hover:text-green-600 font-medium">공지사항</a>
+        <a href="#" class="px-4 py-2 text-gray-700 hover:text-green-600 font-medium">마이페이지</a>
+      </nav>
+      
+      <!-- 오른쪽 로그인/회원가입 -->
       <div class="flex items-center space-x-4">
-        <button class="px-4 py-2 text-gray-600 hover:text-red-600">로그인</button>
-        <button class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">회원가입</button>
+        <div id="auth-buttons" class="flex items-center space-x-4">
+          <a href="login.html" id="loginBtn" class="text-gray-700 hover:text-green-600">로그인</a>
+          <a href="register.html" id="registerBtn" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">회원가입</a>
+        </div>
+        <!-- 로그인 시 표시될 프로필 메뉴 -->
+        <div id="userMenu" class="hidden dropdown relative">
+          <button class="flex items-center space-x-2 focus:outline-none">
+            <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
+              <span class="material-icons text-gray-600">person</span>
+            </div>
+            <span id="userNickname" class="text-gray-700">사용자이름</span>
+            <span class="material-icons text-gray-500">arrow_drop_down</span>
+          </button>
+          <div class="dropdown-menu absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10" style="display: none;">
+            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">마이페이지</a>
+            <a href="#" onclick="handleLogout()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">로그아웃</a>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 모바일 메뉴 버튼 -->
+      <button id="mobileMenuBtn" class="md:hidden text-gray-700">
+        <span class="material-icons text-2xl">menu</span>
+      </button>
+    </div>
+    
+    <!-- 모바일 메뉴 -->
+    <div id="mobileMenu" class="md:hidden hidden bg-white border-t">
+      <div class="container mx-auto px-4 py-2 flex flex-col">
+        <a href="#" class="px-4 py-3 text-gray-700 hover:bg-gray-50">행사</a>
+        <a href="#" class="px-4 py-3 text-gray-700 hover:bg-gray-50">모임</a>
+        <a href="#" class="px-4 py-3 text-gray-700 hover:bg-gray-50">커뮤니티</a>
+        <a href="#" class="px-4 py-3 text-gray-700 hover:bg-gray-50">강의</a>
+        <a href="#" class="px-4 py-3 text-gray-700 hover:bg-gray-50">공지사항</a>
       </div>
     </div>
   </header>
 
   <!-- 메인 배너 -->
-  <section class="relative bg-gray-800 text-white">
+  <section class="relative bg-green-800 text-white">
     <div class="container mx-auto px-4 py-20 flex flex-col items-center text-center">
       <h1 class="text-4xl md:text-5xl font-bold mb-6">홍천에서 만나는 특별한 배움</h1>
       <p class="text-xl mb-8 max-w-2xl">군 장병과 지역민이 함께하는 다양한 교육 프로그램을 만나보세요</p>
@@ -42,36 +108,20 @@
   </section>
 
   <!-- 인기 행사 -->
-  <section class="py-16 bg-white">
+  <section class="py-16 bg-green-200">
     <div class="container mx-auto px-4">
       <div class="flex justify-between items-center mb-8">
         <h2 class="text-2xl font-bold">인기 행사</h2>
         <a href="#" class="text-red-600 hover:underline">더보기</a>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- 행사 카드 1 -->
-        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-          <div class="h-48 bg-gray-200 relative">
-            <img src="https://picsum.photos/400/300?random=1" alt="행사 이미지" class="w-full h-full object-cover">
-            <span class="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded">마감임박</span>
-          </div>
-          <div class="p-4">
-            <div class="text-sm text-gray-500 mb-1">2023.10.15 ~ 2023.10.17</div>
-            <h3 class="font-bold text-lg mb-2">군 장병을 위한 코딩 부트캠프</h3>
-            <p class="text-gray-600 text-sm mb-4">기초부터 배우는 웹 개발 입문 과정</p>
-            <div class="flex justify-between items-center">
-              <span class="text-red-600 font-bold">무료</span>
-              <span class="text-sm text-gray-500">신청 24/30</span>
-            </div>
-          </div>
-        </div>
-        <!-- 행사 카드 2, 3도 유사한 구조로 추가 -->
+      <div id="events-container" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- 동적으로 생성될 이벤트 카드들이 여기에 표시됩니다 -->
       </div>
     </div>
   </section>
 
   <!-- 카테고리 -->
-  <section class="py-16 bg-gray-50">
+  <section class="py-16 bg-green-100">
     <div class="container mx-auto px-4">
       <h2 class="text-2xl font-bold mb-8">카테고리</h2>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -87,7 +137,7 @@
   </section>
 
   <!-- 푸터 -->
-  <footer class="bg-gray-800 text-white py-12">
+  <footer class="bg-green-800 text-white py-12">
     <div class="container mx-auto px-4">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
         <div>
@@ -108,6 +158,92 @@
     </div>
   </footer>
 
+  <style>
+    .dropdown:hover .dropdown-menu {
+      display: block !important;
+    }
+    
+    .dropdown-menu {
+      min-width: 160px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e5e7eb;
+    }
+  </style>
+
+  <script>
+    // 페이지 로드 시 로그인 상태 확인
+    (async function() {
+      // fetchCurrentUser 함수 정의
+      async function fetchCurrentUser() {
+        try {
+          const response = await fetch('/api/current-user', {
+            credentials: 'include'
+          });
+          const data = await response.json();
+          return data;
+        } catch (error) {
+          console.error('사용자 정보를 가져오는 중 오류 발생:', error);
+          return { isAuthenticated: false };
+        }
+      }
+
+      // 로그아웃 처리
+      async function handleLogout() {
+        try {
+          const response = await fetch('/api/logout', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include'
+          });
+          
+          const data = await response.json();
+          
+          if (data.success) {
+            window.location.href = '/';
+            window.location.reload();
+          } else {
+            alert('로그아웃 중 오류가 발생했습니다.');
+          }
+        } catch (error) {
+          console.error('로그아웃 오류:', error);
+          alert('로그아웃 중 오류가 발생했습니다.');
+        }
+      }
+
+      // 전역으로 함수 등록
+      window.handleLogout = handleLogout;
+
+      // 현재 로그인 상태 확인 및 UI 업데이트
+      const authButtons = document.getElementById('auth-buttons');
+      const userMenu = document.getElementById('userMenu');
+      
+      if (authButtons && userMenu) {
+        console.log('로그인 상태 확인 시작');
+        const { isAuthenticated, user } = await fetchCurrentUser();
+        console.log('로그인 상태:', isAuthenticated, '사용자:', user);
+        
+        if (isAuthenticated && user) {
+          // 로그인 상태일 때
+          console.log('로그인된 상태 - UI 업데이트');
+          authButtons.style.display = 'none';
+          userMenu.style.display = 'flex';
+          
+          const userNickname = document.getElementById('userNickname');
+          if (userNickname) {
+            userNickname.textContent = user.nickname || user.username;
+            console.log('닉네임 업데이트:', user.nickname || user.username);
+          }
+        } else {
+          // 비로그인 상태일 때
+          console.log('비로그인 상태 - UI 업데이트');
+          authButtons.style.display = 'flex';
+          userMenu.style.display = 'none';
+        }
+      }
+    })();
+  </script>
   <script src="script.js"></script>
 </body>
 </html>

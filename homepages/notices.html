@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>공지사항 - 홍숲쿨링</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { padding-top: 80px; }
+    .notice-card { transition: transform 0.2s; }
+    .notice-card:hover { transform: translateY(-2px); }
+    .notice-important { border-left: 4px solid #dc2626; }
+    .notice-general { border-left: 4px solid #16a34a; }
+  </style>
+</head>
+<body class="bg-green-50">
+  <!-- 헤더 -->
+  <header class="bg-green-100 shadow-md fixed w-full z-50 top-0">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <a href="/" class="flex items-center space-x-2">
+        <img src="image/hongschool.png" alt="홍숲쿨링" class="h-24 w-auto">
+        <span class="text-4xl font-bold text-green-700">홍숲쿨링</span>
+      </a>
+      <nav class="hidden md:flex space-x-1">
+        <a href="#" class="px-4 py-2 text-gray-700 hover:text-green-600 font-medium">이벤트</a>
+        <a href="studies.html" class="px-4 py-2 text-gray-700 hover:text-green-600 font-medium">모임관리</a>
+        <a href="community.html" class="px-4 py-2 text-gray-700 hover:text-green-600 font-medium">커뮤니티</a>
+        <a href="notices.html" class="px-4 py-2 text-green-600 font-medium">공지사항</a>
+        <a href="#" class="px-4 py-2 text-gray-700 hover:text-green-600 font-medium">마이페이지</a>
+      </nav>
+      <div class="flex items-center space-x-4">
+        <div id="auth-buttons" class="flex items-center space-x-4">
+          <a href="login.html" class="text-gray-700 hover:text-green-600">로그인</a>
+          <a href="register.html" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">회원가입</a>
+        </div>
+        <!-- 로그인 시 표시될 프로필 메뉴 -->
+        <div id="userMenu" class="hidden dropdown relative">
+          <button class="flex items-center space-x-2 focus:outline-none">
+            <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
+              <span class="material-icons text-gray-600">person</span>
+            </div>
+            <span id="userNickname" class="text-gray-700">사용자이름</span>
+            <span class="material-icons text-gray-500">arrow_drop_down</span>
+          </button>
+          <div class="dropdown-menu absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10" style="display: none;">
+            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">마이페이지</a>
+            <a href="#" onclick="handleLogout()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">로그아웃</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 메인 콘텐츠 -->
+  <main class="container mx-auto px-4 py-8">
+    <!-- 페이지 헤더 -->
+    <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+        <h1 class="text-2xl font-bold text-gray-800 mb-4 md:mb-0">공지사항</h1>
+        <button id="createNoticeBtn" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 text-center">
+          <i class="material-icons align-middle">add</i> 공지사항 작성
+        </button>
+      </div>
+      
+      <!-- 검색 및 필터 -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="md:col-span-2">
+          <div class="relative">
+            <input type="text" id="searchInput" placeholder="공지사항 제목, 내용으로 검색" 
+                   class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 pl-10">
+            <i class="material-icons absolute left-3 top-2.5 text-gray-400">search</i>
+          </div>
+        </div>
+        
+        <select id="categoryFilter" class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-white">
+          <option value="">모든 카테고리</option>
+          <option value="important">중요</option>
+          <option value="general">일반</option>
+          <option value="event">이벤트</option>
+          <option value="maintenance">점검</option>
+        </select>
+      </div>
+    </div>
+    
+    <!-- 공지사항 목록 -->
+    <div id="noticeList" class="space-y-4 mb-8">
+      <!-- 공지사항들이 여기에 동적으로 로드됩니다 -->
+      <div class="text-center py-12 text-gray-500">
+        <i class="material-icons text-4xl mb-2">announcement</i>
+        <p>등록된 공지사항이 없습니다.</p>
+      </div>
+    </div>
+    
+    <!-- 페이지네이션 -->
+    <div class="flex justify-center">
+      <nav class="flex items-center space-x-1">
+        <button class="px-3 py-1 rounded-md text-gray-500 hover:bg-gray-100">
+          <i class="material-icons text-sm">chevron_left</i>
+        </button>
+        <button class="px-3 py-1 rounded-md bg-green-600 text-white">1</button>
+        <button class="px-3 py-1 rounded-md text-gray-700 hover:bg-gray-100">2</button>
+        <button class="px-3 py-1 rounded-md text-gray-500 hover:bg-gray-100">
+          <i class="material-icons text-sm">chevron_right</i>
+        </button>
+      </nav>
+    </div>
+  </main>
+
+  <!-- 푸터 -->
+  <footer class="bg-green-800 text-white py-8 mt-12">
+    <div class="container mx-auto px-4 text-center">
+      <p>&copy; 2023 홍숲쿨링. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- 공지사항 작성 모달 -->
+  <div id="createNoticeModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-screen overflow-y-auto">
+      <div class="p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-bold text-gray-900">공지사항 작성</h2>
+          <button id="closeModal" class="text-gray-400 hover:text-gray-600">
+            <i class="material-icons">close</i>
+          </button>
+        </div>
+        
+        <form id="createNoticeForm">
+          <div class="mb-4">
+            <label for="noticeTitle" class="block text-sm font-medium text-green-700 mb-2">제목</label>
+            <input type="text" id="noticeTitle" name="title" required
+                   class="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+          </div>
+          
+          <div class="mb-4">
+            <label for="noticeCategory" class="block text-sm font-medium text-green-700 mb-2">카테고리</label>
+            <select id="noticeCategory" name="category" required
+                    class="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+              <option value="">카테고리 선택</option>
+              <option value="important">중요</option>
+              <option value="general">일반</option>
+              <option value="event">이벤트</option>
+              <option value="maintenance">점검</option>
+            </select>
+          </div>
+          
+          <div class="mb-4">
+            <label for="noticeContent" class="block text-sm font-medium text-green-700 mb-2">내용</label>
+            <textarea id="noticeContent" name="content" rows="8" required
+                      class="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"></textarea>
+          </div>
+          
+          <div class="mb-6">
+            <label class="flex items-center">
+              <input type="checkbox" id="isPinned" name="isPinned" class="rounded border-green-300 text-green-600 focus:ring-green-500">
+              <span class="ml-2 text-sm text-green-700">상단 고정</span>
+            </label>
+          </div>
+          
+          <div class="flex justify-end space-x-3">
+            <button type="button" id="cancelBtn" class="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50">
+              취소
+            </button>
+            <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+              작성 완료
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .dropdown:hover .dropdown-menu {
+      display: block !important;
+    }
+    
+    .dropdown-menu {
+      min-width: 160px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e5e7eb;
+    }
+  </style>
+
+  <script>
+    // 페이지 로드 시 즉시 로그인 확인
+    (async function() {
+      try {
+        const response = await fetch('/api/current-user', {
+          credentials: 'include'
+        });
+        const data = await response.json();
+        
+        if (!data.isAuthenticated) {
+          alert('로그인이 필요한 페이지입니다.');
+          window.location.href = 'login.html';
+          return;
+        }
+        
+        // 로그인된 경우에만 페이지 로드
+        loadNotices();
+        
+        // 로그인 상태 표시
+        document.getElementById('auth-buttons').style.display = 'none';
+        document.getElementById('userMenu').classList.remove('hidden');
+        document.getElementById('userNickname').textContent = data.user.nickname || data.user.username;
+        
+        // 모달 관련 이벤트
+        document.getElementById('createNoticeBtn').addEventListener('click', openCreateModal);
+        document.getElementById('cancelBtn').addEventListener('click', closeCreateModal);
+        document.getElementById('createNoticeForm').addEventListener('submit', handleCreateNotice);
+      } catch (error) {
+        console.error('인증 확인 오류:', error);
+        window.location.href = 'login.html';
+      }
+    })();
+
+    // 공지사항 데이터 로드
+    async function loadNotices() {
+      try {
+        const response = await fetch('/api/notices', {
+          credentials: 'include'
+        });
+        const data = await response.json();
+        renderNotices(data.notices || data);
+      } catch (error) {
+        console.error('공지사항 로드 오류:', error);
+      }
+    }
+
+    // 공지사항 목록 렌더링
+    function renderNotices(notices) {
+      const noticeList = document.getElementById('noticeList');
+      
+      if (!notices || notices.length === 0) {
+        noticeList.innerHTML = `
+          <div class="text-center py-12 text-gray-500">
+            <span class="material-icons text-4xl mb-2">announcement</span>
+            <p>등록된 공지사항이 없습니다.</p>
+          </div>
+        `;
+        return;
+      }
+      
+      noticeList.innerHTML = notices.map(notice => {
+        const categoryColors = {
+          'general': 'bg-blue-100 text-blue-800 border-blue-200',
+          'event': 'bg-green-100 text-green-800 border-green-200',
+          'urgent': 'bg-red-100 text-red-800 border-red-200',
+          'maintenance': 'bg-yellow-100 text-yellow-800 border-yellow-200'
+        };
+        
+        const categoryTexts = {
+          'general': '일반',
+          'event': '이벤트',
+          'urgent': '긴급',
+          'maintenance': '점검'
+        };
+        
+        const createdAt = new Date(notice.createdAt).toLocaleDateString('ko-KR');
+        
+        return `
+          <div class="notice-card bg-white rounded-lg shadow-md p-6 ${notice.isPinned ? 'border-l-4 border-red-500' : ''}">
+            <div class="flex items-start justify-between mb-3">
+              <div class="flex items-center space-x-3">
+                ${notice.isPinned ? '<span class="material-icons text-red-500 text-sm">push_pin</span>' : ''}
+                <span class="px-2 py-1 rounded-full text-xs ${categoryColors[notice.category] || categoryColors.general}">
+                  ${categoryTexts[notice.category] || '일반'}
+                </span>
+              </div>
+              <span class="text-sm text-gray-500">${createdAt}</span>
+            </div>
+            
+            <h3 class="text-lg font-bold text-gray-900 mb-2">${notice.title}</h3>
+            <p class="text-gray-600 text-sm mb-3 line-clamp-2">${notice.content}</p>
+            
+            <div class="flex justify-between items-center pt-3 border-t border-gray-100">
+              <span class="text-sm text-gray-700">작성자: ${notice.author?.nickname || '관리자'}</span>
+              <div class="flex items-center space-x-4">
+                <span class="text-sm text-gray-500 flex items-center">
+                  <span class="material-icons text-sm mr-1">visibility</span>
+                  ${notice.views || 0}
+                </span>
+                <button class="text-green-600 text-sm font-medium hover:underline" onclick="viewNotice('${notice._id}')">
+                  자세히 보기
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    // 공지사항 상세 보기
+    function viewNotice(noticeId) {
+      window.location.href = `/notices/${noticeId}`;
+    }
+    
+    // 모달 관련 함수들
+    function openCreateModal() {
+      document.getElementById('createNoticeModal').classList.remove('hidden');
+    }
+    
+    function closeCreateModal() {
+      document.getElementById('createNoticeModal').classList.add('hidden');
+      document.getElementById('createNoticeForm').reset();
+    }
+    
+    // 공지사항 작성
+    async function createNotice(formData) {
+      try {
+        const response = await fetch('/api/notices', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include',
+          body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.message || '공지사항 작성에 실패했습니다.');
+        }
+        
+        alert('공지사항이 성공적으로 작성되었습니다!');
+        closeCreateModal();
+        loadNotices(); // 목록 새로고침
+      } catch (error) {
+        console.error('공지사항 작성 오류:', error);
+        alert(error.message || '공지사항 작성 중 오류가 발생했습니다.');
+      }
+    }
+    
+    // 폼 제출 처리
+    function handleCreateNotice(e) {
+      e.preventDefault();
+      
+      const formData = {
+        title: document.getElementById('title').value,
+        content: document.getElementById('content').value,
+        category: document.getElementById('category').value,
+        isPinned: document.getElementById('isPinned').checked
+      };
+      
+      createNotice(formData);
+    }
+    
+    // 로그아웃 처리
+    async function handleLogout() {
+      try {
+        const response = await fetch('/api/logout', {
+          method: 'POST',
+          credentials: 'include'
+        });
+        
+        if (!response.ok) {
+          throw new Error('로그아웃에 실패했습니다.');
+        }
+        
+        alert('로그아웃되었습니다.');
+        window.location.href = 'login.html';
+      } catch (error) {
+        console.error('로그아웃 오류:', error);
+        alert('로그아웃 중 오류가 발생했습니다.');
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>커뮤니티 - 홍숲쿨링</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { padding-top: 80px; }
+    .post-card { transition: transform 0.2s; }
+    .post-card:hover { transform: translateY(-2px); }
+    .post-question { border-left: 4px solid #3b82f6; }
+    .post-discussion { border-left: 4px solid #16a34a; }
+    .post-share { border-left: 4px solid #f59e0b; }
+    .post-free { border-left: 4px solid #8b5cf6; }
+  </style>
+</head>
+<body class="bg-green-50">
+  <!-- 헤더 -->
+  <header class="bg-green-100 shadow-md fixed w-full z-50 top-0">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <a href="/" class="flex items-center space-x-2">
+        <img src="image/hongschool.png" alt="홍숲쿨링" class="h-24 w-auto">
+        <span class="text-4xl font-bold text-green-700">홍숲쿨링</span>
+      </a>
+      <nav class="hidden md:flex space-x-1">
+        <a href="#" class="px-4 py-2 text-gray-700 hover:text-green-600 font-medium">이벤트</a>
+        <a href="studies.html" class="px-4 py-2 text-gray-700 hover:text-green-600 font-medium">모임관리</a>
+        <a href="community.html" class="px-4 py-2 text-green-600 font-medium">커뮤니티</a>
+        <a href="notices.html" class="px-4 py-2 text-gray-700 hover:text-green-600 font-medium">공지사항</a>
+        <a href="#" class="px-4 py-2 text-gray-700 hover:text-green-600 font-medium">마이페이지</a>
+      </nav>
+      <div class="flex items-center space-x-4">
+        <div id="auth-buttons" class="flex items-center space-x-4">
+          <a href="login.html" class="text-gray-700 hover:text-green-600">로그인</a>
+          <a href="register.html" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">회원가입</a>
+        </div>
+        <!-- 로그인 시 표시될 프로필 메뉴 -->
+        <div id="userMenu" class="hidden dropdown relative">
+          <button class="flex items-center space-x-2 focus:outline-none">
+            <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
+              <span class="material-icons text-gray-600">person</span>
+            </div>
+            <span id="userNickname" class="text-gray-700">사용자이름</span>
+            <span class="material-icons text-gray-500">arrow_drop_down</span>
+          </button>
+          <div class="dropdown-menu absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10" style="display: none;">
+            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">마이페이지</a>
+            <a href="#" onclick="handleLogout()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">로그아웃</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 메인 콘텐츠 -->
+  <main class="container mx-auto px-4 py-8">
+    <!-- 페이지 헤더 -->
+    <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+        <h1 class="text-2xl font-bold text-gray-800 mb-4 md:mb-0">커뮤니티</h1>
+        <button id="createPostBtn" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 text-center">
+          <i class="material-icons align-middle">add</i> 글 작성하기
+        </button>
+      </div>
+      
+      <!-- 검색 및 필터 -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="md:col-span-2">
+          <div class="relative">
+            <input type="text" id="searchInput" placeholder="제목, 내용으로 검색" 
+                   class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 pl-10">
+            <i class="material-icons absolute left-3 top-2.5 text-gray-400">search</i>
+          </div>
+        </div>
+        
+        <select id="categoryFilter" class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-white">
+          <option value="">모든 카테고리</option>
+          <option value="question">질문</option>
+          <option value="discussion">토론</option>
+          <option value="share">정보공유</option>
+          <option value="free">자유</option>
+        </select>
+      </div>
+    </div>
+    
+    <!-- 게시글 목록 -->
+    <div id="postList" class="space-y-4 mb-8">
+      <!-- 게시글들이 여기에 동적으로 로드됩니다 -->
+      <div class="text-center py-12 text-gray-500">
+        <i class="material-icons text-4xl mb-2">forum</i>
+        <p>등록된 게시글이 없습니다.</p>
+      </div>
+    </div>
+    
+    <!-- 페이지네이션 -->
+    <div class="flex justify-center">
+      <nav class="flex items-center space-x-1">
+        <button class="px-3 py-1 rounded-md text-gray-500 hover:bg-gray-100">
+          <i class="material-icons text-sm">chevron_left</i>
+        </button>
+        <button class="px-3 py-1 rounded-md bg-green-600 text-white">1</button>
+        <button class="px-3 py-1 rounded-md text-gray-700 hover:bg-gray-100">2</button>
+        <button class="px-3 py-1 rounded-md text-gray-500 hover:bg-gray-100">
+          <i class="material-icons text-sm">chevron_right</i>
+        </button>
+      </nav>
+    </div>
+  </main>
+
+  <!-- 푸터 -->
+  <footer class="bg-green-800 text-white py-8 mt-12">
+    <div class="container mx-auto px-4 text-center">
+      <p>&copy; 2023 홍숲쿨링. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- 글 작성 모달 -->
+  <div id="createPostModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-screen overflow-y-auto">
+      <div class="p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-bold text-gray-900">글 작성하기</h2>
+          <button id="closeModal" class="text-gray-400 hover:text-gray-600">
+            <i class="material-icons">close</i>
+          </button>
+        </div>
+        
+        <form id="createPostForm">
+          <div class="mb-4">
+            <label for="postTitle" class="block text-sm font-medium text-green-700 mb-2">제목</label>
+            <input type="text" id="postTitle" name="title" required
+                   class="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+          </div>
+          
+          <div class="mb-4">
+            <label for="postCategory" class="block text-sm font-medium text-green-700 mb-2">카테고리</label>
+            <select id="postCategory" name="category" required
+                    class="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+              <option value="">카테고리 선택</option>
+              <option value="question">질문</option>
+              <option value="discussion">토론</option>
+              <option value="share">정보공유</option>
+              <option value="free">자유</option>
+            </select>
+          </div>
+          
+          <div class="mb-6">
+            <label for="postContent" class="block text-sm font-medium text-green-700 mb-2">내용</label>
+            <textarea id="postContent" name="content" rows="8" required
+                      class="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"></textarea>
+          </div>
+          
+          <div class="flex justify-end space-x-3">
+            <button type="button" id="cancelBtn" class="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50">
+              취소
+            </button>
+            <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+              작성 완료
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .dropdown:hover .dropdown-menu {
+      display: block !important;
+    }
+    
+    .dropdown-menu {
+      min-width: 160px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e5e7eb;
+    }
+  </style>
+
+  <script>
+    // 페이지 로드 시 즉시 로그인 확인
+    (async function() {
+      try {
+        const response = await fetch('/api/current-user', {
+          credentials: 'include'
+        });
+        const data = await response.json();
+        
+        if (!data.isAuthenticated) {
+          alert('로그인이 필요한 페이지입니다.');
+          window.location.href = 'login.html';
+          return;
+        }
+        
+        // 로그인된 경우에만 페이지 로드
+        loadPosts();
+        
+        // 로그인 상태 표시
+        const userMenu = document.getElementById('userMenu');
+        const authButtons = document.getElementById('auth-buttons');
+        userMenu.classList.remove('hidden');
+        authButtons.classList.add('hidden');
+        document.getElementById('userNickname').textContent = data.nickname;
+        
+        // 모달 관련 이벤트
+        document.getElementById('createPostBtn').addEventListener('click', openCreateModal);
+        document.getElementById('cancelBtn').addEventListener('click', closeCreateModal);
+        document.getElementById('createPostForm').addEventListener('submit', handleCreatePost);
+      } catch (error) {
+        console.error('인증 확인 오류:', error);
+        window.location.href = 'login.html';
+      }
+    })();
+
+    // 게시글 데이터 로드
+    async function loadPosts() {
+      try {
+        const response = await fetch('/api/community/posts', {
+          credentials: 'include'
+        });
+        const data = await response.json();
+        renderPosts(data.posts || data);
+      } catch (error) {
+        console.error('게시글 로드 오류:', error);
+      }
+    }
+    
+    // 게시글 목록 렌더링
+    function renderPosts(posts) {
+      const postList = document.getElementById('postList');
+      
+      if (!posts || posts.length === 0) {
+        postList.innerHTML = `
+          <div class="text-center py-12 text-gray-500">
+            <span class="material-icons text-4xl mb-2">forum</span>
+            <p>등록된 게시글이 없습니다.</p>
+          </div>
+        `;
+        return;
+      }
+      
+      postList.innerHTML = posts.map(post => {
+        const categoryColors = {
+          'question': 'bg-blue-100 text-blue-800 border-blue-200',
+          'discussion': 'bg-green-100 text-green-800 border-green-200',
+          'share': 'bg-yellow-100 text-yellow-800 border-yellow-200',
+          'free': 'bg-purple-100 text-purple-800 border-purple-200'
+        };
+        
+        const categoryTexts = {
+          'question': '질문',
+          'discussion': '토론',
+          'share': '정보공유',
+          'free': '자유'
+        };
+        
+        const borderClasses = {
+          'question': 'post-question',
+          'discussion': 'post-discussion',
+          'share': 'post-share',
+          'free': 'post-free'
+        };
+        
+        const borderClass = borderClasses[post.category] || 'post-free';
+        const createdAt = new Date(post.createdAt).toLocaleDateString('ko-KR');
+        
+        return `
+          <div class="post-card bg-white rounded-lg shadow-md p-6 ${borderClass}">
+            <div class="flex items-start justify-between mb-3">
+              <div class="flex items-center space-x-3">
+                <span class="px-2 py-1 rounded-full text-xs ${categoryColors[post.category] || categoryColors.free}">
+                  ${categoryTexts[post.category] || '자유'}
+                </span>
+              </div>
+              <span class="text-sm text-gray-500">${createdAt}</span>
+            </div>
+            
+            <h3 class="text-lg font-bold text-gray-900 mb-2">${post.title}</h3>
+            <p class="text-gray-600 text-sm mb-3 line-clamp-2">${post.content}</p>
+            
+            <div class="flex justify-between items-center pt-3 border-t border-gray-100">
+              <span class="text-sm text-gray-700">작성자: ${post.author?.nickname || '익명'}</span>
+              <div class="flex items-center space-x-4">
+                <span class="text-sm text-gray-500 flex items-center">
+                  <span class="material-icons text-sm mr-1">visibility</span>
+                  ${post.views || 0}
+                </span>
+                <button class="text-green-600 text-sm font-medium hover:underline" onclick="viewPost('${post._id}')">
+                  자세히 보기
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    // 게시글 상세 보기
+    function viewPost(postId) {
+      window.location.href = `/community/${postId}`;
+    }
+    
+    // 모달 관련 함수들
+    function openCreateModal() {
+      document.getElementById('createPostModal').classList.remove('hidden');
+    }
+    
+    function closeCreateModal() {
+      document.getElementById('createPostModal').classList.add('hidden');
+      document.getElementById('createPostForm').reset();
+    }
+    
+    // 게시글 작성
+    async function createPost(formData) {
+      try {
+        const response = await fetch('/api/community/posts', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include',
+          body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.message || '게시글 작성에 실패했습니다.');
+        }
+        
+        alert('게시글이 성공적으로 작성되었습니다!');
+        closeCreateModal();
+        loadPosts(); // 목록 새로고침
+      } catch (error) {
+        console.error('게시글 작성 오류:', error);
+        alert(error.message || '게시글 작성 중 오류가 발생했습니다.');
+      }
+    }
+    
+    // 폼 제출 처리
+    function handleCreatePost(e) {
+      e.preventDefault();
+      
+      const formData = {
+        title: document.getElementById('postTitle').value,
+        content: document.getElementById('postContent').value,
+        category: document.getElementById('postCategory').value
+      };
+      
+      createPost(formData);
+    }
+    
+    // 로그아웃 처리
+    async function handleLogout() {
+      try {
+        const response = await fetch('/api/logout', {
+          method: 'POST',
+          credentials: 'include'
+        });
+        
+        if (!response.ok) {
+          throw new Error('로그아웃에 실패했습니다.');
+        }
+        
+        alert('로그아웃되었습니다.');
+        window.location.href = 'login.html';
+      } catch (error) {
+        console.error('로그아웃 오류:', error);
+        alert('로그아웃 중 오류가 발생했습니다.');
+      }
+    }
+  </script>
+</body>
+</html>

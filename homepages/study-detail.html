@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>스터디 상세 - 홍천학당</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { padding-top: 80px; }
+    .tab-active { 
+      border-bottom: 2px solid #34c759;
+      color: #34c759;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body class="bg-green-50">
+  <!-- 헤더 -->
+  <header class="bg-green-100 shadow-md fixed w-full z-50 top-0">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <a href="/" class="flex items-center space-x-2">
+        <img src="image/hongschool.png" alt="홍숲쿨링" class="h-24 w-auto">
+        <span class="text-4xl font-bold text-green-700">홍숲쿨링</span>
+      </a>
+      <nav class="hidden md:flex space-x-1">
+        <a href="#" class="px-4 py-2 text-gray-700 hover:text-green-600 font-medium">이벤트</a>
+        <a href="studies.html" class="px-4 py-2 text-green-600 font-medium">모임관리</a>
+        <a href="community.html" class="px-4 py-2 text-gray-700 hover:text-green-600 font-medium">커뮤니티</a>
+        <a href="notices.html" class="px-4 py-2 text-gray-700 hover:text-green-600 font-medium">공지사항</a>
+        <a href="#" class="px-4 py-2 text-gray-700 hover:text-green-600 font-medium">마이페이지</a>
+      </nav>
+      <div class="flex items-center space-x-4">
+        <a href="login.html" class="text-gray-700 hover:text-green-600">로그인</a>
+        <a href="register.html" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">회원가입</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 메인 콘텐츠 -->
+  <main class="container mx-auto px-4 py-8">
+    <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
+      <!-- 스터디 헤더 -->
+      <div class="p-6 border-b border-gray-100">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+          <div>
+            <div class="flex items-center mb-2">
+              <span id="studyCategory" class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
+                프로그래밍
+              </span>
+              <span id="studyStatus" class="ml-2 bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
+                모집 중
+              </span>
+            </div>
+            <h1 id="studyTitle" class="text-2xl font-bold text-gray-900 mb-2">스터디 제목</h1>
+            <div class="flex items-center text-sm text-gray-500">
+              <span id="studyLeader" class="flex items-center">
+                <i class="material-icons text-sm mr-1">person</i>
+                리더: 홍길동
+              </span>
+              <span class="mx-2">•</span>
+              <span id="studyCreatedAt" class="flex items-center">
+                <i class="material-icons text-sm mr-1">schedule</i>
+                2023-11-15
+              </span>
+            </div>
+          </div>
+          <div class="mt-4 md:mt-0">
+            <button id="joinButton" class="w-full md:w-auto bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+              참여하기
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 스터디 정보 -->
+      <div class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="md:col-span-2">
+            <!-- 탭 메뉴 -->
+            <div class="border-b border-gray-200 mb-6">
+              <nav class="-mb-px flex space-x-8">
+                <a href="#" class="tab-active py-4 px-1 inline-flex items-center text-sm font-medium" data-tab="info">
+                  소개
+                </a>
+                <a href="#" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" data-tab="members">
+                  멤버 <span id="memberCount" class="ml-1 bg-gray-100 text-gray-600 py-0.5 px-2 rounded-full text-xs">0</span>
+                </a>
+                <a href="#" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" data-tab="schedule">
+                  일정
+                </a>
+              </nav>
+            </div>
+            
+            <!-- 탭 내용 -->
+            <div id="tabContent" class="prose max-w-none">
+              <!-- 소개 탭 (기본 표시) -->
+              <div id="infoTab" class="tab-pane">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">스터디 소개</h3>
+                <div id="studyDescription" class="text-gray-700 whitespace-pre-line">
+                  스터디에 대한 상세한 설명이 여기에 표시됩니다.
+                </div>
+                
+                <h3 class="text-lg font-medium text-gray-900 mt-8 mb-4">진행 방식</h3>
+                <div class="flex items-center text-gray-700 mb-2">
+                  <i class="material-icons text-green-500 mr-2">meeting_room</i>
+                  <span id="meetingType">온라인/오프라인 병행</span>
+                </div>
+                <div id="studyLocation" class="flex items-center text-gray-700 mb-4">
+                  <i class="material-icons text-green-500 mr-2">location_on</i>
+                  <span>서울시 강남구</span>
+                </div>
+                
+                <h3 class="text-lg font-medium text-gray-900 mt-8 mb-4">태그</h3>
+                <div id="studyTags" class="flex flex-wrap gap-2">
+                  <span class="bg-green-100 text-green-800 text-xs px-3 py-1 rounded-full">#JavaScript</span>
+                  <span class="bg-green-100 text-green-800 text-xs px-3 py-1 rounded-full">#프론트엔드</span>
+                </div>
+              </div>
+              
+              <!-- 멤버 탭 (숨김) -->
+              <div id="membersTab" class="tab-pane hidden">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">스터디 멤버</h3>
+                <div id="memberList" class="space-y-4">
+                  <!-- 멤버 목록이 여기에 동적으로 로드됩니다 -->
+                </div>
+              </div>
+              
+              <!-- 일정 탭 (숨김) -->
+              <div id="scheduleTab" class="tab-pane hidden">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">스터디 일정</h3>
+                <div class="bg-green-50 p-4 rounded-lg mb-4">
+                  <div class="flex items-start">
+                    <div class="flex-shrink-0 bg-green-100 p-2 rounded-full">
+                      <i class="material-icons text-green-600">event_available</i>
+                    </div>
+                    <div class="ml-3">
+                      <h4 class="text-sm font-medium text-green-800">시작일</h4>
+                      <p id="startDate" class="text-sm text-green-700">2023년 12월 1일</p>
+                    </div>
+                  </div>
+                  <div class="mt-4 flex items-start">
+                    <div class="flex-shrink-0 bg-green-100 p-2 rounded-full">
+                      <i class="material-icons text-green-600">event_busy</i>
+                    </div>
+                    <div class="ml-3">
+                      <h4 class="text-sm font-medium text-green-800">마감일</h4>
+                      <p id="deadline" class="text-sm text-green-700">2023년 11월 30일</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                  <div class="px-4 py-3 bg-gray-50 border-b border-gray-200">
+                    <h4 class="text-sm font-medium text-gray-700">정기 모임</h4>
+                  </div>
+                  <div class="p-4">
+                    <p class="text-sm text-gray-600">매주 토요일 오후 2시</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 사이드바 -->
+          <div class="md:col-span-1">
+            <div class="bg-white border border-gray-200 rounded-lg p-4 sticky top-24">
+              <h3 class="text-lg font-medium text-gray-900 mb-4">스터디 정보</h3>
+              
+              <div class="space-y-4">
+                <div>
+                  <h4 class="text-sm font-medium text-gray-500">모집 인원</h4>
+                  <p id="memberInfo" class="mt-1 text-sm text-gray-900">3/5명</p>
+                </div>
+                
+                <div>
+                  <h4 class="text-sm font-medium text-gray-500">진행 기간</h4>
+                  <p id="duration" class="mt-1 text-sm text-gray-900">8주</p>
+                </div>
+                
+                <div>
+                  <h4 class="text-sm font-medium text-gray-500">카테고리</h4>
+                  <p id="category" class="mt-1 text-sm text-gray-900">프로그래밍</p>
+                </div>
+                
+                <div>
+                  <h4 class="text-sm font-medium text-gray-500">생성일</h4>
+                  <p id="createdAt" class="mt-1 text-sm text-gray-900">2023-11-15</p>
+                </div>
+                
+                <div class="pt-4 border-t border-gray-200">
+                  <button id="reportButton" class="text-sm text-red-600 hover:text-red-800">
+                    <i class="material-icons text-sm align-middle">report</i> 신고하기
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 푸터 -->
+  <footer class="bg-green-800 text-white py-8 mt-12">
+    <div class="container mx-auto px-4 text-center">
+      <p>&copy; 2023 홍천학당. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // 스터디 ID 가져오기
+    const studyId = window.location.pathname.split('/').pop();
+    
+    // 스터디 데이터 로드
+    async function loadStudy() {
+      try {
+        const response = await fetch(`/api/studies/${studyId}`);
+        const study = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(study.message || '스터디를 불러오는 데 실패했습니다.');
+        }
+        
+        renderStudy(study);
+      } catch (error) {
+        console.error('스터디 로드 오류:', error);
+        alert(error.message);
+      }
+    }
+    
+    // 스터디 정보 렌더링
+    function renderStudy(study) {
+      // 기본 정보
+      document.title = `${study.title} - 홍천학당`;
+      document.getElementById('studyTitle').textContent = study.title;
+      document.getElementById('studyDescription').textContent = study.description;
+      document.getElementById('studyCategory').textContent = study.category;
+      document.getElementById('category').textContent = study.category;
+      document.getElementById('studyStatus').textContent = study.status === 'recruiting' ? '모집 중' : '진행 중';
+      
+      // 날짜 포맷팅
+      const formatDate = (dateString) => {
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        return new Date(dateString).toLocaleDateString('ko-KR', options);
+      };
+      
+      // 날짜 정보
+      document.getElementById('startDate').textContent = formatDate(study.startDate);
+      document.getElementById('deadline').textContent = formatDate(study.deadline);
+      document.getElementById('createdAt').textContent = new Date(study.createdAt).toISOString().split('T')[0];
+      
+      // 멤버 정보
+      const memberCount = study.currentMembers?.length || 0;
+      document.getElementById('memberCount').textContent = memberCount;
+      document.getElementById('memberInfo').textContent = `${memberCount}/${study.maxMembers}명`;
+      
+      // 진행 기간
+      document.getElementById('duration').textContent = `${study.duration}주`;
+      
+      // 진행 방식
+      const meetingTypeText = {
+        'online': '온라인',
+        'offline': '오프라인',
+        'both': '온라인/오프라인 병행'
+      };
+      document.getElementById('meetingType').textContent = meetingTypeText[study.meetingType] || study.meetingType;
+      
+      // 위치 정보
+      if (study.location) {
+        document.getElementById('studyLocation').innerHTML = `
+          <i class="material-icons text-green-500 mr-2">location_on</i>
+          <span>${study.location}</span>
+        `;
+      }
+      
+      // 태그
+      if (study.tags && study.tags.length > 0) {
+        const tagsHtml = study.tags.map(tag => 
+          `<span class="bg-green-100 text-green-800 text-xs px-3 py-1 rounded-full">#${tag}</span>`
+        ).join('');
+        document.getElementById('studyTags').innerHTML = tagsHtml;
+      }
+      
+      // 리더 정보
+      if (study.leader) {
+        document.getElementById('studyLeader').innerHTML = `
+          <i class="material-icons text-sm mr-1">person</i>
+          리더: ${study.leader.nickname || '익명'}
+        `;
+      }
+    }
+    
+    // 탭 전환
+    function setupTabs() {
+      const tabs = document.querySelectorAll('[data-tab]');
+      const tabPanes = document.querySelectorAll('.tab-pane');
+      
+      tabs.forEach(tab => {
+        tab.addEventListener('click', (e) => {
+          e.preventDefault();
+          const targetTab = tab.getAttribute('data-tab');
+          
+          // 탭 활성화
+          tabs.forEach(t => t.classList.remove('tab-active', 'text-green-600', 'border-green-500'));
+          tab.classList.add('tab-active', 'text-green-600', 'border-green-500');
+          
+          // 탭 내용 표시
+          tabPanes.forEach(pane => pane.classList.add('hidden'));
+          document.getElementById(`${targetTab}Tab`).classList.remove('hidden');
+        });
+      });
+    }
+    
+    // 참여하기 버튼 이벤트
+    async function handleJoin() {
+      try {
+        const response = await fetch(`/api/studies/${studyId}/join`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include'
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.message || '스터디 참여에 실패했습니다.');
+        }
+        
+        alert('스터디에 참여하셨습니다!');
+        window.location.reload();
+      } catch (error) {
+        console.error('스터디 참여 오류:', error);
+        alert(error.message || '스터디 참여 중 오류가 발생했습니다.');
+      }
+    }
+    
+    // 초기화
+    document.addEventListener('DOMContentLoaded', () => {
+      loadStudy();
+      setupTabs();
+      
+      // 참여하기 버튼 이벤트 리스너
+      const joinButton = document.getElementById('joinButton');
+      if (joinButton) {
+        joinButton.addEventListener('click', handleJoin);
+      }
+    });
+  </script>
+</body>
+</html>

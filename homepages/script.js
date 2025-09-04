@@ -307,6 +307,52 @@ body {
       const eventsHTML = sampleEvents.map(event => createEventCard(event)).join('');
       eventsContainer.innerHTML = eventsHTML;
     }
+    
+    // 로그인/회원가입 버튼 이벤트 핸들러
+    const loginBtn = document.getElementById('loginBtn');
+    if (loginBtn) {
+      loginBtn.addEventListener('click', function() {
+        window.location.href = '/login.html';
+      });
+    }
+
+    const registerBtn = document.getElementById('registerBtn');
+    if (registerBtn) {
+      registerBtn.addEventListener('click', function() {
+        window.location.href = '/register.html';
+      });
+    }
+
+    // 드롭다운 메뉴 토글
+    const dropdowns = document.querySelectorAll('.dropdown');
+    dropdowns.forEach(dropdown => {
+      const button = dropdown.querySelector('button');
+      const menu = dropdown.querySelector('.dropdown-menu');
+      
+      button.addEventListener('click', () => {
+        const isOpen = menu.style.display === 'block';
+        menu.style.display = isOpen ? 'none' : 'block';
+      });
+      
+      // 외부 클릭 시 드롭다운 닫기
+      document.addEventListener('click', (e) => {
+        if (!dropdown.contains(e.target)) {
+          menu.style.display = 'none';
+        }
+      });
+    });
+
+    // 모바일 메뉴 토글
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    
+    if (mobileMenuBtn && mobileMenu) {
+      mobileMenuBtn.addEventListener('click', () => {
+        const isOpen = mobileMenu.classList.contains('hidden');
+        mobileMenu.classList.toggle('hidden', !isOpen);
+        mobileMenu.classList.toggle('block', isOpen);
+      });
+    }
   });
   
   // 스크롤 시 헤더 색상 변경
@@ -319,4 +365,177 @@ body {
       header.style.background = 'white';
       header.style.backdropFilter = 'none';
     }
+  });
+  
+  // 현재 사용자 정보 가져오기
+  async function fetchCurrentUser() {
+    try {
+      const response = await fetch('/api/current-user', {
+        credentials: 'include'
+      });
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('사용자 정보를 가져오는 중 오류 발생:', error);
+      return { isAuthenticated: false };
+    }
+  }
+
+  // 로그아웃 처리
+  async function handleLogout() {
+    try {
+      const response = await fetch('/api/logout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        window.location.href = '/';
+      } else {
+        alert('로그아웃 중 오류가 발생했습니다.');
+      }
+    } catch (error) {
+      console.error('로그아웃 오류:', error);
+      alert('로그아웃 중 오류가 발생했습니다.');
+    }
+  }
+
+  // 날짜 포맷팅 함수
+  function formatDate(dateString) {
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString('ko-KR', options);
+  }
+
+  // 이벤트 카드 생성 함수 (데이터 바인딩용)
+  function createEventCard(event) {
+    return `
+      <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+        <div class="h-48 bg-gray-200 relative">
+          <img src="${event.image}" alt="${event.title}" class="w-full h-full object-cover">
+          ${event.badge ? `<span class="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded">${event.badge}</span>` : ''}
+        </div>
+        <div class="p-4">
+          <div class="text-sm text-gray-500 mb-1">${event.date}</div>
+          <h3 class="font-bold text-lg mb-2">${event.title}</h3>
+          <p class="text-gray-600 text-sm mb-4">${event.description}</p>
+          <div class="flex justify-between items-center">
+            <span class="text-red-600 font-bold">${event.price === 0 ? '무료' : `₩${event.price.toLocaleString()}`}</span>
+            <span class="text-sm text-gray-500">신청 ${event.participants}/${event.maxParticipants}</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // 인기 행사 로드 함수
+  async function loadPopularEvents() {
+    try {
+      const eventsContainer = document.getElementById('events-container');
+      if (!eventsContainer) return;
+
+      // 실제로는 API를 통해 데이터를 가져옵니다.
+      // 여기서는 예시 데이터를 사용합니다.
+      const sampleEvents = [
+        {
+          id: 1,
+          title: '웹 개발 입문 워크샵',
+          description: 'HTML, CSS, JavaScript 기초부터 배우는 웹 개발 입문 과정',
+          date: '2023.11.10 ~ 2023.11.12',
+          price: 0,
+          participants: 15,
+          maxParticipants: 30,
+          badge: '마감임박',
+          image: 'https://picsum.photos/400/300?random=1'
+        },
+        // 추가 이벤트 데이터...
+      ];
+      
+      const eventsHTML = sampleEvents.map(event => createEventCard(event)).join('');
+      eventsContainer.innerHTML = eventsHTML;
+    } catch (error) {
+      console.error('이벤트를 불러오는 중 오류 발생:', error);
+    }
+  }
+
+  // 페이지 로드 시 실행
+  document.addEventListener('DOMContentLoaded', async () => {
+    // 로그인/회원가입 버튼 이벤트 핸들러
+    const loginBtn = document.getElementById('loginBtn');
+    if (loginBtn) {
+      loginBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.location.href = 'login.html';
+      });
+    }
+
+    const registerBtn = document.getElementById('registerBtn');
+    if (registerBtn) {
+      registerBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.location.href = 'register.html';
+      });
+    }
+
+    // 드롭다운 메뉴 토글
+    const dropdowns = document.querySelectorAll('.dropdown');
+    dropdowns.forEach(dropdown => {
+      const button = dropdown.querySelector('button');
+      const menu = dropdown.querySelector('.dropdown-menu');
+      
+      button.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = menu.style.display === 'block';
+        menu.style.display = isOpen ? 'none' : 'block';
+      });
+      
+      // 외부 클릭 시 드롭다운 닫기
+      document.addEventListener('click', (e) => {
+        if (!dropdown.contains(e.target)) {
+          menu.style.display = 'none';
+        }
+      });
+    });
+
+    // 모바일 메뉴 토글
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    
+    if (mobileMenuBtn && mobileMenu) {
+      mobileMenuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = mobileMenu.classList.contains('hidden');
+        mobileMenu.classList.toggle('hidden', !isOpen);
+        mobileMenu.classList.toggle('block', isOpen);
+      });
+    }
+
+    // 현재 로그인 상태 확인 및 UI 업데이트
+    const authButtons = document.getElementById('auth-buttons');
+    const userMenu = document.getElementById('userMenu');
+    
+    if (authButtons && userMenu) {
+      const { isAuthenticated, user } = await fetchCurrentUser();
+      
+      if (isAuthenticated && user) {
+        // 로그인 상태일 때
+        authButtons.classList.add('hidden');
+        userMenu.classList.remove('hidden');
+        
+        const userNickname = document.getElementById('userNickname');
+        if (userNickname) {
+          userNickname.textContent = user.nickname || user.username;
+        }
+      } else {
+        // 비로그인 상태일 때
+        authButtons.classList.remove('hidden');
+        userMenu.classList.add('hidden');
+      }
+    }
+    
+    // 인기 행사 로드
+    loadPopularEvents();
   });
