@@ -8,7 +8,7 @@ const path = require('path');
 
 // Express 앱 생성
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 
 // MongoDB 연결
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/hongcheon-academy', {
