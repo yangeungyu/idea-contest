@@ -1,0 +1,133 @@
+<!-- 좌측 사이드바 -->
+<aside class="fixed left-0 top-0 h-full bg-white text-gray-700 shadow-lg z-50 transform -translate-x-full lg:translate-x-0 transition-all duration-300" id="sidebar">
+  <!-- 로고 섹션 -->
+  <div class="p-4 border-b border-gray-100">
+    <button id="sidebarToggle" class="flex items-center w-full hover:bg-gray-50 rounded-lg p-2 transition-colors">
+      <div class="flex-shrink-0">
+        <img src="image/logo.png" alt="홍숲쿨링" class="w-10 h-10 object-contain">
+      </div>
+      <div class="ml-3 text-left sidebar-text opacity-0 transition-opacity duration-300">
+        <h1 class="text-lg font-semibold text-gray-900">홍숲쿨링</h1>
+        <p class="text-xs text-gray-500">배움의 공간</p>
+      </div>
+      <div class="ml-auto sidebar-text opacity-0 transition-opacity duration-300">
+        <span class="material-icons text-gray-400 sidebar-arrow">chevron_left</span>
+      </div>
+    </button>
+  </div>
+  
+  <!-- 메뉴 섹션 -->
+  <nav class="p-4">
+    <ul class="space-y-2">
+      <li>
+        <a href="index.html" class="flex items-center p-3 rounded-lg hover:bg-[#168d63] hover:text-white transition-colors group" data-page="index">
+          <span class="material-icons text-2xl flex-shrink-0">home</span>
+          <span class="ml-3 sidebar-text opacity-0 transition-opacity duration-300">홈</span>
+        </a>
+      </li>
+      <li>
+        <a href="create-meeting.html" class="flex items-center p-3 rounded-lg hover:bg-[#168d63] hover:text-white transition-colors group">
+          <span class="material-icons text-2xl flex-shrink-0">event</span>
+          <span class="ml-3 sidebar-text opacity-0 transition-opacity duration-300">새 모임 만들기</span>
+        </a>
+      </li>
+      <li>
+        <a href="community.html" class="flex items-center p-3 rounded-lg hover:bg-[#168d63] hover:text-white transition-colors group" data-page="community">
+          <span class="material-icons text-2xl flex-shrink-0">groups</span>
+          <span class="ml-3 sidebar-text opacity-0 transition-opacity duration-300">커뮤니티</span>
+        </a>
+      </li>
+      <li>
+        <a href="studies.html" class="flex items-center p-3 rounded-lg hover:bg-[#168d63] hover:text-white transition-colors group" data-page="studies">
+          <span class="material-icons text-2xl flex-shrink-0">chat_bubble</span>
+          <span class="ml-3 sidebar-text opacity-0 transition-opacity duration-300">내 모임 관리</span>
+        </a>
+      </li>
+      <li>
+        <a href="notices.html" class="flex items-center p-3 rounded-lg hover:bg-[#168d63] hover:text-white transition-colors group" data-page="notices">
+          <span class="material-icons text-2xl flex-shrink-0">campaign</span>
+          <span class="ml-3 sidebar-text opacity-0 transition-opacity duration-300">공지사항</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+</aside>
+
+<!-- 사이드바 오버레이 (모바일) -->
+<div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden hidden"></div>
+
+<style>
+  /* 사이드바 기본 상태 (접힌 상태) */
+  #sidebar {
+    width: 80px;
+    overflow: hidden;
+  }
+  
+  /* 사이드바 확장 상태 */
+  #sidebar.expanded {
+    width: 280px;
+  }
+  
+  /* 텍스트 기본 상태 (숨김) */
+  .sidebar-text {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    white-space: nowrap;
+  }
+  
+  /* 텍스트 표시 (확장 시) */
+  #sidebar.expanded .sidebar-text {
+    opacity: 1;
+  }
+  
+  /* 화살표 회전 */
+  .sidebar-arrow {
+    transition: transform 0.3s ease;
+  }
+  
+  #sidebar.expanded .sidebar-arrow {
+    transform: rotate(180deg);
+  }
+  
+  /* 모바일에서는 항상 확장된 상태로 표시 */
+  @media (max-width: 1023px) {
+    #sidebar {
+      width: 280px;
+    }
+    #sidebar .sidebar-text {
+      opacity: 1;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    
+    // 사이드바 토글 기능
+    if (sidebarToggle) {
+      sidebarToggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        sidebar.classList.toggle('expanded');
+        console.log('사이드바 토글:', sidebar.classList.contains('expanded'));
+      });
+    }
+    
+    // 데스크톱에서만 마우스 호버 기능
+    if (window.innerWidth >= 1024) {
+      let hoverTimeout;
+      
+      sidebar.addEventListener('mouseenter', function() {
+        clearTimeout(hoverTimeout);
+        sidebar.classList.add('expanded');
+      });
+      
+      sidebar.addEventListener('mouseleave', function() {
+        hoverTimeout = setTimeout(() => {
+          sidebar.classList.remove('expanded');
+        }, 200);
+      });
+    }
+  });
+</script>

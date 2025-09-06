@@ -14,6 +14,13 @@ const PORT = process.env.PORT || 3000;
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/hongcheon-academy', {
   useNewUrlParser: true,
   useUnifiedTopology: true
+})
+.then(() => {
+  console.log('MongoDB에 성공적으로 연결되었습니다.');
+})
+.catch((error) => {
+  console.error('MongoDB 연결 오류:', error);
+  console.log('MongoDB 연결에 실패했지만 서버는 계속 실행됩니다.');
 });
 
 // MongoDB 스토어 설정
@@ -39,16 +46,17 @@ app.use(session({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// 뷰 엔진 설정
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
+// 뷰 엔진 설정 (현재 사용하지 않으므로 주석 처리)
+// app.set('view engine', 'ejs');
+// app.set('views', path.join(__dirname, 'views'));
 
 // 사용자 모델
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  nickname: { type: String, required: true },
-  createdAt: { type: Date, default: Date.now }
+  name: { type: String, required: true },
+  email: { type: String },
+  registrationDate: { type: Date, default: Date.now }
 });
 
 // 스터디 모델
@@ -113,9 +121,9 @@ const isAuthenticated = (req, res, next) => {
   }
 };
 
-// 라우트
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+// 마이페이지
+app.get('/mypage', isAuthenticated, (req, res) => {
+  res.sendFile(path.join(__dirname, 'mypage.html'));
 });
 
 // 로그인 페이지
@@ -144,7 +152,9 @@ app.post('/api/login', async (req, res) => {
     req.session.user = {
       id: user._id,
       username: user.username,
-      nickname: user.nickname
+      name: user.name,
+      email: user.email,
+      registrationDate: user.registrationDate
     };
     
     res.json({ success: true, user: req.session.user });
@@ -165,19 +175,21 @@ app.get('/register', (req, res) => {
 // 회원가입 처리
 app.post('/api/register', async (req, res) => {
   try {
-    const { username, password, nickname } = req.body;
+    const { username, password, name } = req.body;
+    
+    console.log('회원가입 요청 데이터:', { username, password: '***', name });
     
     // 유효성 검사
-    if (!username || !password || !nickname) {
+    if (!username || !password || !name) {
       return res.status(400).json({ success: false, message: '모든 필드를 입력해주세요.' });
     }
     
     // 중복 사용자 확인
-    const existingUser = await User.findOne({ $or: [{ username }, { nickname }] });
+    const existingUser = await User.findOne({ $or: [{ username }, { name }] });
     if (existingUser) {
       return res.status(400).json({ 
         success: false, 
-        message: existingUser.username === username ? '이미 사용 중인 아이디입니다.' : '이미 사용 중인 닉네임입니다.'
+        message: existingUser.username === username ? '이미 사용 중인 아이디입니다.' : '이미 사용 중인 이름입니다.'
       });
     }
     
@@ -189,7 +201,7 @@ app.post('/api/register', async (req, res) => {
     const user = new User({
       username,
       password: hashedPassword,
-      nickname
+      name
     });
     
     await user.save();
@@ -198,7 +210,9 @@ app.post('/api/register', async (req, res) => {
     req.session.user = {
       id: user._id,
       username: user.username,
-      nickname: user.nickname
+      name: user.name,
+      email: user.email,
+      registrationDate: user.registrationDate
     };
     
     res.json({ success: true, user: req.session.user });
@@ -232,6 +246,68 @@ app.get('/api/current-user', (req, res) => {
   }
 });
 
+// 프로필 업데이트
+app.put('/api/profile', isAuthenticated, async (req, res) => {
+  try {
+    const userId = req.session.user.id;
+    const { name, email, currentPassword, newPassword } = req.body;
+    
+    // 기본 유효성 검사
+    if (!name) {
+      return res.status(400).json({ success: false, message: '이름을 입력해주세요.' });
+    }
+    
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: '사용자를 찾을 수 없습니다.' });
+    }
+    
+    // 비밀번호 변경 요청이 있는 경우
+    if (newPassword) {
+      if (!currentPassword) {
+        return res.status(400).json({ success: false, message: '현재 비밀번호를 입력해주세요.' });
+      }
+      
+      // 현재 비밀번호 확인
+      const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
+      if (!isCurrentPasswordValid) {
+        return res.status(400).json({ success: false, message: '현재 비밀번호가 일치하지 않습니다.' });
+      }
+      
+      // 새 비밀번호 해싱
+      const salt = await bcrypt.genSalt(10);
+      const hashedNewPassword = await bcrypt.hash(newPassword, salt);
+      user.password = hashedNewPassword;
+    }
+    
+    // 프로필 정보 업데이트
+    user.name = name;
+    if (email !== undefined) {
+      user.email = email;
+    }
+    
+    await user.save();
+    
+    // 세션 정보 업데이트
+    req.session.user = {
+      id: user._id,
+      username: user.username,
+      name: user.name,
+      email: user.email,
+      registrationDate: user.registrationDate
+    };
+    
+    res.json({ 
+      success: true, 
+      message: '프로필이 성공적으로 업데이트되었습니다.',
+      user: req.session.user
+    });
+  } catch (error) {
+    console.error('프로필 업데이트 오류:', error);
+    res.status(500).json({ success: false, message: '프로필 업데이트 중 오류가 발생했습니다.' });
+  }
+});
+
 // 스터디 생성
 app.post('/api/studies', isAuthenticated, async (req, res) => {
   try {
@@ -245,10 +321,19 @@ app.post('/api/studies', isAuthenticated, async (req, res) => {
     const studyData = {
       ...req.body,
       leader: userId,
-      currentMembers: [userId],
-      deadline: new Date(req.body.deadline),
-      startDate: new Date(req.body.startDate)
+      currentMembers: [userId]
     };
+    
+    // 날짜 필드가 있는 경우에만 변환
+    if (req.body.deadline) {
+      studyData.deadline = new Date(req.body.deadline);
+    }
+    if (req.body.startDate) {
+      studyData.startDate = new Date(req.body.startDate);
+    }
+    if (req.body.endDate) {
+      studyData.endDate = new Date(req.body.endDate);
+    }
 
     const study = new Study(studyData);
     await study.save();
@@ -259,7 +344,8 @@ app.post('/api/studies', isAuthenticated, async (req, res) => {
     });
   } catch (error) {
     console.error('스터디 생성 오류:', error);
-    res.status(500).json({ message: '스터디 생성 중 오류가 발생했습니다.' });
+    console.error('요청 데이터:', req.body);
+    res.status(500).json({ message: '스터디 생성 중 오류가 발생했습니다.', error: error.message });
   }
 });
 
@@ -280,7 +366,7 @@ app.get('/api/studies', async (req, res) => {
     }
 
     const studies = await Study.find(query)
-      .populate('leader', 'nickname')
+      .populate('leader', 'name')
       .sort({ createdAt: -1 })
       .limit(limit * 1)
       .skip((page - 1) * limit)
@@ -303,8 +389,8 @@ app.get('/api/studies', async (req, res) => {
 app.get('/api/studies/:id', async (req, res) => {
   try {
     const study = await Study.findById(req.params.id)
-      .populate('leader', 'nickname')
-      .populate('currentMembers', 'nickname');
+      .populate('leader', 'name')
+      .populate('currentMembers', 'name');
     
     if (!study) {
       return res.status(404).json({ message: '스터디를 찾을 수 없습니다.' });
@@ -360,7 +446,7 @@ app.get('/api/notices', async (req, res) => {
     }
 
     const notices = await Notice.find(query)
-      .populate('author', 'nickname')
+      .populate('author', 'name')
       .sort({ createdAt: -1 })
       .limit(limit * 1)
       .skip((page - 1) * limit)
@@ -379,11 +465,37 @@ app.get('/api/notices', async (req, res) => {
   }
 });
 
+// 공지사항 작성
+app.post('/api/notices', isAuthenticated, async (req, res) => {
+  try {
+    const { title, content, category, isPinned } = req.body;
+    
+    if (!title || !content || !category) {
+      return res.status(400).json({ message: '제목, 내용, 카테고리는 필수입니다.' });
+    }
+    
+    const notice = new Notice({
+      title,
+      content,
+      category,
+      isPinned: isPinned || false,
+      author: req.session.user.id
+    });
+    
+    await notice.save();
+    
+    res.json({ success: true, notice });
+  } catch (error) {
+    console.error('공지사항 작성 오류:', error);
+    res.status(500).json({ message: '공지사항 작성 중 오류가 발생했습니다.' });
+  }
+});
+
 // 공지사항 상세 조회
 app.get('/api/notices/:id', async (req, res) => {
   try {
     const notice = await Notice.findById(req.params.id)
-      .populate('author', 'nickname');
+      .populate('author', 'name');
     
     if (!notice) {
       return res.status(404).json({ message: '공지사항을 찾을 수 없습니다.' });
@@ -411,7 +523,7 @@ app.get('/api/community/posts', async (req, res) => {
     }
 
     const posts = await CommunityPost.find(query)
-      .populate('author', 'nickname')
+      .populate('author', 'name')
       .sort({ createdAt: -1 })
       .limit(limit * 1)
       .skip((page - 1) * limit)
@@ -434,7 +546,7 @@ app.get('/api/community/posts', async (req, res) => {
 app.get('/api/community/posts/:id', async (req, res) => {
   try {
     const post = await CommunityPost.findById(req.params.id)
-      .populate('author', 'nickname');
+      .populate('author', 'name');
     
     if (!post) {
       return res.status(404).json({ message: '게시글을 찾을 수 없습니다.' });
@@ -472,6 +584,56 @@ app.post('/api/community/posts', isAuthenticated, async (req, res) => {
   } catch (error) {
     console.error('게시글 작성 오류:', error);
     res.status(500).json({ message: '게시글 작성 중 오류가 발생했습니다.' });
+  }
+});
+
+// 모임 탈퇴
+app.post('/api/studies/:id/leave', isAuthenticated, async (req, res) => {
+  try {
+    const study = await Study.findById(req.params.id);
+    const userId = req.session.user.id;
+
+    if (!study) {
+      return res.status(404).json({ message: '모임을 찾을 수 없습니다.' });
+    }
+
+    if (!study.currentMembers.includes(userId)) {
+      return res.status(400).json({ message: '참가하지 않은 모임입니다.' });
+    }
+
+    if (study.leader.toString() === userId) {
+      return res.status(400).json({ message: '모임 리더는 탈퇴할 수 없습니다.' });
+    }
+
+    study.currentMembers = study.currentMembers.filter(memberId => memberId.toString() !== userId);
+    await study.save();
+
+    res.json({ message: '모임에서 성공적으로 탈퇴했습니다.' });
+  } catch (error) {
+    console.error('모임 탈퇴 오류:', error);
+    res.status(500).json({ message: '모임 탈퇴 중 오류가 발생했습니다.' });
+  }
+});
+
+// 모임 삭제
+app.delete('/api/studies/:id', isAuthenticated, async (req, res) => {
+  try {
+    const study = await Study.findById(req.params.id);
+    const userId = req.session.user.id;
+
+    if (!study) {
+      return res.status(404).json({ message: '모임을 찾을 수 없습니다.' });
+    }
+
+    if (study.leader.toString() !== userId) {
+      return res.status(403).json({ message: '모임 리더만 삭제할 수 있습니다.' });
+    }
+
+    await Study.findByIdAndDelete(req.params.id);
+    res.json({ message: '모임이 성공적으로 삭제되었습니다.' });
+  } catch (error) {
+    console.error('모임 삭제 오류:', error);
+    res.status(500).json({ message: '모임 삭제 중 오류가 발생했습니다.' });
   }
 });
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>홍천학당 - 배움의 공간</title>
+  <title>홍숲쿨링 - 배움의 공간</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -37,126 +37,221 @@
     }
   </style>
 </head>
-<body class="bg-green-100">
-  <!-- 헤더 -->
-  <header class="bg-green-200 shadow-md fixed w-full z-50 top-0">
-    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-      <a href="/" class="flex items-center space-x-2">
-        <img src="image/hongschool.png" alt="홍숲쿨링" class="h-24 w-auto">
-        <span class="text-4xl font-bold text-green-700">홍숲쿨링</span>
-      </a>
-      
-      <!-- 왼쪽 메뉴 -->
-      <nav class="hidden md:flex space-x-1">
-        <a href="#" class="px-4 py-2 text-gray-700 hover:text-green-600 font-medium">이벤트</a>
-        <a href="studies.html" class="px-4 py-2 text-green-600 font-medium">모임관리</a>
-        <a href="community.html" class="px-4 py-2 text-gray-700 hover:text-green-600 font-medium">커뮤니티</a>
-        <a href="notices.html" class="px-4 py-2 text-gray-700 hover:text-green-600 font-medium">공지사항</a>
-        <a href="#" class="px-4 py-2 text-gray-700 hover:text-green-600 font-medium">마이페이지</a>
-      </nav>
-      
-      <!-- 오른쪽 로그인/회원가입 -->
-      <div class="flex items-center space-x-4">
-        <div id="auth-buttons" class="flex items-center space-x-4">
-          <a href="login.html" id="loginBtn" class="text-gray-700 hover:text-green-600">로그인</a>
-          <a href="register.html" id="registerBtn" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">회원가입</a>
-        </div>
-        <!-- 로그인 시 표시될 프로필 메뉴 -->
-        <div id="userMenu" class="hidden dropdown relative">
-          <button class="flex items-center space-x-2 focus:outline-none">
-            <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
-              <span class="material-icons text-gray-600">person</span>
-            </div>
-            <span id="userNickname" class="text-gray-700">사용자이름</span>
-            <span class="material-icons text-gray-500">arrow_drop_down</span>
+<body class="bg-gray-50 flex" data-page="index">
+  <!-- 메인 콘텐츠 영역 -->
+  <div class="flex-1 lg:ml-20">
+    <!-- 상단 헤더 -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+      <div class="px-4 py-3 flex justify-between items-center">
+        <div class="flex items-center">
+          <button id="mobileMenuBtn" class="text-gray-600 hover:text-gray-900 lg:hidden mr-3">
+            <span class="material-icons text-2xl">menu</span>
           </button>
-          <div class="dropdown-menu absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10" style="display: none;">
-            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">마이페이지</a>
-            <a href="#" onclick="handleLogout()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">로그아웃</a>
+        </div>
+        
+        <!-- 로그인/회원가입 버튼 -->
+        <div class="flex items-center space-x-4">
+          <div id="auth-buttons" class="flex items-center space-x-4">
+            <a href="login.html" class="text-gray-700 hover:text-[#168d63] transition-colors">로그인</a>
+            <a href="register.html" class="bg-[#168d63] text-white px-4 py-2 rounded-md hover:bg-[#0f6b4a] transition-colors">회원가입</a>
+          </div>
+          <!-- 로그인 시 표시될 프로필 메뉴 -->
+          <div id="userMenu" class="hidden dropdown relative">
+            <button class="flex items-center space-x-2 focus:outline-none">
+              <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
+                <span class="material-icons text-gray-600">person</span>
+              </div>
+              <span id="userName" class="text-gray-700">사용자이름</span>
+              <span class="material-icons text-gray-500">arrow_drop_down</span>
+            </button>
+            <div class="dropdown-menu absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10" style="display: none;">
+              <a href="mypage.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">마이페이지</a>
+              <a href="#" onclick="handleLogout()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">로그아웃</a>
+            </div>
           </div>
         </div>
       </div>
-      
-      <!-- 모바일 메뉴 버튼 -->
-      <button id="mobileMenuBtn" class="md:hidden text-gray-700">
-        <span class="material-icons text-2xl">menu</span>
-      </button>
-    </div>
-    
-    <!-- 모바일 메뉴 -->
-    <div id="mobileMenu" class="md:hidden hidden bg-white border-t">
-      <div class="container mx-auto px-4 py-2 flex flex-col">
-        <a href="#" class="px-4 py-3 text-gray-700 hover:bg-gray-50">행사</a>
-        <a href="#" class="px-4 py-3 text-gray-700 hover:bg-gray-50">모임</a>
-        <a href="#" class="px-4 py-3 text-gray-700 hover:bg-gray-50">커뮤니티</a>
-        <a href="#" class="px-4 py-3 text-gray-700 hover:bg-gray-50">강의</a>
-        <a href="#" class="px-4 py-3 text-gray-700 hover:bg-gray-50">공지사항</a>
-      </div>
-    </div>
-  </header>
+    </header>
 
   <!-- 메인 배너 -->
-  <section class="relative bg-green-800 text-white">
-    <div class="container mx-auto px-4 py-20 flex flex-col items-center text-center">
-      <h1 class="text-4xl md:text-5xl font-bold mb-6">홍천에서 만나는 특별한 배움</h1>
-      <p class="text-xl mb-8 max-w-2xl">군 장병과 지역민이 함께하는 다양한 교육 프로그램을 만나보세요</p>
+  <section class="relative bg-white border-b border-gray-100">
+    <div class="container mx-auto px-4 py-24 flex flex-col items-center text-center">
+      <h1 class="text-5xl md:text-6xl font-light text-gray-900 mb-6 tracking-tight">홍천에서 만나는<br>특별한 배움</h1>
+      <p class="text-lg text-gray-600 mb-12 max-w-2xl leading-relaxed">군 장병과 지역민이 함께하는 다양한 교육 프로그램을 만나보세요</p>
       <div class="w-full max-w-2xl relative">
-        <input type="text" placeholder="어떤 행사를 찾고 계신가요?" class="w-full px-6 py-4 rounded-full text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-500">
-        <button class="absolute right-2 top-2 bg-red-600 text-white px-6 py-2 rounded-full hover:bg-red-700">검색</button>
+        <input type="text" placeholder="어떤 행사를 찾고 계신가요?" class="w-full px-6 py-4 rounded-lg text-gray-800 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#168d63] focus:border-transparent transition-all">
+        <button class="absolute right-2 top-2 bg-[#168d63] text-white px-6 py-2 rounded-md hover:bg-[#0f6b4a] transition-colors">
+          <span class="material-icons">search</span>
+        </button>
       </div>
     </div>
   </section>
 
   <!-- 인기 행사 -->
-  <section class="py-16 bg-green-200">
+  <section class="py-20 bg-white">
     <div class="container mx-auto px-4">
-      <div class="flex justify-between items-center mb-8">
-        <h2 class="text-2xl font-bold">인기 행사</h2>
-        <a href="#" class="text-red-600 hover:underline">더보기</a>
+      <div class="flex justify-between items-center mb-12">
+        <h2 class="text-3xl font-light text-gray-900">인기 행사</h2>
+        <a href="#" class="text-[#168d63] hover:text-[#0f6b4a] font-medium transition-colors flex items-center">
+          더보기 <span class="material-icons ml-1">arrow_forward</span>
+        </a>
       </div>
-      <div id="events-container" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- 동적으로 생성될 이벤트 카드들이 여기에 표시됩니다 -->
+      <div id="events-container" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- 샘플 카드 -->
+        <div class="group bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-xl hover:border-[#168d63] transition-all duration-300 cursor-pointer">
+          <div class="aspect-video bg-gray-100 overflow-hidden">
+            <img src="https://picsum.photos/400/225?random=1" alt="행사 이미지" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+          </div>
+          <div class="p-6">
+            <div class="flex items-center justify-between mb-3">
+              <span class="px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full">교육/강연</span>
+              <span class="text-sm text-gray-500">2024.12.15</span>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2 group-hover:text-[#168d63] transition-colors">프로그래밍 기초 강좌</h3>
+            <p class="text-gray-600 text-sm mb-4 line-clamp-2">초보자를 위한 프로그래밍 기초 강좌입니다. 실습 위주로 진행됩니다.</p>
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-500">참가자 24명</span>
+              <span class="text-[#168d63] font-medium">무료</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="group bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-xl hover:border-[#168d63] transition-all duration-300 cursor-pointer">
+          <div class="aspect-video bg-gray-100 overflow-hidden">
+            <img src="https://picsum.photos/400/225?random=2" alt="행사 이미지" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+          </div>
+          <div class="p-6">
+            <div class="flex items-center justify-between mb-3">
+              <span class="px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full">문화/예술</span>
+              <span class="text-sm text-gray-500">2024.12.20</span>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2 group-hover:text-[#168d63] transition-colors">전통 서예 체험</h3>
+            <p class="text-gray-600 text-sm mb-4 line-clamp-2">전통 서예의 아름다움을 직접 체험해보는 시간을 가져보세요.</p>
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-500">참가자 15명</span>
+              <span class="text-[#168d63] font-medium">5,000원</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="group bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-xl hover:border-[#168d63] transition-all duration-300 cursor-pointer">
+          <div class="aspect-video bg-gray-100 overflow-hidden">
+            <img src="https://picsum.photos/400/225?random=3" alt="행사 이미지" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+          </div>
+          <div class="p-6">
+            <div class="flex items-center justify-between mb-3">
+              <span class="px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full">스포츠</span>
+              <span class="text-sm text-gray-500">2024.12.25</span>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2 group-hover:text-[#168d63] transition-colors">배드민턴 동호회</h3>
+            <p class="text-gray-600 text-sm mb-4 line-clamp-2">함께 운동하며 건강한 취미생활을 만들어가요.</p>
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-500">참가자 32명</span>
+              <span class="text-[#168d63] font-medium">무료</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
   <!-- 카테고리 -->
-  <section class="py-16 bg-green-100">
+  <section class="py-20 bg-gray-50">
     <div class="container mx-auto px-4">
-      <h2 class="text-2xl font-bold mb-8">카테고리</h2>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <a href="#" class="category-card">
-          <div class="bg-white p-6 rounded-lg shadow-sm text-center hover:shadow-md">
-            <span class="material-icons text-4xl text-red-500 mb-2">school</span>
-            <h3 class="font-medium">교육/강연</h3>
+      <h2 class="text-3xl font-light text-gray-900 mb-12 text-center">카테고리</h2>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <a href="#" class="group">
+          <div class="bg-white p-8 rounded-xl border border-gray-100 text-center hover:shadow-lg hover:border-[#168d63] transition-all duration-300">
+            <span class="material-icons text-5xl text-gray-400 group-hover:text-[#168d63] mb-4 transition-colors">school</span>
+            <h3 class="font-medium text-gray-900 group-hover:text-[#168d63] transition-colors">교육/강연</h3>
           </div>
         </a>
-        <!-- 다른 카테고리들도 유사하게 추가 -->
+        <a href="#" class="group">
+          <div class="bg-white p-8 rounded-xl border border-gray-100 text-center hover:shadow-lg hover:border-[#168d63] transition-all duration-300">
+            <span class="material-icons text-5xl text-gray-400 group-hover:text-[#168d63] mb-4 transition-colors">palette</span>
+            <h3 class="font-medium text-gray-900 group-hover:text-[#168d63] transition-colors">문화/예술</h3>
+          </div>
+        </a>
+        <a href="#" class="group">
+          <div class="bg-white p-8 rounded-xl border border-gray-100 text-center hover:shadow-lg hover:border-[#168d63] transition-all duration-300">
+            <span class="material-icons text-5xl text-gray-400 group-hover:text-[#168d63] mb-4 transition-colors">sports_soccer</span>
+            <h3 class="font-medium text-gray-900 group-hover:text-[#168d63] transition-colors">스포츠</h3>
+          </div>
+        </a>
+        <a href="#" class="group">
+          <div class="bg-white p-8 rounded-xl border border-gray-100 text-center hover:shadow-lg hover:border-[#168d63] transition-all duration-300">
+            <span class="material-icons text-5xl text-gray-400 group-hover:text-[#168d63] mb-4 transition-colors">computer</span>
+            <h3 class="font-medium text-gray-900 group-hover:text-[#168d63] transition-colors">IT/기술</h3>
+          </div>
+        </a>
+        <a href="#" class="group">
+          <div class="bg-white p-8 rounded-xl border border-gray-100 text-center hover:shadow-lg hover:border-[#168d63] transition-all duration-300">
+            <span class="material-icons text-5xl text-gray-400 group-hover:text-[#168d63] mb-4 transition-colors">music_note</span>
+            <h3 class="font-medium text-gray-900 group-hover:text-[#168d63] transition-colors">음악</h3>
+          </div>
+        </a>
+        <a href="#" class="group">
+          <div class="bg-white p-8 rounded-xl border border-gray-100 text-center hover:shadow-lg hover:border-[#168d63] transition-all duration-300">
+            <span class="material-icons text-5xl text-gray-400 group-hover:text-[#168d63] mb-4 transition-colors">restaurant</span>
+            <h3 class="font-medium text-gray-900 group-hover:text-[#168d63] transition-colors">요리</h3>
+          </div>
+        </a>
+        <a href="#" class="group">
+          <div class="bg-white p-8 rounded-xl border border-gray-100 text-center hover:shadow-lg hover:border-[#168d63] transition-all duration-300">
+            <span class="material-icons text-5xl text-gray-400 group-hover:text-[#168d63] mb-4 transition-colors">fitness_center</span>
+            <h3 class="font-medium text-gray-900 group-hover:text-[#168d63] transition-colors">피트니스</h3>
+          </div>
+        </a>
+        <a href="#" class="group">
+          <div class="bg-white p-8 rounded-xl border border-gray-100 text-center hover:shadow-lg hover:border-[#168d63] transition-all duration-300">
+            <span class="material-icons text-5xl text-gray-400 group-hover:text-[#168d63] mb-4 transition-colors">more_horiz</span>
+            <h3 class="font-medium text-gray-900 group-hover:text-[#168d63] transition-colors">기타</h3>
+          </div>
+        </a>
       </div>
     </div>
   </section>
 
   <!-- 푸터 -->
-  <footer class="bg-green-800 text-white py-12">
+  <footer class="bg-gray-900 text-white py-16">
     <div class="container mx-auto px-4">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
         <div>
-          <h3 class="text-xl font-bold mb-4">홍천학당</h3>
-          <p class="text-gray-400">군 장병과 지역민이 함께하는 배움의 공간</p>
+          <h3 class="text-2xl font-light mb-4">홍숲쿨링</h3>
+          <p class="text-gray-400 leading-relaxed">군 장병과 지역민이 함께하는 배움의 공간</p>
         </div>
         <div>
-          <h4 class="font-bold mb-4">서비스</h4>
-          <ul class="space-y-2">
-            <li><a href="#" class="text-gray-400 hover:text-white">이용약관</a></li>
-            <li><a href="#" class="text-gray-400 hover:text-white">개인정보처리방침</a></li>
+          <h4 class="font-medium mb-4">서비스</h4>
+          <ul class="space-y-3">
+            <li><a href="#" class="text-gray-400 hover:text-[#168d63] transition-colors">이용약관</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-[#168d63] transition-colors">개인정보처리방침</a></li>
           </ul>
         </div>
+        <div>
+          <h4 class="font-medium mb-4">고객지원</h4>
+          <ul class="space-y-3">
+            <li><a href="#" class="text-gray-400 hover:text-[#168d63] transition-colors">자주 묻는 질문</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-[#168d63] transition-colors">문의하기</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-medium mb-4">소셜미디어</h4>
+          <div class="flex space-x-4">
+            <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-[#168d63] transition-colors">
+              <span class="material-icons text-sm">facebook</span>
+            </a>
+            <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-[#168d63] transition-colors">
+              <span class="material-icons text-sm">share</span>
+            </a>
+          </div>
+        </div>
       </div>
-      <div class="border-t border-gray-700 mt-8 pt-8 text-sm text-gray-400">
-        <p> 2025 홍천학당. All rights reserved.</p>
+      <div class="border-t border-gray-800 mt-12 pt-8 text-sm text-gray-400">
+        <p>&copy; 2025 홍숲쿨링. All rights reserved.</p>
       </div>
     </div>
   </footer>
+  </div> <!-- 메인 콘텐츠 영역 닫기 -->
 
   <style>
     .dropdown:hover .dropdown-menu {
@@ -170,80 +265,8 @@
     }
   </style>
 
-  <script>
-    // 페이지 로드 시 로그인 상태 확인
-    (async function() {
-      // fetchCurrentUser 함수 정의
-      async function fetchCurrentUser() {
-        try {
-          const response = await fetch('/api/current-user', {
-            credentials: 'include'
-          });
-          const data = await response.json();
-          return data;
-        } catch (error) {
-          console.error('사용자 정보를 가져오는 중 오류 발생:', error);
-          return { isAuthenticated: false };
-        }
-      }
-
-      // 로그아웃 처리
-      async function handleLogout() {
-        try {
-          const response = await fetch('/api/logout', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            credentials: 'include'
-          });
-          
-          const data = await response.json();
-          
-          if (data.success) {
-            window.location.href = '/';
-            window.location.reload();
-          } else {
-            alert('로그아웃 중 오류가 발생했습니다.');
-          }
-        } catch (error) {
-          console.error('로그아웃 오류:', error);
-          alert('로그아웃 중 오류가 발생했습니다.');
-        }
-      }
-
-      // 전역으로 함수 등록
-      window.handleLogout = handleLogout;
-
-      // 현재 로그인 상태 확인 및 UI 업데이트
-      const authButtons = document.getElementById('auth-buttons');
-      const userMenu = document.getElementById('userMenu');
-      
-      if (authButtons && userMenu) {
-        console.log('로그인 상태 확인 시작');
-        const { isAuthenticated, user } = await fetchCurrentUser();
-        console.log('로그인 상태:', isAuthenticated, '사용자:', user);
-        
-        if (isAuthenticated && user) {
-          // 로그인 상태일 때
-          console.log('로그인된 상태 - UI 업데이트');
-          authButtons.style.display = 'none';
-          userMenu.style.display = 'flex';
-          
-          const userNickname = document.getElementById('userNickname');
-          if (userNickname) {
-            userNickname.textContent = user.nickname || user.username;
-            console.log('닉네임 업데이트:', user.nickname || user.username);
-          }
-        } else {
-          // 비로그인 상태일 때
-          console.log('비로그인 상태 - UI 업데이트');
-          authButtons.style.display = 'flex';
-          userMenu.style.display = 'none';
-        }
-      }
-    })();
-  </script>
+  <script src="common.js"></script>
+  <script src="sidebar.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

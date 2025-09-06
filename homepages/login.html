@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>로그인 - 홍천학당</title>
+  <title>로그인 - 홍숲쿨링</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -85,8 +85,7 @@
   <header class="bg-green-100 shadow-md fixed w-full z-50 top-0">
     <div class="container mx-auto px-4 py-3 flex justify-between items-center">
       <a href="/" class="flex items-center space-x-2">
-        <img src="image/hongschool.png" alt="홍숲쿨링" class="h-24 w-auto">
-        <span class="text-4xl font-bold text-green-700">홍숲쿨링</span>
+        <img src="image/logo.png" alt="홍숲쿨링" class="h-16 w-auto">
       </a>
     </div>
   </header>
@@ -122,13 +121,37 @@
   </div>
 
   <script>
+    // 비밀번호 보기/숨기기 토글
+    document.getElementById('togglePassword').addEventListener('click', function() {
+      const passwordInput = document.getElementById('password');
+      const icon = this.querySelector('i');
+      
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        icon.textContent = 'visibility_off';
+      } else {
+        passwordInput.type = 'password';
+        icon.textContent = 'visibility';
+      }
+    });
+
     document.getElementById('loginForm').addEventListener('submit', async function(e) {
       e.preventDefault();
+      console.log('로그인 폼 제출됨');
       
       const username = document.getElementById('username').value;
       const password = document.getElementById('password').value;
       
+      console.log('입력된 사용자명:', username);
+      console.log('비밀번호 길이:', password.length);
+      
+      if (!username || !password) {
+        alert('아이디와 비밀번호를 모두 입력해주세요.');
+        return;
+      }
+      
       try {
+        console.log('로그인 API 호출 시작');
         const response = await fetch('/api/login', {
           method: 'POST',
           headers: {
@@ -138,18 +161,23 @@
           body: JSON.stringify({ username, password })
         });
         
+        console.log('응답 상태:', response.status);
+        console.log('응답 헤더:', response.headers);
+        
         const data = await response.json();
+        console.log('응답 데이터:', data);
         
         if (data.success) {
+          console.log('로그인 성공, 리디렉션 중...');
           // 로그인 성공 시 메인 페이지로 리디렉션
           window.location.href = '/';
-          window.location.reload();
         } else {
+          console.error('로그인 실패:', data.message);
           alert(data.message || '로그인에 실패했습니다.');
         }
       } catch (error) {
         console.error('로그인 오류:', error);
-        alert('로그인 중 오류가 발생했습니다.');
+        alert('로그인 중 오류가 발생했습니다: ' + error.message);
       }
     });
   </script>

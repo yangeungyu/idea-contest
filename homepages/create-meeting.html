@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>새 모임 만들기 - 홍숲쿨링</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { padding-top: 80px; }
+    .form-section { margin-bottom: 2rem; }
+    .form-group { margin-bottom: 1rem; }
+    .required { color: #dc2626; }
+  </style>
+</head>
+<body class="bg-green-50 lg:ml-20" data-page="create-meeting">
+  <!-- 상단 헤더 -->
+  <header class="bg-white shadow-sm border-b border-gray-200 fixed w-full z-40 lg:ml-20">
+    <div class="px-4 py-3 flex justify-between items-center">
+      <div class="flex items-center">
+        <button id="mobileMenuBtn" class="text-gray-600 hover:text-gray-900 lg:hidden mr-3">
+          <span class="material-icons text-2xl">menu</span>
+        </button>
+        <h1 class="text-xl font-bold text-gray-800">새 모임 만들기</h1>
+      </div>
+      
+      <!-- 로그인/회원가입 버튼 -->
+      <div class="flex items-center space-x-4">
+        <div id="auth-buttons" class="flex items-center space-x-4">
+          <a href="login.html" class="text-gray-700 hover:text-green-600">로그인</a>
+          <a href="register.html" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">회원가입</a>
+        </div>
+        <!-- 로그인 시 표시될 프로필 메뉴 -->
+        <div id="userMenu" class="hidden dropdown relative">
+          <button class="flex items-center space-x-2 focus:outline-none">
+            <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
+              <span class="material-icons text-gray-600">person</span>
+            </div>
+            <span id="userName" class="text-gray-700">사용자이름</span>
+            <span class="material-icons text-gray-500">arrow_drop_down</span>
+          </button>
+          <div class="dropdown-menu absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10" style="display: none;">
+            <a href="mypage.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">마이페이지</a>
+            <a href="#" onclick="handleLogout()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">로그아웃</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 메인 콘텐츠 -->
+  <main class="container mx-auto px-4 py-8">
+    <!-- 모임 목록 화면 -->
+    <div id="meetingListView" class="max-w-6xl mx-auto">
+      <!-- 페이지 헤더 -->
+      <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+          <div class="flex items-center mb-4 md:mb-0">
+            <span class="material-icons text-green-600 text-3xl mr-3">event</span>
+            <div>
+              <h2 class="text-2xl font-bold text-gray-800">모임 찾기</h2>
+              <p class="text-gray-600 mt-1">다양한 모임을 둘러보고 참가하거나 새로운 모임을 만들어보세요</p>
+            </div>
+          </div>
+          <button id="createNewMeetingBtn" class="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 text-center flex items-center">
+            <span class="material-icons mr-2">add</span>
+            새 모임 만들기
+          </button>
+        </div>
+        
+        <!-- 검색 및 필터 -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="md:col-span-2">
+            <div class="relative">
+              <input type="text" id="searchInput" placeholder="모임 제목, 설명으로 검색" 
+                     class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 pl-10">
+              <span class="material-icons absolute left-3 top-2.5 text-gray-400">search</span>
+            </div>
+          </div>
+          
+          <select id="categoryFilter" class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-white">
+            <option value="">모든 카테고리</option>
+            <option value="study">스터디</option>
+            <option value="hobby">취미</option>
+            <option value="exercise">운동</option>
+            <option value="culture">문화</option>
+            <option value="volunteer">봉사</option>
+            <option value="networking">네트워킹</option>
+            <option value="other">기타</option>
+          </select>
+        </div>
+      </div>
+      
+      <!-- 모임 목록 -->
+      <div id="meetingList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <!-- 모임들이 여기에 동적으로 로드됩니다 -->
+        <div class="text-center py-12 text-gray-500 col-span-full">
+          <span class="material-icons text-4xl mb-2">event_note</span>
+          <p>등록된 모임이 없습니다.</p>
+        </div>
+      </div>
+      
+      <!-- 페이지네이션 -->
+      <div class="flex justify-center">
+        <nav class="flex items-center space-x-1">
+          <button class="px-3 py-1 rounded-md text-gray-500 hover:bg-gray-100">
+            <span class="material-icons text-sm">chevron_left</span>
+          </button>
+          <button class="px-3 py-1 rounded-md bg-green-600 text-white">1</button>
+          <button class="px-3 py-1 rounded-md text-gray-700 hover:bg-gray-100">2</button>
+          <button class="px-3 py-1 rounded-md text-gray-500 hover:bg-gray-100">
+            <span class="material-icons text-sm">chevron_right</span>
+          </button>
+        </nav>
+      </div>
+    </div>
+
+    <!-- 모임 생성 폼 (처음에는 숨김) -->
+    <div id="meetingFormView" class="max-w-4xl mx-auto hidden">
+      <!-- 뒤로가기 버튼 -->
+      <div class="mb-6">
+        <button id="backToListBtn" class="flex items-center text-gray-600 hover:text-gray-800">
+          <span class="material-icons mr-2">arrow_back</span>
+          모임 목록으로 돌아가기
+        </button>
+      </div>
+      
+      <!-- 페이지 설명 -->
+      <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+        <div class="flex items-center mb-4">
+          <span class="material-icons text-green-600 text-3xl mr-3">event</span>
+          <div>
+            <h2 class="text-2xl font-bold text-gray-800">새로운 모임을 만들어보세요</h2>
+            <p class="text-gray-600 mt-1">다양한 사람들과 함께할 수 있는 모임을 개설하고 관리할 수 있습니다.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 모임 생성 폼 -->
+      <form id="createMeetingForm" class="bg-white p-8 rounded-lg shadow-md">
+        <!-- 기본 정보 섹션 -->
+        <div class="form-section">
+          <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+            <span class="material-icons text-green-600 mr-2">info</span>
+            기본 정보
+          </h3>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="form-group">
+              <label for="meetingTitle" class="block text-sm font-medium text-gray-700 mb-2">
+                모임 제목 <span class="required">*</span>
+              </label>
+              <input type="text" id="meetingTitle" name="title" required
+                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                     placeholder="예: 홍천 독서 모임">
+            </div>
+            
+            <div class="form-group">
+              <label for="meetingCategory" class="block text-sm font-medium text-gray-700 mb-2">
+                카테고리 <span class="required">*</span>
+              </label>
+              <select id="meetingCategory" name="category" required
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                <option value="">카테고리 선택</option>
+                <option value="study">스터디</option>
+                <option value="hobby">취미</option>
+                <option value="exercise">운동</option>
+                <option value="culture">문화</option>
+                <option value="volunteer">봉사</option>
+                <option value="networking">네트워킹</option>
+                <option value="other">기타</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="meetingDescription" class="block text-sm font-medium text-gray-700 mb-2">
+              모임 설명 <span class="required">*</span>
+            </label>
+            <textarea id="meetingDescription" name="description" rows="4" required
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                      placeholder="모임에 대한 자세한 설명을 작성해주세요..."></textarea>
+          </div>
+        </div>
+
+        <!-- 일정 정보 섹션 -->
+        <div class="form-section">
+          <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+            <span class="material-icons text-green-600 mr-2">schedule</span>
+            일정 정보
+          </h3>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="form-group">
+              <label for="startDate" class="block text-sm font-medium text-gray-700 mb-2">
+                시작일 <span class="required">*</span>
+              </label>
+              <input type="date" id="startDate" name="startDate" required
+                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+            </div>
+            
+            <div class="form-group">
+              <label for="endDate" class="block text-sm font-medium text-gray-700 mb-2">
+                종료일
+              </label>
+              <input type="date" id="endDate" name="endDate"
+                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="form-group">
+              <label for="meetingTime" class="block text-sm font-medium text-gray-700 mb-2">
+                모임 시간
+              </label>
+              <input type="time" id="meetingTime" name="time"
+                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+            </div>
+            
+            <div class="form-group">
+              <label for="frequency" class="block text-sm font-medium text-gray-700 mb-2">
+                모임 주기
+              </label>
+              <select id="frequency" name="frequency"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                <option value="once">일회성</option>
+                <option value="weekly">매주</option>
+                <option value="biweekly">격주</option>
+                <option value="monthly">매월</option>
+                <option value="irregular">비정기</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- 장소 정보 섹션 -->
+        <div class="form-section">
+          <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+            <span class="material-icons text-green-600 mr-2">location_on</span>
+            장소 정보
+          </h3>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="form-group">
+              <label for="meetingType" class="block text-sm font-medium text-gray-700 mb-2">
+                모임 형태 <span class="required">*</span>
+              </label>
+              <select id="meetingType" name="type" required
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                <option value="">선택해주세요</option>
+                <option value="offline">오프라인</option>
+                <option value="online">온라인</option>
+                <option value="hybrid">혼합형</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="maxMembers" class="block text-sm font-medium text-gray-700 mb-2">
+                최대 인원 <span class="required">*</span>
+              </label>
+              <input type="number" id="maxMembers" name="maxMembers" min="2" max="100" required
+                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                     placeholder="2">
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="location" class="block text-sm font-medium text-gray-700 mb-2">
+              장소/링크
+            </label>
+            <input type="text" id="location" name="location"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                   placeholder="오프라인: 구체적인 주소 / 온라인: 화상회의 링크">
+          </div>
+        </div>
+
+        <!-- 추가 정보 섹션 -->
+        <div class="form-section">
+          <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+            <span class="material-icons text-green-600 mr-2">settings</span>
+            추가 설정
+          </h3>
+          
+          <div class="form-group">
+            <label for="tags" class="block text-sm font-medium text-gray-700 mb-2">
+              태그 (쉼표로 구분)
+            </label>
+            <input type="text" id="tags" name="tags"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                   placeholder="예: 독서, 토론, 자기계발">
+          </div>
+          
+          <div class="form-group">
+            <label for="requirements" class="block text-sm font-medium text-gray-700 mb-2">
+              참가 조건/요구사항
+            </label>
+            <textarea id="requirements" name="requirements" rows="3"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                      placeholder="모임 참가를 위한 특별한 조건이나 준비물이 있다면 작성해주세요..."></textarea>
+          </div>
+          
+          <div class="flex items-center space-x-4">
+            <label class="flex items-center">
+              <input type="checkbox" id="isPublic" name="isPublic" checked
+                     class="rounded border-gray-300 text-green-600 focus:ring-green-500">
+              <span class="ml-2 text-sm text-gray-700">공개 모임 (누구나 참가 신청 가능)</span>
+            </label>
+            
+            <label class="flex items-center">
+              <input type="checkbox" id="allowWaitlist" name="allowWaitlist"
+                     class="rounded border-gray-300 text-green-600 focus:ring-green-500">
+              <span class="ml-2 text-sm text-gray-700">대기자 명단 허용</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- 제출 버튼 -->
+        <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+          <button type="button" onclick="history.back()" 
+                  class="px-6 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+            취소
+          </button>
+          <button type="submit" 
+                  class="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center">
+            <span class="material-icons mr-2">add</span>
+            모임 만들기
+          </button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <!-- 푸터 -->
+  <footer class="bg-green-800 text-white py-8 mt-12">
+    <div class="container mx-auto px-4 text-center">
+      <p>&copy; 2025 홍숲쿨링. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <style>
+    .dropdown:hover .dropdown-menu {
+      display: block !important;
+    }
+    
+    .dropdown-menu {
+      min-width: 160px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e5e7eb;
+    }
+  </style>
+
+  <script>
+    // 페이지 로드 시 즉시 로그인 확인
+    (async function() {
+      try {
+        const response = await fetch('/api/current-user', {
+          credentials: 'include'
+        });
+        const data = await response.json();
+        
+        if (!data.isAuthenticated) {
+          alert('로그인이 필요한 페이지입니다.');
+          window.location.href = 'login.html';
+          return;
+        }
+        
+        // 로그인 상태 표시
+        document.getElementById('auth-buttons').style.display = 'none';
+        document.getElementById('userMenu').classList.remove('hidden');
+        document.getElementById('userName').textContent = data.user.name || data.user.username;
+        
+        // 모임 목록 로드
+        loadMeetings();
+        
+        // 버튼 이벤트 리스너
+        document.getElementById('createNewMeetingBtn').addEventListener('click', showCreateForm);
+        document.getElementById('backToListBtn').addEventListener('click', showMeetingList);
+        document.getElementById('createMeetingForm').addEventListener('submit', handleCreateMeeting);
+        
+        // 오늘 날짜를 최소값으로 설정
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('startDate').min = today;
+        document.getElementById('endDate').min = today;
+        
+        // 시작일 변경 시 종료일 최소값 업데이트
+        document.getElementById('startDate').addEventListener('change', function() {
+          document.getElementById('endDate').min = this.value;
+        });
+        
+      } catch (error) {
+        console.error('인증 확인 오류:', error);
+        window.location.href = 'login.html';
+      }
+    })();
+
+    // 모임 생성 처리
+    async function handleCreateMeeting(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(e.target);
+      const meetingData = {};
+      
+      // 폼 데이터 수집
+      for (let [key, value] of formData.entries()) {
+        if (key === 'tags') {
+          meetingData[key] = value.split(',').map(tag => tag.trim()).filter(tag => tag);
+        } else if (key === 'isPublic' || key === 'allowWaitlist') {
+          meetingData[key] = true;
+        } else {
+          meetingData[key] = value;
+        }
+      }
+      
+      // 체크박스 처리 (체크되지 않은 경우)
+      if (!formData.has('isPublic')) meetingData.isPublic = false;
+      if (!formData.has('allowWaitlist')) meetingData.allowWaitlist = false;
+      
+      // 스키마에 맞게 필드명 변경
+      meetingData.meetingType = meetingData.type; // type -> meetingType
+      delete meetingData.type;
+      
+      // deadline 필드 추가 (endDate를 deadline으로 사용)
+      if (meetingData.endDate) {
+        meetingData.deadline = meetingData.endDate;
+      } else {
+        // endDate가 없으면 startDate + 4주를 기본값으로 설정
+        const startDate = new Date(meetingData.startDate);
+        startDate.setDate(startDate.getDate() + 28); // 4주 후
+        meetingData.deadline = startDate.toISOString().split('T')[0];
+      }
+      
+      // duration 필드 추가 (기본값 4주)
+      if (!meetingData.duration) {
+        meetingData.duration = 4;
+      }
+      
+      let response;
+      try {
+        response = await fetch('/api/studies', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include',
+          body: JSON.stringify(meetingData)
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+          console.error('서버 응답:', data);
+          throw new Error(data.message || '모임 생성에 실패했습니다.');
+        }
+        
+        alert('모임이 성공적으로 생성되었습니다!');
+        showMeetingList(); // 목록으로 돌아가기
+        
+      } catch (error) {
+        console.error('모임 생성 오류:', error);
+        console.error('전송된 데이터:', meetingData);
+        if (response) {
+          console.error('응답 상태:', response.status);
+        }
+        alert(error.message || '모임 생성 중 오류가 발생했습니다.');
+      }
+    }
+
+    // 모임 목록 로드
+    async function loadMeetings() {
+      try {
+        const response = await fetch('/api/studies', {
+          credentials: 'include'
+        });
+        const data = await response.json();
+        renderMeetings(data.studies || data);
+      } catch (error) {
+        console.error('모임 목록 로드 오류:', error);
+      }
+    }
+
+    // 모임 목록 렌더링
+    function renderMeetings(meetings) {
+      const meetingList = document.getElementById('meetingList');
+      
+      if (!meetings || meetings.length === 0) {
+        meetingList.innerHTML = `
+          <div class="text-center py-12 text-gray-500 col-span-full">
+            <span class="material-icons text-4xl mb-2">event_note</span>
+            <p>등록된 모임이 없습니다.</p>
+          </div>
+        `;
+        return;
+      }
+      
+      meetingList.innerHTML = meetings.map(meeting => {
+        const categoryColors = {
+          'study': 'bg-blue-100 text-blue-800',
+          'hobby': 'bg-purple-100 text-purple-800',
+          'exercise': 'bg-red-100 text-red-800',
+          'culture': 'bg-yellow-100 text-yellow-800',
+          'volunteer': 'bg-green-100 text-green-800',
+          'networking': 'bg-indigo-100 text-indigo-800',
+          'other': 'bg-gray-100 text-gray-800'
+        };
+        
+        const categoryTexts = {
+          'study': '스터디',
+          'hobby': '취미',
+          'exercise': '운동',
+          'culture': '문화',
+          'volunteer': '봉사',
+          'networking': '네트워킹',
+          'other': '기타'
+        };
+        
+        const startDate = new Date(meeting.startDate).toLocaleDateString('ko-KR');
+        
+        return `
+          <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+            <div class="flex items-start justify-between mb-3">
+              <span class="px-2 py-1 rounded-full text-xs ${categoryColors[meeting.category] || categoryColors.other}">
+                ${categoryTexts[meeting.category] || '기타'}
+              </span>
+              <span class="text-sm text-gray-500">${startDate}</span>
+            </div>
+            
+            <h3 class="text-lg font-bold text-gray-900 mb-2">${meeting.title}</h3>
+            <p class="text-gray-600 text-sm mb-3 line-clamp-2">${meeting.description}</p>
+            
+            <div class="flex justify-between items-center pt-3 border-t border-gray-100">
+              <div class="flex items-center space-x-4">
+                <span class="text-sm text-gray-500 flex items-center">
+                  <span class="material-icons text-sm mr-1">people</span>
+                  ${meeting.currentMembers?.length || 0}/${meeting.maxMembers}
+                </span>
+                <span class="text-sm text-gray-500 flex items-center">
+                  <span class="material-icons text-sm mr-1">location_on</span>
+                  ${meeting.type === 'online' ? '온라인' : meeting.type === 'offline' ? '오프라인' : '혼합형'}
+                </span>
+              </div>
+              <button class="text-green-600 text-sm font-medium hover:underline" onclick="joinMeeting('${meeting._id}')">
+                참가하기
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // 모임 참가하기
+    async function joinMeeting(meetingId) {
+      try {
+        const response = await fetch(`/api/studies/${meetingId}/join`, {
+          method: 'POST',
+          credentials: 'include'
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.message || '모임 참가에 실패했습니다.');
+        }
+        
+        alert('모임에 성공적으로 참가했습니다!');
+        loadMeetings(); // 목록 새로고침
+        
+      } catch (error) {
+        console.error('모임 참가 오류:', error);
+        alert(error.message || '모임 참가 중 오류가 발생했습니다.');
+      }
+    }
+
+    // 화면 전환 함수들
+    function showCreateForm() {
+      document.getElementById('meetingListView').classList.add('hidden');
+      document.getElementById('meetingFormView').classList.remove('hidden');
+    }
+
+    function showMeetingList() {
+      document.getElementById('meetingFormView').classList.add('hidden');
+      document.getElementById('meetingListView').classList.remove('hidden');
+      loadMeetings(); // 목록 새로고침
+    }
+    
+    // 로그아웃 처리
+    async function handleLogout() {
+      try {
+        const response = await fetch('/api/logout', {
+          method: 'POST',
+          credentials: 'include'
+        });
+        
+        if (!response.ok) {
+          throw new Error('로그아웃에 실패했습니다.');
+        }
+        
+        alert('로그아웃되었습니다.');
+        window.location.href = 'login.html';
+      } catch (error) {
+        console.error('로그아웃 오류:', error);
+        alert('로그아웃 중 오류가 발생했습니다.');
+      }
+    }
+  </script>
+  <script src="common.js"></script>
+  <script src="sidebar.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,7 +1,7 @@
 {
   "name": "hongcheon-academy",
   "version": "1.0.0",
-  "description": "홍천학당 웹사이트",
+  "description": "홍숲쿨링 웹사이트",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -17,6 +17,7 @@
     "ejs": "^3.1.9",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
+    "mongodb": "^6.19.0",
     "mongoose": "^7.5.0"
   },
   "devDependencies": {

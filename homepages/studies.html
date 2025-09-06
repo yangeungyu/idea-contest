@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>스터디 모임 - 홍천학당</title>
+  <title>스터디 모임 - 홍숲쿨링</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -13,21 +13,17 @@
     .study-card:hover { transform: translateY(-3px); }
   </style>
 </head>
-<body class="bg-green-50">
-  <!-- 헤더 -->
-  <header class="bg-green-100 shadow-md fixed w-full z-50 top-0">
-    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-      <a href="/" class="flex items-center space-x-2">
-        <img src="image/hongschool.png" alt="홍숲쿨링" class="h-24 w-auto">
-        <span class="text-4xl font-bold text-green-700">홍숲쿨링</span>
-      </a>
-      <nav class="hidden md:flex space-x-1">
-        <a href="#" class="px-4 py-2 text-gray-700 hover:text-green-600 font-medium">이벤트</a>
-        <a href="studies.html" class="px-4 py-2 text-green-600 font-medium">모임관리</a>
-        <a href="community.html" class="px-4 py-2 text-gray-700 hover:text-green-600 font-medium">커뮤니티</a>
-        <a href="notices.html" class="px-4 py-2 text-gray-700 hover:text-green-600 font-medium">공지사항</a>
-        <a href="#" class="px-4 py-2 text-gray-700 hover:text-green-600 font-medium">마이페이지</a>
-      </nav>
+<body class="bg-green-50 lg:ml-20" data-page="studies">
+  <!-- 상단 헤더 -->
+  <header class="bg-white shadow-sm border-b border-gray-200 fixed w-full z-40 lg:ml-20">
+    <div class="px-4 py-3 flex justify-between items-center">
+        <div class="flex items-center">
+          <button id="mobileMenuBtn" class="text-gray-600 hover:text-gray-900 lg:hidden mr-3">
+            <span class="material-icons text-2xl">menu</span>
+          </button>
+        </div>
+      
+      <!-- 로그인/회원가입 버튼 -->
       <div class="flex items-center space-x-4">
         <div id="auth-buttons" class="flex items-center space-x-4">
           <a href="login.html" class="text-gray-700 hover:text-green-600">로그인</a>
@@ -39,11 +35,11 @@
             <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
               <span class="material-icons text-gray-600">person</span>
             </div>
-            <span id="userNickname" class="text-gray-700">사용자이름</span>
+            <span id="userName" class="text-gray-700">사용자이름</span>
             <span class="material-icons text-gray-500">arrow_drop_down</span>
           </button>
           <div class="dropdown-menu absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10" style="display: none;">
-            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">마이페이지</a>
+            <a href="mypage.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">마이페이지</a>
             <a href="#" onclick="handleLogout()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">로그아웃</a>
           </div>
         </div>
@@ -55,7 +51,7 @@
   <main class="container mx-auto px-4 py-8">
     <div class="bg-white p-6 rounded-lg shadow-md mb-8">
       <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-        <h1 class="text-2xl font-bold text-gray-800 mb-4 md:mb-0">스터디 모임</h1>
+        <h1 class="text-2xl font-bold text-gray-800 mb-4 md:mb-0">내 모임 관리</h1>
         <a href="create-study.html" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 text-center">
           <i class="material-icons align-middle">add</i> 스터디 개설하기
         </a>
@@ -96,7 +92,7 @@
   <!-- 푸터 -->
   <footer class="bg-green-800 text-white py-8 mt-12">
     <div class="container mx-auto px-4 text-center">
-      <p>&copy; 2023 홍천학당. All rights reserved.</p>
+      <p>&copy; 2025 홍숲쿨링. All rights reserved.</p>
     </div>
   </footer>
 
@@ -127,23 +123,40 @@
           return;
         }
         
+        // 현재 사용자 ID 저장
+        currentUserId = data.user.id;
+        
         // 로그인된 경우에만 페이지 로드
         loadStudies();
-        showUserMenu(data.nickname);
+        showUserMenu(data.user.name || data.user.username);
       } catch (error) {
         console.error('인증 확인 오류:', error);
         window.location.href = 'login.html';
       }
     })();
 
-    // 스터디 데이터 로드
+    // 사용자의 모임 데이터 로드 (생성한 모임 + 참가한 모임)
     async function loadStudies() {
       try {
-        const response = await fetch('/api/studies', {
+        const response = await fetch('/api/current-user', {
           credentials: 'include'
         });
-        const studies = await response.json();
-        renderStudies(studies);
+        const userData = await response.json();
+        const userId = userData.user.id;
+        
+        // 모든 모임 조회
+        const studiesResponse = await fetch('/api/studies', {
+          credentials: 'include'
+        });
+        const allStudies = await studiesResponse.json();
+        
+        // 사용자가 생성했거나 참가한 모임만 필터링
+        const userStudies = (allStudies.studies || allStudies).filter(study => 
+          study.leader === userId || 
+          (study.currentMembers && study.currentMembers.includes(userId))
+        );
+        
+        renderStudies(userStudies);
       } catch (error) {
         console.error('스터디 로드 오류:', error);
       }
@@ -163,33 +176,106 @@
         return;
       }
       
-      studyList.innerHTML = studies.map(study => `
-        <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
-          <div class="flex justify-between items-start mb-4">
-            <h3 class="text-xl font-bold text-gray-900">${study.title}</h3>
-            <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">${study.category}</span>
+      studyList.innerHTML = studies.map(study => {
+        const isLeader = study.leader === getCurrentUserId();
+        const memberCount = study.currentMembers ? study.currentMembers.length : 0;
+        
+        return `
+          <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+            <div class="flex justify-between items-start mb-4">
+              <div>
+                <h3 class="text-xl font-bold text-gray-900">${study.title}</h3>
+                <span class="text-sm ${isLeader ? 'text-blue-600' : 'text-green-600'} font-medium">
+                  ${isLeader ? '내가 만든 모임' : '참가 중인 모임'}
+                </span>
+              </div>
+              <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">${study.category}</span>
+            </div>
+            <p class="text-gray-600 mb-4">${study.description}</p>
+            <div class="flex justify-between items-center text-sm text-gray-500 mb-4">
+              <span>참가인원: ${memberCount}/${study.maxMembers}명</span>
+              <span>마감일: ${new Date(study.deadline).toLocaleDateString()}</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <div class="flex space-x-2">
+                ${isLeader ? 
+                  `<button onclick="editStudy('${study._id}')" class="text-blue-600 hover:text-blue-700 font-medium text-sm">수정</button>
+                   <button onclick="deleteStudy('${study._id}')" class="text-red-600 hover:text-red-700 font-medium text-sm">삭제</button>` :
+                  `<button onclick="leaveStudy('${study._id}')" class="text-red-600 hover:text-red-700 font-medium text-sm">탈퇴</button>`
+                }
+              </div>
+              <a href="study-detail.html?id=${study._id}" class="text-green-600 hover:text-green-700 font-medium">자세히 보기</a>
+            </div>
           </div>
-          <p class="text-gray-600 mb-4">${study.description}</p>
-          <div class="flex justify-between items-center text-sm text-gray-500">
-            <span>모집인원: ${study.currentMembers}/${study.maxMembers}명</span>
-            <span>마감일: ${new Date(study.deadline).toLocaleDateString()}</span>
-          </div>
-          <div class="mt-4 flex justify-end">
-            <a href="study-detail.html?id=${study._id}" class="text-green-600 hover:text-green-700 font-medium">자세히 보기</a>
-          </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     // 로그인된 사용자 메뉴 표시
-    function showUserMenu(nickname) {
+    function showUserMenu(name) {
       const userMenu = document.getElementById('userMenu');
       const authButtons = document.getElementById('auth-buttons');
-      const userNickname = document.getElementById('userNickname');
+      const userName = document.getElementById('userName');
       
-      userNickname.textContent = nickname;
+      userName.textContent = name;
       userMenu.classList.remove('hidden');
       authButtons.classList.add('hidden');
+    }
+
+    // 현재 사용자 ID 가져오기
+    let currentUserId = null;
+    
+    function getCurrentUserId() {
+      return currentUserId;
+    }
+
+    // 모임 수정
+    function editStudy(studyId) {
+      window.location.href = `create-meeting.html?edit=${studyId}`;
+    }
+
+    // 모임 삭제
+    async function deleteStudy(studyId) {
+      if (!confirm('정말로 이 모임을 삭제하시겠습니까?')) return;
+      
+      try {
+        const response = await fetch(`/api/studies/${studyId}`, {
+          method: 'DELETE',
+          credentials: 'include'
+        });
+        
+        if (response.ok) {
+          alert('모임이 삭제되었습니다.');
+          loadStudies();
+        } else {
+          alert('모임 삭제에 실패했습니다.');
+        }
+      } catch (error) {
+        console.error('모임 삭제 오류:', error);
+        alert('모임 삭제 중 오류가 발생했습니다.');
+      }
+    }
+
+    // 모임 탈퇴
+    async function leaveStudy(studyId) {
+      if (!confirm('정말로 이 모임에서 탈퇴하시겠습니까?')) return;
+      
+      try {
+        const response = await fetch(`/api/studies/${studyId}/leave`, {
+          method: 'POST',
+          credentials: 'include'
+        });
+        
+        if (response.ok) {
+          alert('모임에서 탈퇴했습니다.');
+          loadStudies();
+        } else {
+          alert('모임 탈퇴에 실패했습니다.');
+        }
+      } catch (error) {
+        console.error('모임 탈퇴 오류:', error);
+        alert('모임 탈퇴 중 오류가 발생했습니다.');
+      }
     }
 
     // 로그아웃 처리
@@ -206,5 +292,8 @@
       });
     }
   </script>
+  <script src="common.js"></script>
+  <script src="sidebar.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>

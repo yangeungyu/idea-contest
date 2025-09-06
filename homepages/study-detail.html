@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>스터디 상세 - 홍천학당</title>
+  <title>스터디 상세 - 홍숲쿨링</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -16,24 +16,36 @@
     }
   </style>
 </head>
-<body class="bg-green-50">
-  <!-- 헤더 -->
-  <header class="bg-green-100 shadow-md fixed w-full z-50 top-0">
-    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-      <a href="/" class="flex items-center space-x-2">
-        <img src="image/hongschool.png" alt="홍숲쿨링" class="h-24 w-auto">
-        <span class="text-4xl font-bold text-green-700">홍숲쿨링</span>
-      </a>
-      <nav class="hidden md:flex space-x-1">
-        <a href="#" class="px-4 py-2 text-gray-700 hover:text-green-600 font-medium">이벤트</a>
-        <a href="studies.html" class="px-4 py-2 text-green-600 font-medium">모임관리</a>
-        <a href="community.html" class="px-4 py-2 text-gray-700 hover:text-green-600 font-medium">커뮤니티</a>
-        <a href="notices.html" class="px-4 py-2 text-gray-700 hover:text-green-600 font-medium">공지사항</a>
-        <a href="#" class="px-4 py-2 text-gray-700 hover:text-green-600 font-medium">마이페이지</a>
-      </nav>
+<body class="bg-green-50 lg:ml-20" data-page="study-detail">
+  <!-- 상단 헤더 -->
+  <header class="bg-white shadow-sm border-b border-gray-200 fixed w-full z-40 lg:ml-20">
+    <div class="px-4 py-3 flex justify-between items-center">
+      <div class="flex items-center">
+        <button id="mobileMenuBtn" class="text-gray-600 hover:text-gray-900 lg:hidden mr-3">
+          <span class="material-icons text-2xl">menu</span>
+        </button>
+      </div>
+      
+      <!-- 로그인/회원가입 버튼 -->
       <div class="flex items-center space-x-4">
-        <a href="login.html" class="text-gray-700 hover:text-green-600">로그인</a>
-        <a href="register.html" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">회원가입</a>
+        <div id="auth-buttons" class="flex items-center space-x-4">
+          <a href="login.html" class="text-gray-700 hover:text-green-600">로그인</a>
+          <a href="register.html" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">회원가입</a>
+        </div>
+        <!-- 로그인 시 표시될 프로필 메뉴 -->
+        <div id="userMenu" class="hidden dropdown relative">
+          <button class="flex items-center space-x-2 focus:outline-none">
+            <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
+              <span class="material-icons text-gray-600">person</span>
+            </div>
+            <span id="userName" class="text-gray-700">사용자이름</span>
+            <span class="material-icons text-gray-500">arrow_drop_down</span>
+          </button>
+          <div class="dropdown-menu absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10" style="display: none;">
+            <a href="mypage.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">마이페이지</a>
+            <a href="#" onclick="handleLogout()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">로그아웃</a>
+          </div>
+        </div>
       </div>
     </div>
   </header>
@@ -204,7 +216,7 @@
   <!-- 푸터 -->
   <footer class="bg-green-800 text-white py-8 mt-12">
     <div class="container mx-auto px-4 text-center">
-      <p>&copy; 2023 홍천학당. All rights reserved.</p>
+      <p>&copy; 2025 홍숲쿨링. All rights reserved.</p>
     </div>
   </footer>
 
@@ -232,7 +244,7 @@
     // 스터디 정보 렌더링
     function renderStudy(study) {
       // 기본 정보
-      document.title = `${study.title} - 홍천학당`;
+      document.title = `${study.title} - 홍숲쿨링`;
       document.getElementById('studyTitle').textContent = study.title;
       document.getElementById('studyDescription').textContent = study.description;
       document.getElementById('studyCategory').textContent = study.category;
@@ -286,7 +298,7 @@
       if (study.leader) {
         document.getElementById('studyLeader').innerHTML = `
           <i class="material-icons text-sm mr-1">person</i>
-          리더: ${study.leader.nickname || '익명'}
+          리더: ${study.leader.name || '익명'}
         `;
       }
     }
@@ -349,5 +361,8 @@
       }
     });
   </script>
+  <script src="common.js"></script>
+  <script src="sidebar.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
