@@ -21,7 +21,9 @@
   <style>
     body { 
       padding-top: 0px; 
-      font-family: 'Noto Sans KR', sans-serif;
+      font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
     .profile-card { 
       transition: transform 0.2s; 
@@ -32,48 +34,8 @@
   </style>
 </head>
 <body class="bg-green-50 lg:ml-20" data-page="mypage">
-  <!-- 상단 헤더 -->
-  <header class="bg-white shadow-sm border-b border-gray-200 fixed w-full z-40 lg:ml-20">
-    <div class="px-4 py-3 flex justify-between items-center">
-      <div class="flex items-center">
-        <!-- 모바일에서도 로고 표시 (클릭 가능) -->
-        <div id="mobileLogoBtn" class="lg:hidden flex items-center cursor-pointer hover:bg-gray-50 rounded-lg p-2 transition-colors">
-          <img src="logo.png" alt="홍숲쿨링" class="w-8 h-8 object-contain mr-2">
-          <span class="text-lg font-semibold text-gray-900">홍숲쿨링</span>
-        </div>
-      </div>
-      
-      <!-- 로그인/회원가입 버튼 -->
-      <div class="flex items-center space-x-4">
-        <div id="auth-buttons" class="flex items-center space-x-4">
-          <a href="login.html" class="text-gray-700 hover:text-green-600">로그인</a>
-          <a href="register.html" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">회원가입</a>
-        </div>
-        <!-- 로그인 시 표시될 프로필 메뉴 -->
-        <div id="userMenu" class="hidden dropdown relative">
-          <button class="flex items-center space-x-2 focus:outline-none">
-            <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
-              <span class="material-icons text-gray-600">person</span>
-            </div>
-            <span id="userName" class="text-gray-700">사용자이름</span>
-            <span class="material-icons text-gray-500">arrow_drop_down</span>
-          </button>
-          <div class="dropdown-menu absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10" style="display: none;">
-            <a href="mypage.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">마이페이지</a>
-            <a href="#" onclick="handleLogout()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">로그아웃</a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </header>
-
   <!-- 메인 콘텐츠 -->
   <main class="container mx-auto px-4 py-8">
-    <!-- 페이지 헤더 -->
-    <div class="bg-white p-6 rounded-lg shadow-md mb-8">
-      <h1 class="text-2xl font-bold text-gray-800 mb-2">마이페이지</h1>
-      <p class="text-gray-600">프로필 정보를 수정하고 계정을 관리하세요.</p>
-    </div>
     
     <!-- 프로필 정보 카드 -->
     <div class="bg-white rounded-lg shadow-md p-6 mb-8 profile-card">
@@ -106,6 +68,12 @@
           <div>
             <label for="editEmail" class="block text-sm font-medium text-green-700 mb-2">이메일</label>
             <input type="email" id="editEmail" name="email"
+                   class="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+          </div>
+          
+          <div>
+            <label for="editLocation" class="block text-sm font-medium text-green-700 mb-2">지역</label>
+            <input type="text" id="editLocation" name="location" placeholder="예: 서울특별시 강남구"
                    class="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
           </div>
           
@@ -150,6 +118,40 @@
                   <i class="material-icons text-green-500">visibility</i>
                 </button>
               </div>
+              <!-- 비밀번호 일치 확인 메시지 -->
+              <div id="passwordMatchMessage" class="text-sm mt-2" style="display: none;"></div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 보안 질문 설정 섹션 -->
+        <div class="border-t pt-6">
+          <h3 class="text-lg font-medium text-gray-800 mb-4">보안 질문 설정</h3>
+          <p class="text-sm text-gray-600 mb-4">비밀번호를 잊어버렸을 때 계정을 복구할 수 있도록 보안 질문을 설정해주세요.</p>
+          
+          <div class="space-y-4">
+            <div>
+              <label for="securityQuestion" class="block text-sm font-medium text-green-700 mb-2">보안 질문</label>
+              <select id="securityQuestion" name="securityQuestion" 
+                      class="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                <option value="">보안 질문을 선택하세요</option>
+                <option value="childhood_pet">어린 시절 기르던 애완동물의 이름은?</option>
+                <option value="first_school">처음 다닌 초등학교의 이름은?</option>
+                <option value="mother_maiden">어머니의 성함은?</option>
+                <option value="birth_city">태어난 도시의 이름은?</option>
+                <option value="favorite_food">가장 좋아하는 음식은?</option>
+                <option value="first_car">첫 번째 자동차 모델은?</option>
+                <option value="favorite_book">가장 좋아하는 책 제목은?</option>
+                <option value="childhood_friend">어린 시절 가장 친한 친구의 이름은?</option>
+              </select>
+            </div>
+            
+            <div>
+              <label for="securityAnswer" class="block text-sm font-medium text-green-700 mb-2">보안 답변</label>
+              <input type="text" id="securityAnswer" name="securityAnswer" 
+                     placeholder="보안 질문에 대한 답변을 입력하세요"
+                     class="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+              <p class="text-xs text-gray-500 mt-1">답변은 대소문자를 구분하지 않으며, 공백은 제거됩니다.</p>
             </div>
           </div>
         </div>
@@ -167,11 +169,9 @@
   </main>
 
   <!-- 푸터 -->
-  <footer class="bg-green-800 text-white py-8 mt-12">
-    <div class="container mx-auto px-4 text-center">
-      <p>&copy; 2025 홍숲쿨링. All rights reserved.</p>
-    </div>
-  </footer>
+  <div class="text-center py-8 mt-12">
+    <p class="text-gray-600">&copy; 2025 홍숲쿨링. All rights reserved.</p>
+  </div>
 
   <style>
     .dropdown:hover .dropdown-menu {
@@ -194,8 +194,11 @@
     async function loadUserProfile() {
       try {
         const userData = await fetchCurrentUser();
+        console.log('기본 사용자 데이터:', userData);
+        
         if (userData.isAuthenticated) {
           currentUserData = userData.user;
+          console.log('최종 사용자 데이터:', currentUserData);
           
           // 프로필 정보 표시
           document.getElementById('profileName').textContent = currentUserData.name || currentUserData.username;
@@ -205,6 +208,38 @@
           document.getElementById('editName').value = currentUserData.name || '';
           document.getElementById('editUsername').value = currentUserData.username;
           document.getElementById('editEmail').value = currentUserData.email || '';
+          
+          // 지역 정보 채우기 (localStorage에서 백업 데이터 확인)
+          console.log('지역 데이터:', currentUserData.location);
+          const locationField = document.getElementById('editLocation');
+          if (locationField) {
+            const locationKey = `location_${currentUserData.username}`;
+            const savedLocation = localStorage.getItem(locationKey);
+            console.log('localStorage에서 지역 데이터 확인:', locationKey, savedLocation);
+            locationField.value = savedLocation || currentUserData.location || '';
+            console.log('지역 필드 설정됨:', locationField.value);
+          }
+          
+          // 보안 질문 정보 채우기 (localStorage에서 백업 데이터 확인)
+          console.log('보안 질문 데이터:', currentUserData.securityQuestion, currentUserData.securityAnswer);
+          const securityQuestionField = document.getElementById('securityQuestion');
+          const securityAnswerField = document.getElementById('securityAnswer');
+          
+          if (securityQuestionField) {
+            const questionKey = `securityQuestion_${currentUserData.username}`;
+            const savedQuestion = localStorage.getItem(questionKey);
+            console.log('localStorage에서 보안질문 확인:', questionKey, savedQuestion);
+            securityQuestionField.value = savedQuestion || currentUserData.securityQuestion || '';
+            console.log('보안 질문 설정됨:', securityQuestionField.value);
+          }
+          
+          if (securityAnswerField) {
+            const answerKey = `securityAnswer_${currentUserData.username}`;
+            const savedAnswer = localStorage.getItem(answerKey);
+            console.log('localStorage에서 보안답변 확인:', answerKey, savedAnswer);
+            securityAnswerField.value = savedAnswer || currentUserData.securityAnswer || '';
+            console.log('보안 답변 설정됨:', securityAnswerField.value);
+          }
           
           // 가입일 표시 (YYYY.MM.DD 형식)
           console.log('사용자 가입일 데이터:', currentUserData.registrationDate);
@@ -225,6 +260,28 @@
       } catch (error) {
         console.error('사용자 정보 로드 오류:', error);
         alert('사용자 정보를 불러오는 중 오류가 발생했습니다.');
+      }
+    }
+
+    // 비밀번호 일치 확인 함수
+    function checkPasswordMatch() {
+      const newPassword = document.getElementById('newPassword').value;
+      const confirmPassword = document.getElementById('confirmNewPassword').value;
+      const messageDiv = document.getElementById('passwordMatchMessage');
+      
+      if (confirmPassword === '') {
+        messageDiv.style.display = 'none';
+        return;
+      }
+      
+      messageDiv.style.display = 'block';
+      
+      if (newPassword === confirmPassword) {
+        messageDiv.textContent = '✓ 비밀번호가 일치합니다';
+        messageDiv.className = 'text-sm mt-2 text-green-600';
+      } else {
+        messageDiv.textContent = '✗ 비밀번호가 일치하지 않습니다';
+        messageDiv.className = 'text-sm mt-2 text-red-600';
       }
     }
 
@@ -252,9 +309,12 @@
       const updateData = {
         name: formData.get('name').trim(),
         email: formData.get('email').trim(),
+        location: formData.get('location').trim(),
         currentPassword: formData.get('currentPassword'),
         newPassword: formData.get('newPassword'),
-        confirmNewPassword: formData.get('confirmNewPassword')
+        confirmNewPassword: formData.get('confirmNewPassword'),
+        securityQuestion: formData.get('securityQuestion'),
+        securityAnswer: formData.get('securityAnswer')?.trim()
       };
 
       // 기본 유효성 검사
@@ -283,6 +343,17 @@
         }
       }
 
+      // 보안 질문 유효성 검사
+      if (updateData.securityQuestion && !updateData.securityAnswer) {
+        alert('보안 질문을 선택했다면 답변도 입력해주세요.');
+        return;
+      }
+
+      if (!updateData.securityQuestion && updateData.securityAnswer) {
+        alert('보안 답변을 입력했다면 질문도 선택해주세요.');
+        return;
+      }
+
       try {
         const response = await fetch('/api/profile', {
           method: 'PUT',
@@ -303,11 +374,51 @@
           document.getElementById('newPassword').value = '';
           document.getElementById('confirmNewPassword').value = '';
           
-          // 사용자 정보 다시 로드
-          await loadUserProfile();
+          // 현재 사용자 데이터에 업데이트된 정보 병합
+          if (data.user) {
+            currentUserData = { ...currentUserData, ...data.user };
+            console.log('업데이트된 사용자 데이터:', currentUserData);
+            
+            // 폼에서 현재 입력된 값을 localStorage에 저장
+            const currentLocation = document.getElementById('editLocation').value;
+            const currentQuestion = document.getElementById('securityQuestion').value;
+            const currentAnswer = document.getElementById('securityAnswer').value;
+            
+            if (currentLocation) {
+              localStorage.setItem(`location_${currentUserData.username}`, currentLocation);
+              console.log('지역 localStorage 저장됨:', currentLocation);
+            }
+            if (currentQuestion) {
+              localStorage.setItem(`securityQuestion_${currentUserData.username}`, currentQuestion);
+              console.log('보안질문 localStorage 저장됨:', currentQuestion);
+            }
+            if (currentAnswer) {
+              localStorage.setItem(`securityAnswer_${currentUserData.username}`, currentAnswer);
+              console.log('보안답변 localStorage 저장됨:', currentAnswer);
+            }
+            
+            // 서버 응답 데이터도 localStorage에 저장
+            if (data.user.location !== undefined) {
+              localStorage.setItem(`location_${currentUserData.username}`, data.user.location || '');
+              document.getElementById('editLocation').value = data.user.location || '';
+              console.log('지역 필드 업데이트됨:', data.user.location);
+            }
+            if (data.user.securityQuestion !== undefined) {
+              localStorage.setItem(`securityQuestion_${currentUserData.username}`, data.user.securityQuestion || '');
+              document.getElementById('securityQuestion').value = data.user.securityQuestion || '';
+              console.log('보안 질문 업데이트됨:', data.user.securityQuestion);
+            }
+            if (data.user.securityAnswer !== undefined) {
+              localStorage.setItem(`securityAnswer_${currentUserData.username}`, data.user.securityAnswer || '');
+              document.getElementById('securityAnswer').value = data.user.securityAnswer || '';
+              console.log('보안 답변 업데이트됨:', data.user.securityAnswer);
+            }
+          }
           
           // 헤더의 사용자 이름 업데이트
-          await updateAuthUI(data.user);
+          if (typeof updateAuthUI === 'function') {
+            await updateAuthUI(currentUserData);
+          }
         } else {
           alert(data.message || '프로필 업데이트에 실패했습니다.');
         }
@@ -324,15 +435,37 @@
       }
     });
 
+    // localStorage 디버깅 함수
+    function debugLocalStorage() {
+      console.log('=== localStorage 전체 내용 ===');
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        const value = localStorage.getItem(key);
+        console.log(`${key}: ${value}`);
+      }
+      console.log('=== localStorage 끝 ===');
+    }
+
     // 페이지 초기화
     document.addEventListener('DOMContentLoaded', async function() {
       await initializePage();
-      await loadUserProfile();
+      
+      // localStorage 내용 확인
+      debugLocalStorage();
+      
+      // 약간의 지연 후 사용자 정보 로드 (DOM 완전 로드 보장)
+      setTimeout(async () => {
+        await loadUserProfile();
+      }, 100);
       
       // 비밀번호 토글 설정
       setupPasswordToggle('currentPassword', 'toggleCurrentPassword');
       setupPasswordToggle('newPassword', 'toggleNewPassword');
       setupPasswordToggle('confirmNewPassword', 'toggleConfirmNewPassword');
+      
+      // 비밀번호 일치 확인 이벤트 리스너 추가
+      document.getElementById('newPassword').addEventListener('input', checkPasswordMatch);
+      document.getElementById('confirmNewPassword').addEventListener('input', checkPasswordMatch);
     });
   </script>
 </body>

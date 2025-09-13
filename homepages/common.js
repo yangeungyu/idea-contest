@@ -45,15 +45,20 @@ async function updateAuthUI(user) {
     const userMenu = document.getElementById('userMenu');
     const userName = document.getElementById('userName');
     
+    // 요소가 존재하지 않으면 함수 종료 (마이페이지 등에서는 헤더가 없음)
+    if (!authButtons && !userMenu) {
+      return;
+    }
+    
     if (user) {
       // 로그인 상태
-      authButtons.style.display = 'none';
-      userMenu.style.display = 'block';
-      userName.textContent = user.name || user.username;
+      if (authButtons) authButtons.style.display = 'none';
+      if (userMenu) userMenu.style.display = 'block';
+      if (userName) userName.textContent = user.name || user.username;
     } else {
       // 로그아웃 상태
-      authButtons.style.display = 'flex';
-      userMenu.style.display = 'none';
+      if (authButtons) authButtons.style.display = 'flex';
+      if (userMenu) userMenu.style.display = 'none';
     }
   } catch (error) {
     console.error('인증 UI 업데이트 오류:', error);

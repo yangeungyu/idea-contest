@@ -21,7 +21,7 @@
   <style>
     body { 
       padding-top: 0px; 
-      background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+      background-color: #f8f9fa;
     }
     
     .line-clamp-2 {
@@ -50,134 +50,125 @@
     }
   </style>
 </head>
-<body class="bg-green-50 lg:ml-20" data-page="notices">
-  <!-- 상단 헤더 -->
-  <header class="bg-white shadow-sm border-b border-gray-200 fixed w-full z-40 lg:ml-20">
-    <div class="px-4 py-3 flex justify-between items-center">
-      <div class="flex items-center">
-        <!-- 모바일에서도 로고 표시 (클릭 가능) -->
-        <div id="mobileLogoBtn" class="lg:hidden flex items-center cursor-pointer hover:bg-gray-50 rounded-lg p-2 transition-colors">
-          <img src="logo.png" alt="홍숲쿨링" class="w-8 h-8 object-contain mr-2">
-          <span class="text-lg font-semibold text-gray-900">홍숲쿨링</span>
-        </div>
-      </div>
-      
-      <!-- 로그인/회원가입 버튼 -->
-      <div class="flex items-center space-x-4">
-        <div id="auth-buttons" class="flex items-center space-x-4">
-          <a href="login.html" class="text-gray-700 hover:text-green-600">로그인</a>
-          <a href="register.html" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">회원가입</a>
-        </div>
-        <!-- 로그인 시 표시될 프로필 메뉴 -->
-        <div id="userMenu" class="hidden dropdown relative">
-          <button class="flex items-center space-x-2 focus:outline-none">
-            <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
-              <span class="material-icons text-gray-600">person</span>
-            </div>
-            <span id="userName" class="text-gray-700">사용자이름</span>
-            <span class="material-icons text-gray-500">arrow_drop_down</span>
-          </button>
-          <div class="dropdown-menu absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10" style="display: none;">
-            <a href="mypage.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">마이페이지</a>
-            <a href="#" onclick="handleLogout()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">로그아웃</a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </header>
+<body class="bg-gray-100 lg:ml-20" data-page="notices">
+
+  <!-- 사이드바 include -->
+  <div id="sidebar-container"></div>
 
   <!-- 메인 콘텐츠 -->
-  <main class="container mx-auto px-4 py-8 max-w-6xl">
-    <!-- 페이지 헤더 -->
-    <div class="text-center mb-12">
-      <h1 class="text-4xl font-bold text-gray-900 mb-4">공지사항</h1>
-      <p class="text-lg text-gray-600 mb-8">홍숲쿨링의 최신 소식과 중요한 공지사항을 확인하세요</p>
+  <main class="min-h-screen flex flex-col items-center justify-center px-4 py-16">
+    <!-- 페이지 컨테이너 -->
+    <div class="w-full max-w-5xl mx-auto">
+      <!-- 페이지 헤더 -->
+      <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-gray-900 mb-3">공지사항</h1>
+        <p class="text-gray-600 text-lg">홍숲쿨링의 최신 소식과 중요한 공지사항을 확인하세요</p>
+      </div>
       
       <!-- 검색 및 필터 섹션 -->
-      <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
-        <div class="flex flex-col lg:flex-row gap-4 items-center justify-center">
-          <div class="relative flex-1 max-w-md">
-            <input type="text" id="searchInput" placeholder="검색어를 입력하세요" 
-                   class="w-full px-5 py-3 border-2 border-gray-200 rounded-full focus:outline-none focus:border-[#0A5C36] pl-12 transition-colors">
-            <span class="material-icons absolute left-4 top-3.5 text-gray-400">search</span>
+      <div class="mb-8">
+        <div class="flex flex-col sm:flex-row gap-4 items-center justify-between">
+          <div class="flex flex-col sm:flex-row gap-4 items-center flex-1">
+            <div class="relative">
+              <input type="text" id="searchInput" placeholder="검색어를 입력하세요" 
+                     class="w-full sm:w-80 px-4 py-2 border-b-2 border-gray-300 bg-transparent focus:outline-none focus:border-green-500">
+              <span class="material-icons absolute left-0 top-2.5 text-gray-400">search</span>
+            </div>
+            <div class="flex gap-2">
+              <select id="categoryFilter" class="px-3 py-2 border-b-2 border-gray-300 bg-transparent focus:outline-none focus:border-green-500">
+                <option value="all">전체</option>
+                <option value="general">일반</option>
+                <option value="event">이벤트</option>
+                <option value="update">업데이트</option>
+                <option value="important">중요</option>
+                <option value="maintenance">점검</option>
+              </select>
+            </div>
           </div>
           
-          <select id="categoryFilter" class="px-6 py-3 border-2 border-gray-200 rounded-full focus:outline-none focus:border-[#0A5C36] bg-white min-w-40">
-            <option value="">전체 카테고리</option>
-            <option value="important">🔴 중요</option>
-            <option value="general">📢 일반</option>
-            <option value="event">🎉 이벤트</option>
-            <option value="maintenance">🔧 점검</option>
-          </select>
-          
-          <button id="createNoticeBtn" class="bg-[#0A5C36] text-white px-8 py-3 rounded-full hover:bg-[#0F5132] transition-all duration-300 shadow-lg hover:shadow-xl flex items-center gap-2 font-medium">
-            <span class="material-icons">add</span>
+          <button id="createNoticeBtn" class="bg-green-600 text-white px-6 py-2 hover:bg-green-700 transition-colors flex items-center gap-2">
+            <span class="material-icons text-sm">add</span>
             새 공지 작성
           </button>
         </div>
       </div>
-    </div>
     
-    <!-- 공지사항 목록 테이블 -->
-    <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-12">
-      <div class="overflow-x-auto">
-        <table class="w-full table-fixed">
-          <colgroup>
-            <col class="w-16 sm:w-20">
-            <col class="w-20 sm:w-24">
-            <col class="w-auto">
-            <col class="w-16 sm:w-20">
-            <col class="w-12 sm:w-16">
-            <col class="w-20 sm:w-24">
-          </colgroup>
-          <thead class="bg-gray-50 border-b">
-            <tr>
-              <th class="px-2 sm:px-4 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">번호</th>
-              <th class="px-2 sm:px-4 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">분류</th>
-              <th class="px-2 sm:px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">제목</th>
-              <th class="px-2 sm:px-4 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">작성자</th>
-              <th class="px-2 sm:px-4 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">조회</th>
-              <th class="px-2 sm:px-4 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">작성일</th>
-            </tr>
-          </thead>
-          <tbody id="noticeTableBody" class="bg-white divide-y divide-gray-200">
-            <!-- 공지사항들이 여기에 동적으로 로드됩니다 -->
-            <tr>
-              <td colspan="6" class="px-6 py-16 text-center text-gray-500">
-                <div class="flex flex-col items-center">
-                  <span class="material-icons text-4xl mb-2 text-gray-300">announcement</span>
-                  <p class="text-lg text-gray-400">등록된 공지사항이 없습니다</p>
-                  <p class="text-sm text-gray-400 mt-1">새로운 공지사항을 작성해보세요!</p>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <!-- 공지사항 목록 -->
+      <div class="mb-8">
+        <div class="bg-white">
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead class="border-b-2 border-gray-200">
+                <tr>
+                  <th class="px-4 py-3 text-center text-sm font-medium text-gray-600 w-16">번호</th>
+                  <th class="px-4 py-3 text-center text-sm font-medium text-gray-600 w-20">분류</th>
+                  <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">제목</th>
+                  <th class="px-4 py-3 text-center text-sm font-medium text-gray-600 w-24">작성일</th>
+                  <th class="px-4 py-3 text-center text-sm font-medium text-gray-600 w-16">조회</th>
+                </tr>
+              </thead>
+              <tbody id="noticesList" class="divide-y divide-gray-100">
+                <!-- 공지사항들이 여기에 동적으로 로드됩니다 -->
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
-    </div>
     
-    <!-- 페이지네이션 -->
-    <div class="flex justify-center">
-      <nav class="flex items-center space-x-2 bg-white rounded-full shadow-lg p-2">
-        <button class="w-10 h-10 rounded-full text-gray-500 hover:bg-gray-100 flex items-center justify-center transition-colors">
-          <span class="material-icons text-sm">chevron_left</span>
-        </button>
-        <button class="w-10 h-10 rounded-full bg-[#0A5C36] text-white flex items-center justify-center font-medium">1</button>
-        <button class="w-10 h-10 rounded-full text-gray-700 hover:bg-gray-100 flex items-center justify-center transition-colors">2</button>
-        <button class="w-10 h-10 rounded-full text-gray-700 hover:bg-gray-100 flex items-center justify-center transition-colors">3</button>
-        <button class="w-10 h-10 rounded-full text-gray-500 hover:bg-gray-100 flex items-center justify-center transition-colors">
-          <span class="material-icons text-sm">chevron_right</span>
-        </button>
-      </nav>
+      <!-- 페이지네이션 -->
+      <div id="pagination" class="flex justify-center">
+        <!-- 동적으로 생성됨 -->
+      </div>
     </div>
   </main>
 
   <!-- 푸터 -->
-  <footer class="bg-green-800 text-white py-8 mt-12">
-    <div class="container mx-auto px-4 text-center">
+  <footer class="mt-16 py-6 border-t border-gray-200">
+    <div class="container mx-auto px-4 text-center text-gray-600 text-sm">
       <p>&copy; 2025 홍숲쿨링. All rights reserved.</p>
     </div>
   </footer>
+
+  <!-- 공지사항 상세 보기 모달 -->
+  <div id="noticeDetailModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <!-- 모달 헤더 -->
+      <div class="flex items-center justify-between p-6 border-b border-gray-200">
+        <div class="flex items-center space-x-3">
+          <span id="detailCategory" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"></span>
+          <span id="detailPinned" class="material-icons text-red-500 text-lg hidden">push_pin</span>
+        </div>
+        <button id="closeDetailModal" class="text-gray-400 hover:text-gray-600 transition-colors">
+          <span class="material-icons text-2xl">close</span>
+        </button>
+      </div>
+      
+      <!-- 모달 내용 -->
+      <div class="p-6">
+        <h2 id="detailTitle" class="text-2xl font-bold text-gray-900 mb-4"></h2>
+        
+        <div class="flex items-center space-x-6 text-sm text-gray-500 mb-6">
+          <div class="flex items-center space-x-1">
+            <span class="material-icons text-sm">schedule</span>
+            <span id="detailDate"></span>
+          </div>
+          <div class="flex items-center space-x-1">
+            <span class="material-icons text-sm">visibility</span>
+            <span id="detailViews"></span>
+          </div>
+        </div>
+        
+        <div id="detailContent" class="prose max-w-none text-gray-700 leading-relaxed whitespace-pre-wrap"></div>
+      </div>
+      
+      <!-- 모달 푸터 -->
+      <div class="flex justify-end p-6 border-t border-gray-200">
+        <button id="closeDetailModalBtn" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors">
+          닫기
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- 공지사항 작성 모달 -->
   <div id="createNoticeModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
@@ -202,9 +193,10 @@
             <select id="noticeCategory" name="category" required
                     class="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
               <option value="">카테고리 선택</option>
-              <option value="important">중요</option>
               <option value="general">일반</option>
               <option value="event">이벤트</option>
+              <option value="update">업데이트</option>
+              <option value="important">중요</option>
               <option value="maintenance">점검</option>
             </select>
           </div>
@@ -218,24 +210,6 @@
           <div class="mb-6">
             <label class="flex items-center">
               <input type="checkbox" id="isPinned" name="isPinned" class="rounded border-green-300 text-green-600 focus:ring-green-500">
-              <span class="ml-2 text-sm text-green-700">상단 고정</span>
-            </label>
-          </div>
-          
-          <div class="flex justify-end space-x-3">
-            <button type="button" id="cancelBtn" class="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50">
-              취소
-            </button>
-            <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
-              작성 완료
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <style>
     .dropdown:hover .dropdown-menu {
       display: block !important;
     }
@@ -248,109 +222,149 @@
   </style>
 
   <script>
-    // 페이지 로드 시 즉시 로그인 확인
-    (async function() {
-      try {
-        const response = await fetch('/api/current-user', {
-          credentials: 'include'
-        });
-        const data = await response.json();
-        
-        if (!data.isAuthenticated) {
-          alert('로그인이 필요한 페이지입니다.');
-          window.location.href = 'login.html';
-          return;
-        }
-        
-        // 로그인된 경우에만 페이지 로드
-        loadNotices();
-        
-        // 로그인 상태 표시
-        document.getElementById('auth-buttons').style.display = 'none';
-        document.getElementById('userMenu').classList.remove('hidden');
-        document.getElementById('userName').textContent = data.user.name || data.user.username;
-        
-        // 모달 관련 이벤트
-        document.getElementById('createNoticeBtn').addEventListener('click', openCreateModal);
-        document.getElementById('closeModal').addEventListener('click', closeCreateModal);
-        document.getElementById('cancelBtn').addEventListener('click', closeCreateModal);
-        document.getElementById('createNoticeForm').addEventListener('submit', handleCreateNotice);
-      } catch (error) {
-        console.error('인증 확인 오류:', error);
-        window.location.href = 'login.html';
-      }
-    })();
+    // 전역 변수
+    let allNotices = [];
+    let filteredNotices = [];
+    let currentPage = 1;
+    const noticesPerPage = 10;
+    
+    // 현재 사용자 정보 (실제로는 로그인 시스템에서 가져와야 함)
+    let currentUser = {
+      username: 'yangeg2004', // 테스트용
+      isAdmin: false
+    };
+    
+    // 관리자 계정 설정
+    const ADMIN_USERS = ['yangeg2004'];
+    
+    // 사용자 권한 확인
+    function isAdmin(username = currentUser.username) {
+      return ADMIN_USERS.includes(username);
+    }
+    
+    // 공지사항 관리 권한 확인 (작성자 또는 관리자)
+    function canManageNotice(notice) {
+      return notice.author === currentUser.username || isAdmin();
+    }
 
-    // 공지사항 데이터 로드
+    // 공지사항 목록 로드 (더미 데이터 사용)
     async function loadNotices() {
       try {
-        const response = await fetch('/api/notices', {
-          credentials: 'include'
-        });
-        const data = await response.json();
-        renderNotices(data.notices || data);
+        // 더미 데이터로 대체 (API 서버가 없는 경우)
+        allNotices = [
+          {
+            id: 1,
+            title: "홍숲쿨링 서비스 이용 안내",
+            content: "안녕하세요, 홍숲쿨링을 이용해 주셔서 감사합니다.\n\n다음과 같은 주요 기능들을 제공하고 있습니다:\n\n🌟 주요 기능\n• 실시간 환경 데이터 모니터링\n• 개인 맞춤형 환경 관리 솔루션\n• 커뮤니티 기반 정보 공유\n• 친환경 생활 가이드\n\n📱 모바일 앱도 곧 출시 예정이니 많은 관심 부탁드립니다!\n\n문의사항이 있으시면 언제든지 고객센터로 연락해 주세요.",
+            category: "general",
+            author: "yangeg2004",
+            createdAt: "2025-01-10",
+            views: 156,
+            pinned: true
+          },
+          {
+            id: 2,
+            title: '시스템 점검 안내',
+            content: '안녕하세요, 홍숲쿨링입니다.\n\n서비스 품질 향상을 위한 정기 점검을 실시합니다.\n\n점검 일시: 2025년 1월 15일 (수) 오전 2시 ~ 오전 6시\n점검 내용:\n• 서버 성능 최적화\n• 보안 업데이트 적용\n• 데이터베이스 정리\n\n점검 시간 동안 서비스 이용이 일시적으로 중단됩니다.\n이용에 불편을 드려 죄송합니다.\n\n문의사항이 있으시면 고객센터로 연락 부탁드립니다.\n\n감사합니다.',
+            category: 'maintenance',
+            author: 'testuser',
+            createdAt: '2025-01-09',
+            views: 89,
+            pinned: false
+          },
+          {
+            id: 3,
+            title: '새로운 기능 업데이트',
+            content: '홍숲쿨링에 새로운 기능들이 추가되었습니다! ✨\n\n업데이트 내용:\n\n1. 실시간 화상 회의 기능\n   • 스터디 그룹 내에서 화상 통화 가능\n   • 화면 공유 및 화이트보드 기능\n\n2. 학습 진도 추적\n   • 개인별 학습 진도 시각화\n   • 목표 설정 및 달성률 확인\n\n3. 모바일 앱 최적화\n   • 더 빠른 로딩 속도\n   • 개선된 사용자 인터페이스\n\n4. 알림 시스템 개선\n   • 맞춤형 알림 설정\n   • 중요 공지사항 푸시 알림\n\n새로운 기능들을 활용하여 더욱 효과적인 학습을 경험해보세요!\n\n홍숲쿨링 팀',
+            category: 'update',
+            author: 'yangeg2004',
+            createdAt: '2025-01-08',
+            views: 234,
+            pinned: false
+          }
+        ];
+        
+        filteredNotices = [...allNotices];
+        currentPage = 1;
+        renderNotices();
+        renderPagination();
       } catch (error) {
         console.error('공지사항 로드 오류:', error);
+        document.getElementById('noticesList').innerHTML = `
+          <tr>
+            <td colspan="5" class="px-6 py-8 text-center text-gray-500">
+              공지사항을 불러오는 중 오류가 발생했습니다.
+            </td>
+          </tr>
+        `;
       }
     }
 
-    // 공지사항 목록 렌더링
-    function renderNotices(notices) {
-      const noticeTableBody = document.getElementById('noticeTableBody');
+    // 공지사항 렌더링
+    function renderNotices() {
+      const noticesList = document.getElementById('noticesList');
       
-      if (!notices || notices.length === 0) {
-        noticeTableBody.innerHTML = `
+      if (!filteredNotices || filteredNotices.length === 0) {
+        noticesList.innerHTML = `
           <tr>
-            <td colspan="6" class="px-6 py-16 text-center text-gray-500">
-              <div class="flex flex-col items-center">
-                <span class="material-icons text-4xl mb-2 text-gray-300">announcement</span>
-                <p class="text-lg text-gray-400">등록된 공지사항이 없습니다</p>
-                <p class="text-sm text-gray-400 mt-1">새로운 공지사항을 작성해보세요!</p>
-              </div>
+            <td colspan="5" class="px-6 py-8 text-center text-gray-500">
+              등록된 공지사항이 없습니다.
             </td>
           </tr>
         `;
         return;
       }
       
-      noticeTableBody.innerHTML = notices.map((notice, index) => {
+      // 페이지네이션 적용
+      const startIndex = (currentPage - 1) * noticesPerPage;
+      const endIndex = startIndex + noticesPerPage;
+      const paginatedNotices = filteredNotices.slice(startIndex, endIndex);
+      
+      noticesList.innerHTML = paginatedNotices.map((notice, index) => {
         const categoryInfo = {
-          'general': { color: 'bg-blue-50 text-blue-700 border-blue-200', emoji: '📢', text: '일반' },
-          'event': { color: 'bg-green-50 text-green-700 border-green-200', emoji: '🎉', text: '이벤트' },
+          'general': { color: 'bg-gray-50 text-gray-700 border-gray-200', emoji: '📢', text: '일반' },
+          'event': { color: 'bg-blue-50 text-blue-700 border-blue-200', emoji: '🎉', text: '이벤트' },
+          'update': { color: 'bg-green-50 text-green-700 border-green-200', emoji: '🔄', text: '업데이트' },
           'important': { color: 'bg-red-50 text-red-700 border-red-200', emoji: '🔴', text: '중요' },
           'maintenance': { color: 'bg-yellow-50 text-yellow-700 border-yellow-200', emoji: '🔧', text: '점검' }
         };
         
         const category = categoryInfo[notice.category] || categoryInfo.general;
-        const createdAt = new Date(notice.createdAt).toLocaleDateString('ko-KR');
-        const timeAgo = getTimeAgo(notice.createdAt);
+        const globalIndex = startIndex + index + 1;
         
         return `
-          <tr class="hover:bg-gray-50 transition-colors ${notice.isPinned ? 'bg-red-50' : ''}">
-            <td class="px-2 sm:px-4 py-3 whitespace-nowrap text-sm text-gray-900 font-medium text-center">
-              ${notice.isPinned ? '<span class="material-icons text-red-500 text-xs">push_pin</span><br>' : ''}
-              <span class="text-xs sm:text-sm">${index + 1}</span>
-            </td>
-            <td class="px-1 sm:px-2 py-3 whitespace-nowrap text-center">
-              <span class="inline-flex items-center justify-center px-1.5 py-0.5 rounded-full text-xs font-medium ${category.color}">
-                <span class="hidden sm:inline">${category.emoji} ${category.text}</span>
-                <span class="sm:hidden">${category.emoji}</span>
+          <tr class="hover:bg-gray-50 transition-colors ${notice.pinned ? 'bg-yellow-50' : ''}">
+            <td class="px-4 py-3 text-center text-sm text-gray-600">${globalIndex}</td>
+            <td class="px-4 py-3 text-center">
+              <span class="inline-flex items-center px-2 py-1 text-xs font-medium ${category.color}">
+                ${category.text}
               </span>
             </td>
-            <td class="px-2 sm:px-4 py-3 text-sm text-gray-900">
-              <div class="cursor-pointer hover:text-[#0A5C36] transition-colors" onclick="viewNotice('${notice._id}')">
-                <div class="font-medium truncate">${notice.title}</div>
-                <div class="text-gray-500 text-xs mt-0.5 truncate hidden sm:block">${notice.content.substring(0, 50)}${notice.content.length > 50 ? '...' : ''}</div>
+            <td class="px-4 py-3 text-sm text-gray-900">
+              <div class="flex items-center justify-between">
+                <div class="cursor-pointer hover:text-green-600 transition-colors flex-1" onclick="openNoticeDetail(${notice.id})">
+                  <div class="font-medium flex items-center">
+                    ${notice.pinned ? '<span class="material-icons text-red-500 text-sm mr-2">push_pin</span>' : ''}
+                    ${notice.title}
+                  </div>
+                </div>
+                <div class="flex items-center space-x-2 ml-4">
+                  ${canManageNotice(notice) ? `
+                    <button onclick="togglePin(${notice.id})" class="text-xs px-2 py-1 rounded ${notice.pinned ? 'bg-red-100 text-red-600 hover:bg-red-200' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'} transition-colors" title="${notice.pinned ? '고정 해제' : '상단 고정'}">
+                      <span class="material-icons text-xs">push_pin</span>
+                    </button>
+                    <button onclick="deleteNotice(${notice.id})" class="text-xs px-2 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200 transition-colors" title="삭제">
+                      <span class="material-icons text-xs">delete</span>
+                    </button>
+                  ` : ''}
+                </div>
               </div>
             </td>
-            <td class="px-1 sm:px-2 py-3 whitespace-nowrap text-xs sm:text-sm text-gray-500 text-center">
-              <div class="truncate">${(notice.author?.name || '관리자').substring(0, 6)}</div>
+            <td class="px-4 py-3 text-center text-sm text-gray-500">
+              ${new Date(notice.createdAt).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
             </td>
-            <td class="px-1 sm:px-2 py-3 whitespace-nowrap text-xs sm:text-sm text-gray-500 text-center">
+            <td class="px-4 py-3 text-center text-sm text-gray-500">
               ${notice.views || 0}
-            </td>
-            <td class="px-1 sm:px-2 py-3 whitespace-nowrap text-xs text-gray-500 text-center">
-              <div class="truncate">${new Date(notice.createdAt).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}</div>
             </td>
           </tr>
         `;
@@ -371,9 +385,129 @@
       return date.toLocaleDateString('ko-KR');
     }
     
+    // 새 공지사항 작성
+    function createNotice(formData) {
+      // 새 공지사항 생성
+      const newNotice = {
+        id: Date.now(), // 임시 ID
+        title: formData.title,
+        content: formData.content,
+        category: formData.category,
+        author: currentUser.username, // 현재 로그인된 사용자
+        createdAt: new Date().toISOString().split('T')[0],
+        views: 0,
+        pinned: formData.isPinned || false
+      };
+      
+      // 배열 맨 앞에 추가
+      allNotices.unshift(newNotice);
+      
+      // 필터된 목록도 업데이트
+      filteredNotices = [...allNotices];
+      
+      alert('공지사항이 성공적으로 작성되었습니다!');
+      closeCreateModal();
+      loadNotices(); // 목록 새로고침
+    }
+    
+    // 공지사항 고정/해제
+    function togglePin(noticeId) {
+      const notice = allNotices.find(n => n.id === noticeId);
+      if (!notice) return;
+      
+      if (!canManageNotice(notice)) {
+        alert('권한이 없습니다.');
+        return;
+      }
+      
+      notice.pinned = !notice.pinned;
+      
+      // 필터된 목록도 업데이트
+      filteredNotices = [...allNotices];
+      
+      alert(notice.pinned ? '공지사항이 상단에 고정되었습니다.' : '공지사항 고정이 해제되었습니다.');
+      renderNotices(); // 목록 새로고침
+    }
+    
+    // 공지사항 삭제
+    function deleteNotice(noticeId) {
+      const notice = allNotices.find(n => n.id === noticeId);
+      if (!notice) return;
+      
+      if (!canManageNotice(notice)) {
+        alert('권한이 없습니다.');
+        return;
+      }
+      
+      if (!confirm('정말로 이 공지사항을 삭제하시겠습니까?')) {
+        return;
+      }
+      
+      // 배열에서 제거
+      const index = allNotices.findIndex(n => n.id === noticeId);
+      if (index > -1) {
+        allNotices.splice(index, 1);
+      }
+      
+      // 필터된 목록도 업데이트
+      filteredNotices = [...allNotices];
+      
+      alert('공지사항이 삭제되었습니다.');
+      renderNotices(); // 목록 새로고침
+      renderPagination(); // 페이지네이션 업데이트
+    }
+
     // 공지사항 상세 보기
-    function viewNotice(noticeId) {
-      window.location.href = `/notices/${noticeId}`;
+    function openNoticeDetail(noticeId) {
+      const notice = allNotices.find(n => n.id === noticeId);
+      if (!notice) return;
+      
+      // 조회수 증가
+      notice.views++;
+      
+      // 모달 내용 설정
+      const categoryColors = {
+        'general': 'bg-gray-100 text-gray-800',
+        'event': 'bg-blue-100 text-blue-800',
+        'update': 'bg-green-100 text-green-800',
+        'important': 'bg-red-100 text-red-800',
+        'maintenance': 'bg-yellow-100 text-yellow-800'
+      };
+      
+      const categoryTexts = {
+        'general': '일반',
+        'event': '이벤트',
+        'update': '업데이트',
+        'important': '중요',
+        'maintenance': '점검'
+      };
+      
+      document.getElementById('detailTitle').textContent = notice.title;
+      document.getElementById('detailContent').textContent = notice.content;
+      document.getElementById('detailDate').textContent = notice.createdAt;
+      document.getElementById('detailViews').textContent = `조회 ${notice.views}회`;
+      
+      const modalCategory = document.getElementById('detailCategory');
+      modalCategory.textContent = categoryTexts[notice.category] || '일반';
+      modalCategory.className = `px-3 py-1 rounded-full text-sm font-medium ${categoryColors[notice.category] || categoryColors.general}`;
+      
+      const modalPinned = document.getElementById('detailPinned');
+      if (notice.pinned) {
+        modalPinned.classList.remove('hidden');
+      } else {
+        modalPinned.classList.add('hidden');
+      }
+      
+      // 모달 표시
+      document.getElementById('noticeDetailModal').classList.remove('hidden');
+      
+      // 목록 업데이트 (조회수 반영)
+      renderNotices();
+    }
+    
+    // 상세 모달 닫기
+    function closeDetailModal() {
+      document.getElementById('noticeDetailModal').classList.add('hidden');
     }
     
     // 모달 관련 함수들
@@ -386,31 +520,79 @@
       document.getElementById('createNoticeForm').reset();
     }
     
-    // 공지사항 작성
-    async function createNotice(formData) {
-      try {
-        const response = await fetch('/api/notices', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          credentials: 'include',
-          body: JSON.stringify(formData)
-        });
-        
-        const data = await response.json();
-        
-        if (!response.ok) {
-          throw new Error(data.message || '공지사항 작성에 실패했습니다.');
-        }
-        
-        alert('공지사항이 성공적으로 작성되었습니다!');
-        closeCreateModal();
-        loadNotices(); // 목록 새로고침
-      } catch (error) {
-        console.error('공지사항 작성 오류:', error);
-        alert(error.message || '공지사항 작성 중 오류가 발생했습니다.');
+    // 검색 기능
+    function searchNotices() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const category = document.getElementById('categoryFilter').value;
+      
+      filteredNotices = allNotices.filter(notice => {
+        const matchesSearch = notice.title.toLowerCase().includes(searchTerm) || 
+                            notice.content.toLowerCase().includes(searchTerm);
+        const matchesCategory = category === '' || notice.category === category;
+        return matchesSearch && matchesCategory;
+      });
+      
+      currentPage = 1;
+      renderNotices();
+      renderPagination();
+    }
+    
+    // 페이지네이션 렌더링
+    function renderPagination() {
+      const totalPages = Math.ceil(filteredNotices.length / noticesPerPage);
+      const pagination = document.getElementById('pagination');
+      
+      if (totalPages <= 1) {
+        pagination.innerHTML = '';
+        return;
       }
+      
+      let paginationHtml = '<nav class="flex items-center justify-center space-x-1 mt-8">';
+      
+      // 이전 버튼
+      if (currentPage > 1) {
+        paginationHtml += `
+          <button onclick="changePage(${currentPage - 1})" class="px-3 py-2 text-gray-500 hover:bg-gray-100 rounded-md transition-colors">
+            <span class="material-icons text-sm">chevron_left</span>
+          </button>
+        `;
+      }
+      
+      // 페이지 번호들
+      const startPage = Math.max(1, currentPage - 2);
+      const endPage = Math.min(totalPages, currentPage + 2);
+      
+      for (let i = startPage; i <= endPage; i++) {
+        const isActive = i === currentPage;
+        paginationHtml += `
+          <button onclick="changePage(${i})" class="px-3 py-2 rounded-md transition-colors ${
+            isActive 
+              ? 'bg-green-600 text-white' 
+              : 'text-gray-700 hover:bg-gray-100'
+          }">
+            ${i}
+          </button>
+        `;
+      }
+      
+      // 다음 버튼
+      if (currentPage < totalPages) {
+        paginationHtml += `
+          <button onclick="changePage(${currentPage + 1})" class="px-3 py-2 text-gray-500 hover:bg-gray-100 rounded-md transition-colors">
+            <span class="material-icons text-sm">chevron_right</span>
+          </button>
+        `;
+      }
+      
+      paginationHtml += '</nav>';
+      pagination.innerHTML = paginationHtml;
+    }
+    
+    // 페이지 변경
+    function changePage(page) {
+      currentPage = page;
+      renderNotices();
+      renderPagination();
     }
     
     // 폼 제출 처리
@@ -427,28 +609,56 @@
       createNotice(formData);
     }
     
-    // 로그아웃 처리
-    async function handleLogout() {
+    // 사이드바 로드
+    async function loadSidebar() {
       try {
-        const response = await fetch('/api/logout', {
-          method: 'POST',
-          credentials: 'include'
-        });
+        const response = await fetch('sidebar.html');
+        const sidebarHtml = await response.text();
+        document.getElementById('sidebar-container').innerHTML = sidebarHtml;
         
-        if (!response.ok) {
-          throw new Error('로그아웃에 실패했습니다.');
+        // 사이드바 스크립트 실행
+        if (typeof initSidebar === 'function') {
+          initSidebar();
         }
-        
-        alert('로그아웃되었습니다.');
-        window.location.href = 'login.html';
       } catch (error) {
-        console.error('로그아웃 오류:', error);
-        alert('로그아웃 중 오류가 발생했습니다.');
+        console.error('사이드바 로드 오류:', error);
       }
     }
+    
+    // 이벤트 리스너 설정
+    function setupEventListeners() {
+      // 검색 기능
+      document.getElementById('searchInput').addEventListener('input', searchNotices);
+      
+      // 카테고리 필터
+      document.getElementById('categoryFilter').addEventListener('change', searchNotices);
+      
+      // 모달 관련
+      document.getElementById('createNoticeBtn').addEventListener('click', openCreateModal);
+      document.getElementById('closeModal').addEventListener('click', closeCreateModal);
+      document.getElementById('cancelBtn').addEventListener('click', closeCreateModal);
+      document.getElementById('createNoticeForm').addEventListener('submit', handleCreateNotice);
+      
+      // 상세 모달 관련
+      document.getElementById('closeDetailModal').addEventListener('click', closeDetailModal);
+      document.getElementById('closeDetailModalBtn').addEventListener('click', closeDetailModal);
+    }
+    
+    // 페이지 로드 시 초기화
+    document.addEventListener('DOMContentLoaded', function() {
+      // 현재 사용자 정보 설정 (실제로는 로그인 시스템에서 가져와야 함)
+      currentUser.isAdmin = isAdmin(currentUser.username);
+      
+      // 사이드바 로드
+      loadSidebar();
+      
+      // 공지사항 로드
+      loadNotices();
+      
+      // 이벤트 리스너 등록
+      setupEventListeners();
+    });
   </script>
   <script src="common.js"></script>
-  <script src="sidebar.js"></script>
-  <script src="script.js"></script>
 </body>
 </html>

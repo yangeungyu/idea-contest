@@ -19,103 +19,105 @@
     }
   </script>
   <style>
-    body { padding-top: 0px; }
-    .post-card { transition: transform 0.2s; }
-    .post-card:hover { transform: translateY(-2px); }
-    .post-question { border-left: 4px solid #3b82f6; }
-    .post-discussion { border-left: 4px solid #16a34a; }
-    .post-share { border-left: 4px solid #f59e0b; }
-    .post-free { border-left: 4px solid #8b5cf6; }
+    body { 
+      padding-top: 0px; 
+      background-color: #f8f9fa;
+    }
+    
+    .line-clamp-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    .line-clamp-3 {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    .animate-float {
+      animation: float 3s ease-in-out infinite;
+    }
   </style>
 </head>
-<body class="bg-green-50 lg:ml-20" data-page="community">
-  <!-- 상단 헤더 -->
-  <header class="bg-white shadow-sm border-b border-gray-200 fixed w-full z-40 lg:ml-20">
-    <div class="px-4 py-3 flex justify-between items-center">
-        <div class="flex items-center">
-          <!-- 모바일에서도 로고 표시 (클릭 가능) -->
-          <div id="mobileLogoBtn" class="lg:hidden flex items-center cursor-pointer hover:bg-gray-50 rounded-lg p-2 transition-colors">
-            <img src="logo.png" alt="홍숲쿨링" class="w-8 h-8 object-contain mr-2">
-            <span class="text-lg font-semibold text-gray-900">홍숲쿨링</span>
-          </div>
-        </div>
-      
-      <!-- 로그인/회원가입 버튼 -->
-      <div class="flex items-center space-x-4">
-        <div id="auth-buttons" class="flex items-center space-x-4">
-          <a href="login.html" class="text-gray-700 hover:text-green-600">로그인</a>
-          <a href="register.html" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">회원가입</a>
-        </div>
-        <!-- 로그인 시 표시될 프로필 메뉴 -->
-        <div id="userMenu" class="hidden dropdown relative">
-          <button class="flex items-center space-x-2 focus:outline-none">
-            <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
-              <span class="material-icons text-gray-600">person</span>
-            </div>
-            <span id="userName" class="text-gray-700">사용자이름</span>
-            <span class="material-icons text-gray-500">arrow_drop_down</span>
-          </button>
-          <div class="dropdown-menu absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10" style="display: none;">
-            <a href="mypage.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">마이페이지</a>
-            <a href="#" onclick="handleLogout()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">로그아웃</a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </header>
+<body class="bg-gray-100 lg:ml-20" data-page="community">
 
+  <!-- 사이드바 include -->
+  <div id="sidebar-container"></div>
   <!-- 메인 콘텐츠 -->
-  <main class="container mx-auto px-4 py-8">
-    <!-- 페이지 헤더 -->
-    <div class="bg-white p-6 rounded-lg shadow-md mb-8">
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-        <h1 class="text-2xl font-bold text-gray-800 mb-4 md:mb-0">커뮤니티</h1>
-        <button id="createPostBtn" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 text-center">
-          <i class="material-icons align-middle">add</i> 글 작성하기
-        </button>
+  <main class="min-h-screen flex flex-col items-center justify-center px-4 py-16">
+    <!-- 페이지 컨테이너 -->
+    <div class="w-full max-w-5xl mx-auto">
+      <!-- 페이지 헤더 -->
+      <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-gray-900 mb-3">커뮤니티</h1>
+        <p class="text-gray-600 text-lg">홍숲쿨링 사용자들과 함께 소통하고 정보를 공유하세요</p>
       </div>
       
-      <!-- 검색 및 필터 -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="md:col-span-2">
-          <div class="relative">
-            <input type="text" id="searchInput" placeholder="제목, 내용으로 검색" 
-                   class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 pl-10">
-            <i class="material-icons absolute left-3 top-2.5 text-gray-400">search</i>
+      <!-- 검색 및 필터 섹션 -->
+      <div class="mb-8">
+        <div class="flex flex-col sm:flex-row gap-4 items-center justify-between">
+          <div class="flex flex-col sm:flex-row gap-4 items-center flex-1">
+            <div class="relative">
+              <input type="text" id="searchInput" placeholder="검색어를 입력하세요" 
+                     class="w-full sm:w-80 px-4 py-2 border-b-2 border-gray-300 bg-transparent focus:outline-none focus:border-green-500">
+              <span class="material-icons absolute left-0 top-2.5 text-gray-400">search</span>
+            </div>
+            <div class="flex gap-2">
+              <select id="categoryFilter" class="px-3 py-2 border-b-2 border-gray-300 bg-transparent focus:outline-none focus:border-green-500">
+                <option value="all">전체</option>
+                <option value="question">질문</option>
+                <option value="discussion">토론</option>
+                <option value="share">정보공유</option>
+                <option value="free">자유</option>
+              </select>
+            </div>
+          </div>
+          
+          <button id="createPostBtn" class="bg-green-600 text-white px-6 py-2 hover:bg-green-700 transition-colors flex items-center gap-2">
+            <span class="material-icons text-sm">add</span>
+            새 글 작성
+          </button>
+        </div>
+      </div>
+    
+      <!-- 게시글 목록 -->
+      <div class="bg-white border border-gray-200">
+        <div class="overflow-x-auto">
+          <div class="min-w-full">
+            <table class="w-full">
+              <thead class="border-b-2 border-gray-200">
+                <tr>
+                  <th class="px-4 py-3 text-center text-sm font-medium text-gray-600 w-16">번호</th>
+                  <th class="px-4 py-3 text-center text-sm font-medium text-gray-600 w-20">분류</th>
+                  <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">제목</th>
+                  <th class="px-4 py-3 text-center text-sm font-medium text-gray-600 w-24">작성자</th>
+                  <th class="px-4 py-3 text-center text-sm font-medium text-gray-600 w-24">작성일</th>
+                  <th class="px-4 py-3 text-center text-sm font-medium text-gray-600 w-16">조회</th>
+                </tr>
+              </thead>
+              <tbody id="postsList" class="divide-y divide-gray-100">
+                <!-- 게시글들이 여기에 동적으로 로드됩니다 -->
+              </tbody>
+            </table>
           </div>
         </div>
-        
-        <select id="categoryFilter" class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-white">
-          <option value="">모든 카테고리</option>
-          <option value="question">질문</option>
-          <option value="discussion">토론</option>
-          <option value="share">정보공유</option>
-          <option value="free">자유</option>
-        </select>
       </div>
-    </div>
     
-    <!-- 게시글 목록 -->
-    <div id="postList" class="space-y-4 mb-8">
-      <!-- 게시글들이 여기에 동적으로 로드됩니다 -->
-      <div class="text-center py-12 text-gray-500">
-        <i class="material-icons text-4xl mb-2">forum</i>
-        <p>등록된 게시글이 없습니다.</p>
+      <!-- 페이지네이션 -->
+      <div id="pagination" class="flex justify-center">
+        <!-- 동적으로 생성됨 -->
       </div>
-    </div>
-    
-    <!-- 페이지네이션 -->
-    <div class="flex justify-center">
-      <nav class="flex items-center space-x-1">
-        <button class="px-3 py-1 rounded-md text-gray-500 hover:bg-gray-100">
-          <i class="material-icons text-sm">chevron_left</i>
-        </button>
-        <button class="px-3 py-1 rounded-md bg-green-600 text-white">1</button>
-        <button class="px-3 py-1 rounded-md text-gray-700 hover:bg-gray-100">2</button>
-        <button class="px-3 py-1 rounded-md text-gray-500 hover:bg-gray-100">
-          <i class="material-icons text-sm">chevron_right</i>
-        </button>
-      </nav>
     </div>
   </main>
 
@@ -131,23 +133,23 @@
     <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-screen overflow-y-auto">
       <div class="p-6">
         <div class="flex justify-between items-center mb-6">
-          <h2 class="text-xl font-bold text-gray-900">글 작성하기</h2>
+          <h2 class="text-xl font-bold text-gray-900">새 글 작성</h2>
           <button id="closeModal" class="text-gray-400 hover:text-gray-600">
-            <i class="material-icons">close</i>
+            <span class="material-icons">close</span>
           </button>
         </div>
         
         <form id="createPostForm">
           <div class="mb-4">
-            <label for="postTitle" class="block text-sm font-medium text-green-700 mb-2">제목</label>
+            <label for="postTitle" class="block text-sm font-medium text-gray-700 mb-2">제목</label>
             <input type="text" id="postTitle" name="title" required
-                   class="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
           </div>
           
           <div class="mb-4">
-            <label for="postCategory" class="block text-sm font-medium text-green-700 mb-2">카테고리</label>
+            <label for="postCategory" class="block text-sm font-medium text-gray-700 mb-2">카테고리</label>
             <select id="postCategory" name="category" required
-                    class="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
               <option value="">카테고리 선택</option>
               <option value="question">질문</option>
               <option value="discussion">토론</option>
@@ -157,9 +159,9 @@
           </div>
           
           <div class="mb-6">
-            <label for="postContent" class="block text-sm font-medium text-green-700 mb-2">내용</label>
+            <label for="postContent" class="block text-sm font-medium text-gray-700 mb-2">내용</label>
             <textarea id="postContent" name="content" rows="8" required
-                      class="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"></textarea>
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"></textarea>
           </div>
           
           <div class="flex justify-end space-x-3">
@@ -171,6 +173,46 @@
             </button>
           </div>
         </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 게시글 상세 보기 모달 -->
+  <div id="postDetailModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-screen overflow-y-auto">
+      <div class="p-6">
+        <div class="flex justify-between items-start mb-6">
+          <div class="flex-1">
+            <div class="flex items-center gap-3 mb-3">
+              <span id="modalCategory" class="px-3 py-1 rounded-full text-sm font-medium"></span>
+              <span id="modalPinned" class="hidden text-red-500">
+                <span class="material-icons text-sm">push_pin</span>
+              </span>
+            </div>
+            <h2 id="modalTitle" class="text-2xl font-bold text-gray-900 mb-2"></h2>
+            <div class="flex items-center gap-4 text-sm text-gray-500">
+              <span id="modalAuthor"></span>
+              <span id="modalDate"></span>
+              <span class="flex items-center gap-1">
+                <span class="material-icons text-sm">visibility</span>
+                <span id="modalViews"></span>
+              </span>
+            </div>
+          </div>
+          <button id="closeDetailModal" class="text-gray-400 hover:text-gray-600 ml-4">
+            <span class="material-icons">close</span>
+          </button>
+        </div>
+        
+        <div class="border-t border-gray-200 pt-6">
+          <div id="modalContent" class="prose max-w-none text-gray-700 whitespace-pre-wrap"></div>
+        </div>
+        
+        <div class="flex justify-end mt-6 pt-4 border-t border-gray-200">
+          <button id="closeDetailModalBtn" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200">
+            닫기
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -188,126 +230,312 @@
   </style>
 
   <script>
-    // 페이지 로드 시 즉시 로그인 확인
-    (async function() {
-      try {
-        const response = await fetch('/api/current-user', {
-          credentials: 'include'
-        });
-        const data = await response.json();
-        
-        if (!data.isAuthenticated) {
-          alert('로그인이 필요한 페이지입니다.');
-          window.location.href = 'login.html';
-          return;
-        }
-        
-        // 로그인된 경우에만 페이지 로드
-        loadPosts();
-        
-        // 로그인 상태 표시
-        const userMenu = document.getElementById('userMenu');
-        const authButtons = document.getElementById('auth-buttons');
-        userMenu.classList.remove('hidden');
-        authButtons.classList.add('hidden');
-        document.getElementById('userName').textContent = data.name;
-        
-        // 모달 관련 이벤트
-        document.getElementById('createPostBtn').addEventListener('click', openCreateModal);
-        document.getElementById('cancelBtn').addEventListener('click', closeCreateModal);
-        document.getElementById('createPostForm').addEventListener('submit', handleCreatePost);
-      } catch (error) {
-        console.error('인증 확인 오류:', error);
-        window.location.href = 'login.html';
+    // 더미 게시글 데이터
+    let allPosts = [
+      {
+        id: 1,
+        title: "홍숲쿨링 사용법에 대해 궁금합니다",
+        content: "안녕하세요! 홍숲쿨링을 처음 사용하는데, 기본적인 사용법을 알고 싶습니다.\n\n특히 다음과 같은 부분이 궁금해요:\n1. 회원가입 후 첫 설정\n2. 주요 기능 사용법\n3. 커뮤니티 이용 규칙\n\n자세한 답변 부탁드립니다!",
+        category: "question",
+        author: "새내기사용자",
+        createdAt: "2025-01-10",
+        views: 45,
+        pinned: false
+      },
+      {
+        id: 2,
+        title: "환경보호 실천 방법 토론해요",
+        content: "요즘 환경 문제가 심각한데, 우리가 일상에서 실천할 수 있는 환경보호 방법에 대해 이야기해봐요.\n\n제가 실천하고 있는 것들:\n- 텀블러 사용하기\n- 대중교통 이용\n- 분리수거 철저히\n- 일회용품 줄이기\n\n여러분은 어떤 방법으로 환경보호를 실천하고 계신가요?",
+        category: "discussion",
+        author: "그린라이프",
+        createdAt: "2025-01-09",
+        views: 78,
+        pinned: true
+      },
+      {
+        id: 3,
+        title: "유용한 앱 추천 정보 공유",
+        content: "최근에 발견한 정말 유용한 앱들을 공유합니다! 📱\n\n🌟 추천 앱 목록:\n1. **Forest** - 집중력 향상 앱\n2. **Todoist** - 할일 관리\n3. **Headspace** - 명상 및 수면\n4. **Duolingo** - 언어 학습\n5. **MyFitnessPal** - 건강 관리\n\n각각 무료 버전도 충분히 유용하니 한번 써보세요!",
+        category: "share",
+        author: "앱마니아",
+        createdAt: "2025-01-08",
+        views: 92,
+        pinned: false
+      },
+      {
+        id: 4,
+        title: "오늘 날씨 정말 좋네요!",
+        content: "오늘 하늘이 정말 맑고 파랗네요! ☀️\n\n이런 날엔 밖에 나가서 산책하거나 운동하기 딱 좋은 것 같아요.\n여러분은 좋은 날씨에 주로 뭘 하시나요?\n\n저는 오늘 한강 공원에 가서 자전거 타려고 합니다! 🚴‍♂️",
+        category: "free",
+        author: "햇살좋아",
+        createdAt: "2025-01-07",
+        views: 34,
+        pinned: false
+      },
+      {
+        id: 5,
+        title: "프로그래밍 공부 방법 질문",
+        content: "프로그래밍을 처음 시작하려는데 어떤 언어부터 배우는 게 좋을까요?\n\n현재 상황:\n- 완전 초보자\n- 웹 개발에 관심\n- 시간은 하루 2-3시간 정도 투자 가능\n\n추천해주시는 학습 로드맵이나 강의가 있다면 알려주세요!",
+        category: "question",
+        author: "코딩초보",
+        createdAt: "2025-01-06",
+        views: 67,
+        pinned: false
       }
-    })();
-
-    // 게시글 데이터 로드
-    async function loadPosts() {
+    ];
+    
+    let currentPage = 1;
+    let postsPerPage = 10;
+    let filteredPosts = [...allPosts];
+    
+    // 페이지 로드 시 초기화
+    document.addEventListener('DOMContentLoaded', function() {
+      // 사이드바 로드
+      loadSidebar();
+      
+      // 게시글 로드
+      loadPosts();
+      
+      // 이벤트 리스너 등록
+      setupEventListeners();
+    });
+    
+    // 사이드바 로드
+    async function loadSidebar() {
       try {
-        const response = await fetch('/api/community/posts', {
-          credentials: 'include'
-        });
-        const data = await response.json();
-        renderPosts(data.posts || data);
+        const response = await fetch('sidebar.html');
+        const sidebarHtml = await response.text();
+        document.getElementById('sidebar-container').innerHTML = sidebarHtml;
+        
+        // 사이드바 스크립트 실행
+        if (typeof initSidebar === 'function') {
+          initSidebar();
+        }
       } catch (error) {
-        console.error('게시글 로드 오류:', error);
+        console.error('사이드바 로드 오류:', error);
       }
     }
     
-    // 게시글 목록 렌더링
-    function renderPosts(posts) {
-      const postList = document.getElementById('postList');
+    // 이벤트 리스너 설정
+    function setupEventListeners() {
+      // 검색 기능
+      document.getElementById('searchInput').addEventListener('input', handleSearch);
       
-      if (!posts || posts.length === 0) {
-        postList.innerHTML = `
-          <div class="text-center py-12 text-gray-500">
-            <span class="material-icons text-4xl mb-2">forum</span>
-            <p>등록된 게시글이 없습니다.</p>
-          </div>
+      // 카테고리 필터
+      document.getElementById('categoryFilter').addEventListener('change', handleCategoryFilter);
+      
+      // 모달 관련
+      document.getElementById('createPostBtn').addEventListener('click', openCreateModal);
+      document.getElementById('closeModal').addEventListener('click', closeCreateModal);
+      document.getElementById('cancelBtn').addEventListener('click', closeCreateModal);
+      document.getElementById('createPostForm').addEventListener('submit', handleCreatePost);
+      
+      // 상세 모달 관련
+      document.getElementById('closeDetailModal').addEventListener('click', closeDetailModal);
+      document.getElementById('closeDetailModalBtn').addEventListener('click', closeDetailModal);
+    }
+
+    // 게시글 데이터 로드
+    function loadPosts() {
+      renderPosts();
+      renderPagination();
+    }
+    
+    // 검색 처리
+    function handleSearch() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const category = document.getElementById('categoryFilter').value;
+      
+      filteredPosts = allPosts.filter(post => {
+        const matchesSearch = post.title.toLowerCase().includes(searchTerm) || 
+                            post.content.toLowerCase().includes(searchTerm);
+        const matchesCategory = category === 'all' || category === '' || post.category === category;
+        return matchesSearch && matchesCategory;
+      });
+      
+      currentPage = 1;
+      renderPosts();
+      renderPagination();
+    }
+    
+    // 카테고리 필터 처리
+    function handleCategoryFilter() {
+      handleSearch(); // 검색과 동일한 로직 사용
+    }
+    
+    // 게시글 목록 렌더링
+    function renderPosts() {
+      const postsList = document.getElementById('postsList');
+      
+      if (filteredPosts.length === 0) {
+        postsList.innerHTML = `
+          <tr>
+            <td colspan="6" class="px-4 py-12 text-center text-gray-500">
+              <div class="flex flex-col items-center">
+                <span class="material-icons text-4xl mb-2 animate-float">forum</span>
+                <p>등록된 게시글이 없습니다.</p>
+              </div>
+            </td>
+          </tr>
         `;
         return;
       }
       
-      postList.innerHTML = posts.map(post => {
-        const categoryColors = {
-          'question': 'bg-blue-100 text-blue-800 border-blue-200',
-          'discussion': 'bg-green-100 text-green-800 border-green-200',
-          'share': 'bg-yellow-100 text-yellow-800 border-yellow-200',
-          'free': 'bg-purple-100 text-purple-800 border-purple-200'
-        };
-        
-        const categoryTexts = {
-          'question': '질문',
-          'discussion': '토론',
-          'share': '정보공유',
-          'free': '자유'
-        };
-        
-        const borderClasses = {
-          'question': 'post-question',
-          'discussion': 'post-discussion',
-          'share': 'post-share',
-          'free': 'post-free'
-        };
-        
-        const borderClass = borderClasses[post.category] || 'post-free';
-        const createdAt = new Date(post.createdAt).toLocaleDateString('ko-KR');
+      const startIndex = (currentPage - 1) * postsPerPage;
+      const endIndex = startIndex + postsPerPage;
+      const currentPosts = filteredPosts.slice(startIndex, endIndex);
+      
+      const categoryColors = {
+        'question': 'bg-blue-100 text-blue-800',
+        'discussion': 'bg-green-100 text-green-800',
+        'share': 'bg-yellow-100 text-yellow-800',
+        'free': 'bg-purple-100 text-purple-800'
+      };
+      
+      const categoryTexts = {
+        'question': '질문',
+        'discussion': '토론',
+        'share': '정보공유',
+        'free': '자유'
+      };
+      
+      postsList.innerHTML = currentPosts.map((post, index) => {
+        const rowNumber = startIndex + index + 1;
+        const categoryClass = categoryColors[post.category] || categoryColors.free;
+        const categoryText = categoryTexts[post.category] || '자유';
         
         return `
-          <div class="post-card bg-white rounded-lg shadow-md p-6 ${borderClass}">
-            <div class="flex items-start justify-between mb-3">
-              <div class="flex items-center space-x-3">
-                <span class="px-2 py-1 rounded-full text-xs ${categoryColors[post.category] || categoryColors.free}">
-                  ${categoryTexts[post.category] || '자유'}
-                </span>
-              </div>
-              <span class="text-sm text-gray-500">${createdAt}</span>
-            </div>
-            
-            <h3 class="text-lg font-bold text-gray-900 mb-2">${post.title}</h3>
-            <p class="text-gray-600 text-sm mb-3 line-clamp-2">${post.content}</p>
-            
-            <div class="flex justify-between items-center pt-3 border-t border-gray-100">
-              <span class="text-sm text-gray-700">작성자: ${post.author?.name || '익명'}</span>
-              <div class="flex items-center space-x-4">
-                <span class="text-sm text-gray-500 flex items-center">
-                  <span class="material-icons text-sm mr-1">visibility</span>
-                  ${post.views || 0}
-                </span>
-                <button class="text-green-600 text-sm font-medium hover:underline" onclick="viewPost('${post._id}')">
-                  자세히 보기
+          <tr class="hover:bg-gray-50 transition-colors">
+            <td class="px-4 py-3 text-center text-sm text-gray-900">${rowNumber}</td>
+            <td class="px-4 py-3 text-center">
+              <span class="px-2 py-1 rounded-full text-xs font-medium ${categoryClass}">
+                ${categoryText}
+              </span>
+            </td>
+            <td class="px-4 py-3">
+              <div class="flex items-center">
+                ${post.pinned ? '<span class="material-icons text-red-500 text-sm mr-2">push_pin</span>' : ''}
+                <button onclick="openPostDetail(${post.id})" class="text-left hover:text-green-600 transition-colors">
+                  <div class="font-medium text-gray-900">${post.title}</div>
                 </button>
               </div>
-            </div>
-          </div>
+            </td>
+            <td class="px-4 py-3 text-center text-sm text-gray-600">${post.author}</td>
+            <td class="px-4 py-3 text-center text-sm text-gray-600">${post.createdAt}</td>
+            <td class="px-4 py-3 text-center text-sm text-gray-600">${post.views}</td>
+          </tr>
         `;
       }).join('');
     }
     
+    // 페이지네이션 렌더링
+    function renderPagination() {
+      const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
+      const pagination = document.getElementById('pagination');
+      
+      if (totalPages <= 1) {
+        pagination.innerHTML = '';
+        return;
+      }
+      
+      let paginationHtml = '<nav class="flex items-center justify-center space-x-1 mt-8">';
+      
+      // 이전 버튼
+      if (currentPage > 1) {
+        paginationHtml += `
+          <button onclick="changePage(${currentPage - 1})" class="px-3 py-2 text-gray-500 hover:bg-gray-100 rounded-md transition-colors">
+            <span class="material-icons text-sm">chevron_left</span>
+          </button>
+        `;
+      }
+      
+      // 페이지 번호들
+      const startPage = Math.max(1, currentPage - 2);
+      const endPage = Math.min(totalPages, currentPage + 2);
+      
+      for (let i = startPage; i <= endPage; i++) {
+        const isActive = i === currentPage;
+        paginationHtml += `
+          <button onclick="changePage(${i})" class="px-3 py-2 rounded-md transition-colors ${
+            isActive 
+              ? 'bg-green-600 text-white' 
+              : 'text-gray-700 hover:bg-gray-100'
+          }">
+            ${i}
+          </button>
+        `;
+      }
+      
+      // 다음 버튼
+      if (currentPage < totalPages) {
+        paginationHtml += `
+          <button onclick="changePage(${currentPage + 1})" class="px-3 py-2 text-gray-500 hover:bg-gray-100 rounded-md transition-colors">
+            <span class="material-icons text-sm">chevron_right</span>
+          </button>
+        `;
+      }
+      
+      paginationHtml += '</nav>';
+      pagination.innerHTML = paginationHtml;
+    }
+    
+    // 페이지 변경
+    function changePage(page) {
+      currentPage = page;
+      renderPosts();
+      renderPagination();
+    }
+    
     // 게시글 상세 보기
-    function viewPost(postId) {
-      window.location.href = `/community/${postId}`;
+    function openPostDetail(postId) {
+      const post = allPosts.find(p => p.id === postId);
+      if (!post) return;
+      
+      // 조회수 증가
+      post.views++;
+      
+      // 모달 내용 설정
+      const categoryColors = {
+        'question': 'bg-blue-100 text-blue-800',
+        'discussion': 'bg-green-100 text-green-800',
+        'share': 'bg-yellow-100 text-yellow-800',
+        'free': 'bg-purple-100 text-purple-800'
+      };
+      
+      const categoryTexts = {
+        'question': '질문',
+        'discussion': '토론',
+        'share': '정보공유',
+        'free': '자유'
+      };
+      
+      document.getElementById('modalTitle').textContent = post.title;
+      document.getElementById('modalContent').textContent = post.content;
+      document.getElementById('modalAuthor').textContent = `작성자: ${post.author}`;
+      document.getElementById('modalDate').textContent = post.createdAt;
+      document.getElementById('modalViews').textContent = post.views;
+      
+      const modalCategory = document.getElementById('modalCategory');
+      modalCategory.textContent = categoryTexts[post.category] || '자유';
+      modalCategory.className = `px-3 py-1 rounded-full text-sm font-medium ${categoryColors[post.category] || categoryColors.free}`;
+      
+      const modalPinned = document.getElementById('modalPinned');
+      if (post.pinned) {
+        modalPinned.classList.remove('hidden');
+      } else {
+        modalPinned.classList.add('hidden');
+      }
+      
+      // 모달 표시
+      document.getElementById('postDetailModal').classList.remove('hidden');
+      
+      // 목록 업데이트 (조회수 반영)
+      renderPosts();
+    }
+    
+    // 상세 모달 닫기
+    function closeDetailModal() {
+      document.getElementById('postDetailModal').classList.add('hidden');
     }
     
     // 모달 관련 함수들
@@ -321,30 +549,28 @@
     }
     
     // 게시글 작성
-    async function createPost(formData) {
-      try {
-        const response = await fetch('/api/community/posts', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          credentials: 'include',
-          body: JSON.stringify(formData)
-        });
-        
-        const data = await response.json();
-        
-        if (!response.ok) {
-          throw new Error(data.message || '게시글 작성에 실패했습니다.');
-        }
-        
-        alert('게시글이 성공적으로 작성되었습니다!');
-        closeCreateModal();
-        loadPosts(); // 목록 새로고침
-      } catch (error) {
-        console.error('게시글 작성 오류:', error);
-        alert(error.message || '게시글 작성 중 오류가 발생했습니다.');
-      }
+    function createPost(formData) {
+      // 새 게시글 생성
+      const newPost = {
+        id: Date.now(), // 임시 ID
+        title: formData.title,
+        content: formData.content,
+        category: formData.category,
+        author: '현재사용자', // 실제로는 로그인된 사용자 정보 사용
+        createdAt: new Date().toISOString().split('T')[0],
+        views: 0,
+        pinned: false
+      };
+      
+      // 배열 맨 앞에 추가
+      allPosts.unshift(newPost);
+      
+      // 필터된 목록도 업데이트
+      filteredPosts = [...allPosts];
+      
+      alert('게시글이 성공적으로 작성되었습니다!');
+      closeCreateModal();
+      loadPosts(); // 목록 새로고침
     }
     
     // 폼 제출 처리
@@ -368,10 +594,6 @@
           credentials: 'include'
         });
         
-        if (!response.ok) {
-          throw new Error('로그아웃에 실패했습니다.');
-        }
-        
         alert('로그아웃되었습니다.');
         window.location.href = 'login.html';
       } catch (error) {
@@ -381,7 +603,5 @@
     }
   </script>
   <script src="common.js"></script>
-  <script src="sidebar.js"></script>
-  <script src="script.js"></script>
 </body>
 </html>

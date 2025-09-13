@@ -11,7 +11,7 @@ const app = express();
 const PORT = process.env.PORT || 10000;
 
 // MongoDB 연결
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/hongcheon-academy', {
+mongoose.connect(process.env.MONGODB_URL || 'mongodb://localhost:27017/hongcheon-academy', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   serverSelectionTimeoutMS: 5000, // 5초 타임아웃
@@ -30,7 +30,7 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/hongcheon
 let store;
 try {
   store = new MongoDBStore({
-    uri: process.env.MONGODB_URI || 'mongodb://localhost:27017/hongcheon-academy',
+    uri: process.env.MONGODB_URL || 'mongodb://localhost:27017/hongcheon-academy',
     collection: 'sessions'
   });
   
@@ -75,7 +75,9 @@ const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String },
   registrationDate: { type: Date, default: Date.now },
-  createdAt: { type: Date, default: Date.now, immutable: true }
+  createdAt: { type: Date, default: Date.now, immutable: true },
+  securityQuestion: { type: String },
+  securityAnswer: { type: String }
 });
 
 // 스터디 모델
@@ -272,7 +274,7 @@ app.get('/api/current-user', (req, res) => {
 app.put('/api/profile', isAuthenticated, async (req, res) => {
   try {
     const userId = req.session.user.id;
-    const { name, email, currentPassword, newPassword } = req.body;
+    const { name, email, currentPassword, newPassword, securityQuestion, securityAnswer } = req.body;
     
     // 기본 유효성 검사
     if (!name) {
@@ -306,6 +308,14 @@ app.put('/api/profile', isAuthenticated, async (req, res) => {
     user.name = name;
     if (email !== undefined) {
       user.email = email;
+    }
+    
+    // 보안 질문 업데이트
+    if (securityQuestion !== undefined) {
+      user.securityQuestion = securityQuestion;
+    }
+    if (securityAnswer !== undefined) {
+      user.securityAnswer = securityAnswer;
     }
     
     await user.save();
@@ -656,6 +666,135 @@ app.delete('/api/studies/:id', isAuthenticated, async (req, res) => {
   } catch (error) {
     console.error('모임 삭제 오류:', error);
     res.status(500).json({ message: '모임 삭제 중 오류가 발생했습니다.' });
+  }
+});
+
+// 보안 질문 확인 API
+app.post('/api/check-security-question', async (req, res) => {
+  try {
+    const { username } = req.body;
+
+    if (!username) {
+      return res.status(400).json({ 
+        success: false, 
+        message: '아이디를 입력해주세요.' 
+      });
+    }
+
+    const user = await User.findOne({ username });
+
+    if (!user) {
+      return res.status(404).json({ 
+        success: false, 
+        message: '존재하지 않는 사용자입니다.' 
+      });
+    }
+
+    if (!user.securityQuestion || !user.securityAnswer) {
+      return res.status(400).json({ 
+        success: false, 
+        message: '보안 질문이 설정되지 않았습니다. 관리자에게 문의하세요.' 
+      });
+    }
+
+    res.json({ 
+      success: true, 
+      securityQuestion: user.securityQuestion 
+    });
+  } catch (error) {
+    console.error('보안 질문 확인 오류:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: '서버 오류가 발생했습니다.' 
+    });
+  }
+});
+
+// 보안 답변 확인 API
+app.post('/api/verify-security-answer', async (req, res) => {
+  try {
+    const { username, answer } = req.body;
+
+    if (!username || !answer) {
+      return res.status(400).json({ 
+        success: false, 
+        message: '아이디와 답변을 모두 입력해주세요.' 
+      });
+    }
+
+    const user = await User.findOne({ username });
+
+    if (!user) {
+      return res.status(404).json({ 
+        success: false, 
+        message: '존재하지 않는 사용자입니다.' 
+      });
+    }
+
+    // 답변 비교 (대소문자 구분 없이, 공백 제거)
+    const normalizedUserAnswer = user.securityAnswer.toLowerCase().replace(/\s+/g, '');
+    const normalizedInputAnswer = answer.toLowerCase().replace(/\s+/g, '');
+
+    if (normalizedUserAnswer !== normalizedInputAnswer) {
+      return res.status(400).json({ 
+        success: false, 
+        message: '보안 답변이 일치하지 않습니다.' 
+      });
+    }
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('보안 답변 확인 오류:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: '서버 오류가 발생했습니다.' 
+    });
+  }
+});
+
+// 비밀번호 재설정 API
+app.post('/api/reset-password', async (req, res) => {
+  try {
+    const { username, newPassword } = req.body;
+
+    if (!username || !newPassword) {
+      return res.status(400).json({ 
+        success: false, 
+        message: '아이디와 새 비밀번호를 모두 입력해주세요.' 
+      });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ 
+        success: false, 
+        message: '비밀번호는 6자 이상이어야 합니다.' 
+      });
+    }
+
+    const user = await User.findOne({ username });
+
+    if (!user) {
+      return res.status(404).json({ 
+        success: false, 
+        message: '존재하지 않는 사용자입니다.' 
+      });
+    }
+
+    // 새 비밀번호 해시화
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    await user.save();
+
+    res.json({ 
+      success: true, 
+      message: '비밀번호가 성공적으로 변경되었습니다.' 
+    });
+  } catch (error) {
+    console.error('비밀번호 재설정 오류:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: '서버 오류가 발생했습니다.' 
+    });
   }
 });
 
