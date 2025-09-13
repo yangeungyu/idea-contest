@@ -5,10 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>새 모임 만들기 - 홍숲쿨링</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            'sans': ['Pretendard Variable', 'Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'Roboto', 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
   <style>
-    body { padding-top: 80px; }
+    body { padding-top: 0px; }
     .form-section { margin-bottom: 2rem; }
     .form-group { margin-bottom: 1rem; }
     .required { color: #dc2626; }
@@ -19,9 +30,11 @@
   <header class="bg-white shadow-sm border-b border-gray-200 fixed w-full z-40 lg:ml-20">
     <div class="px-4 py-3 flex justify-between items-center">
       <div class="flex items-center">
-        <button id="mobileMenuBtn" class="text-gray-600 hover:text-gray-900 lg:hidden mr-3">
-          <span class="material-icons text-2xl">menu</span>
-        </button>
+        <!-- 모바일에서도 로고 표시 (클릭 가능) -->
+        <div id="mobileLogoBtn" class="lg:hidden flex items-center cursor-pointer hover:bg-gray-50 rounded-lg p-2 transition-colors">
+          <img src="logo.png" alt="홍숲쿨링" class="w-8 h-8 object-contain mr-2">
+          <span class="text-lg font-semibold text-gray-900">홍숲쿨링</span>
+        </div>
         <h1 class="text-xl font-bold text-gray-800">새 모임 만들기</h1>
       </div>
       

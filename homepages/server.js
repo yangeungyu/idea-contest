@@ -13,34 +13,52 @@ const PORT = process.env.PORT || 10000;
 // MongoDB 연결
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/hongcheon-academy', {
   useNewUrlParser: true,
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
+  serverSelectionTimeoutMS: 5000, // 5초 타임아웃
+  connectTimeoutMS: 10000, // 10초 연결 타임아웃
 })
 .then(() => {
   console.log('MongoDB에 성공적으로 연결되었습니다.');
 })
 .catch((error) => {
-  console.error('MongoDB 연결 오류:', error);
+  console.error('MongoDB 연결 오류:', error.message);
   console.log('MongoDB 연결에 실패했지만 서버는 계속 실행됩니다.');
+  console.log('로컬 개발을 위해 MongoDB Atlas 사용을 권장합니다.');
 });
 
-// MongoDB 스토어 설정
-const store = new MongoDBStore({
-  uri: process.env.MONGODB_URI || 'mongodb://localhost:27017/hongcheon-academy',
-  collection: 'sessions'
-});
+// MongoDB 스토어 설정 (MongoDB 연결 실패 시 메모리 스토어 사용)
+let store;
+try {
+  store = new MongoDBStore({
+    uri: process.env.MONGODB_URI || 'mongodb://localhost:27017/hongcheon-academy',
+    collection: 'sessions'
+  });
+  
+  store.on('error', function(error) {
+    console.log('MongoDB 세션 스토어 오류:', error.message);
+  });
+} catch (error) {
+  console.log('MongoDB 스토어 생성 실패, 메모리 스토어를 사용합니다.');
+  store = null; // 메모리 스토어 사용
+}
 
 // 세션 설정
-app.use(session({
+const sessionConfig = {
   secret: process.env.SESSION_SECRET || 'your-secret-key',
   resave: false,
   saveUninitialized: false,
-  store: store,
   cookie: {
     maxAge: 1000 * 60 * 60 * 24, // 1일
     httpOnly: true,
     secure: false // 개발환경에서는 false
   }
-}));
+};
+
+if (store) {
+  sessionConfig.store = store;
+}
+
+app.use(session(sessionConfig));
 
 // 미들웨어 설정
 app.use(express.json());
@@ -56,7 +74,8 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   name: { type: String, required: true },
   email: { type: String },
-  registrationDate: { type: Date, default: Date.now }
+  registrationDate: { type: Date, default: Date.now },
+  createdAt: { type: Date, default: Date.now, immutable: true }
 });
 
 // 스터디 모델
@@ -197,11 +216,14 @@ app.post('/api/register', async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
     
-    // 사용자 생성
+    // 사용자 생성 (가입일을 명시적으로 설정)
+    const registrationDate = new Date();
     const user = new User({
       username,
       password: hashedPassword,
-      name
+      name,
+      registrationDate: registrationDate,
+      createdAt: registrationDate
     });
     
     await user.save();
