@@ -234,23 +234,34 @@
   </footer>
 
   <script>
-    // 스터디 ID 가져오기
-    const studyId = window.location.pathname.split('/').pop();
+    // URL에서 스터디 ID 추출
+    const urlParams = new URLSearchParams(window.location.search);
+    const studyId = urlParams.get('id');
     
     // 스터디 데이터 로드
     async function loadStudy() {
+      if (!studyId) {
+        alert('스터디 ID가 없습니다.');
+        window.location.href = 'studies.html';
+        return;
+      }
+      
       try {
-        const response = await fetch(`/api/studies/${studyId}`);
-        const study = await response.json();
+        const response = await fetch(`/api/studies/${studyId}`, {
+          credentials: 'include'
+        });
         
         if (!response.ok) {
-          throw new Error(study.message || '스터디를 불러오는 데 실패했습니다.');
+          const errorData = await response.json();
+          throw new Error(errorData.message || '스터디를 불러오는 데 실패했습니다.');
         }
         
+        const study = await response.json();
         renderStudy(study);
       } catch (error) {
         console.error('스터디 로드 오류:', error);
-        alert(error.message);
+        alert('스터디 정보를 불러오는 중 오류가 발생했습니다: ' + error.message);
+        window.location.href = 'studies.html';
       }
     }
     

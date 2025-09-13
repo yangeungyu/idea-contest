@@ -70,12 +70,12 @@
           <div class="flex flex-col sm:flex-row gap-4 items-center flex-1">
             <div class="relative">
               <input type="text" id="searchInput" placeholder="검색어를 입력하세요" 
-                     class="w-full sm:w-80 px-4 py-2 border-b-2 border-gray-300 bg-transparent focus:outline-none focus:border-green-500">
-              <span class="material-icons absolute left-0 top-2.5 text-gray-400">search</span>
+                     class="w-full sm:w-80 pl-10 pr-4 py-2 border-b-2 border-gray-300 bg-transparent focus:outline-none focus:border-green-500">
+              <span class="material-icons absolute left-2 top-2.5 text-gray-400">search</span>
             </div>
             <div class="flex gap-2">
               <select id="categoryFilter" class="px-3 py-2 border-b-2 border-gray-300 bg-transparent focus:outline-none focus:border-green-500">
-                <option value="all">전체</option>
+                <option value="">전체</option>
                 <option value="question">질문</option>
                 <option value="discussion">토론</option>
                 <option value="share">정보공유</option>
@@ -84,8 +84,8 @@
             </div>
           </div>
           
-          <button id="createPostBtn" class="bg-green-600 text-white px-6 py-2 hover:bg-green-700 transition-colors flex items-center gap-2">
-            <span class="material-icons text-sm">add</span>
+          <button id="createPostBtn" class="bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-3 rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-300 flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+            <span class="material-icons text-sm">edit</span>
             새 글 작성
           </button>
         </div>
@@ -99,7 +99,7 @@
               <thead class="border-b-2 border-gray-200">
                 <tr>
                   <th class="px-4 py-3 text-center text-sm font-medium text-gray-600 w-16">번호</th>
-                  <th class="px-4 py-3 text-center text-sm font-medium text-gray-600 w-20">분류</th>
+                  <th class="px-4 py-3 text-center text-sm font-medium text-gray-600 w-24">분류</th>
                   <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">제목</th>
                   <th class="px-4 py-3 text-center text-sm font-medium text-gray-600 w-24">작성자</th>
                   <th class="px-4 py-3 text-center text-sm font-medium text-gray-600 w-24">작성일</th>
@@ -122,7 +122,7 @@
   </main>
 
   <!-- 푸터 -->
-  <footer class="bg-green-800 text-white py-8 mt-12">
+  <footer class="text-gray-600 py-8 mt-12">
     <div class="container mx-auto px-4 text-center">
       <p>&copy; 2025 홍숲쿨링. All rights reserved.</p>
     </div>
@@ -178,8 +178,8 @@
   </div>
 
   <!-- 게시글 상세 보기 모달 -->
-  <div id="postDetailModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-    <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-screen overflow-y-auto">
+  <div id="postDetailModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center" onclick="closeDetailModal()">
+    <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-screen overflow-y-auto" onclick="event.stopPropagation()">
       <div class="p-6">
         <div class="flex justify-between items-start mb-6">
           <div class="flex-1">
@@ -205,7 +205,29 @@
         </div>
         
         <div class="border-t border-gray-200 pt-6">
-          <div id="modalContent" class="prose max-w-none text-gray-700 whitespace-pre-wrap"></div>
+          <div id="modalContent" class="prose max-w-none text-gray-700 whitespace-pre-wrap mb-6"></div>
+          
+          <!-- 댓글 섹션 -->
+          <div class="border-t border-gray-200 pt-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">댓글</h3>
+            
+            <!-- 댓글 작성 폼 -->
+            <div class="mb-6">
+              <textarea id="commentInput" placeholder="댓글을 작성해주세요..." 
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500" 
+                        rows="3"></textarea>
+              <div class="flex justify-end mt-2">
+                <button id="submitComment" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">
+                  댓글 작성
+                </button>
+              </div>
+            </div>
+            
+            <!-- 댓글 목록 -->
+            <div id="commentsList" class="space-y-4">
+              <!-- 댓글들이 여기에 동적으로 로드됩니다 -->
+            </div>
+          </div>
         </div>
         
         <div class="flex justify-end mt-6 pt-4 border-t border-gray-200">
@@ -213,6 +235,56 @@
             닫기
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 게시글 수정 모달 -->
+  <div id="editPostModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-screen overflow-y-auto">
+      <div class="p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-bold text-gray-900">게시글 수정</h2>
+          <button id="closeEditModal" class="text-gray-400 hover:text-gray-600">
+            <span class="material-icons">close</span>
+          </button>
+        </div>
+        
+        <form id="editPostForm">
+          <input type="hidden" id="editPostId">
+          <div class="mb-4">
+            <label for="editPostTitle" class="block text-sm font-medium text-gray-700 mb-2">제목</label>
+            <input type="text" id="editPostTitle" name="title" required
+                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+          </div>
+          
+          <div class="mb-4">
+            <label for="editPostCategory" class="block text-sm font-medium text-gray-700 mb-2">카테고리</label>
+            <select id="editPostCategory" name="category" required
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+              <option value="">카테고리 선택</option>
+              <option value="question">질문</option>
+              <option value="discussion">토론</option>
+              <option value="share">정보공유</option>
+              <option value="free">자유</option>
+            </select>
+          </div>
+          
+          <div class="mb-6">
+            <label for="editPostContent" class="block text-sm font-medium text-gray-700 mb-2">내용</label>
+            <textarea id="editPostContent" name="content" rows="8" required
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"></textarea>
+          </div>
+          
+          <div class="flex justify-end space-x-3">
+            <button type="button" id="cancelEditBtn" class="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50">
+              취소
+            </button>
+            <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+              수정 완료
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
@@ -230,63 +302,93 @@
   </style>
 
   <script>
-    // 더미 게시글 데이터
-    let allPosts = [
+    // 게시글 데이터 로드 (로컬 스토리지에서 불러오기)
+    function loadPostsFromStorage() {
+      const savedPosts = localStorage.getItem('communityPosts');
+      if (savedPosts) {
+        return JSON.parse(savedPosts);
+      }
+      // 기본 더미 데이터
+      return [
       {
         id: 1,
         title: "홍숲쿨링 사용법에 대해 궁금합니다",
         content: "안녕하세요! 홍숲쿨링을 처음 사용하는데, 기본적인 사용법을 알고 싶습니다.\n\n특히 다음과 같은 부분이 궁금해요:\n1. 회원가입 후 첫 설정\n2. 주요 기능 사용법\n3. 커뮤니티 이용 규칙\n\n자세한 답변 부탁드립니다!",
         category: "question",
         author: "새내기사용자",
+        authorUsername: "newuser",
         createdAt: "2025-01-10",
-        views: 45,
-        pinned: false
+        views: 45
       },
       {
         id: 2,
-        title: "환경보호 실천 방법 토론해요",
-        content: "요즘 환경 문제가 심각한데, 우리가 일상에서 실천할 수 있는 환경보호 방법에 대해 이야기해봐요.\n\n제가 실천하고 있는 것들:\n- 텀블러 사용하기\n- 대중교통 이용\n- 분리수거 철저히\n- 일회용품 줄이기\n\n여러분은 어떤 방법으로 환경보호를 실천하고 계신가요?",
-        category: "discussion",
-        author: "그린라이프",
-        createdAt: "2025-01-09",
-        views: 78,
-        pinned: true
+        title: '환경보호 실천 방법 토론해요',
+        content: '요즘 환경 문제가 심각한데, 우리가 일상에서 실천할 수 있는 환경보호 방법에 대해 이야기해봐요.\n\n제가 실천하고 있는 것들:\n- 텀블러 사용하기\n- 대중교통 이용\n- 분리수거 철저히\n- 일회용품 줄이기\n\n여러분은 어떤 방법으로 환경보호를 실천하고 계신가요?',
+        category: 'discussion',
+        author: '그린라이프',
+        authorUsername: 'yangeg2004',
+        createdAt: '2025-01-09',
+        views: 78
       },
       {
         id: 3,
-        title: "유용한 앱 추천 정보 공유",
-        content: "최근에 발견한 정말 유용한 앱들을 공유합니다! 📱\n\n🌟 추천 앱 목록:\n1. **Forest** - 집중력 향상 앱\n2. **Todoist** - 할일 관리\n3. **Headspace** - 명상 및 수면\n4. **Duolingo** - 언어 학습\n5. **MyFitnessPal** - 건강 관리\n\n각각 무료 버전도 충분히 유용하니 한번 써보세요!",
-        category: "share",
-        author: "앱마니아",
-        createdAt: "2025-01-08",
-        views: 92,
-        pinned: false
+        title: '유용한 앱 추천 정보 공유',
+        content: '최근에 발견한 정말 유용한 앱들을 공유합니다! 📱\n\n🌟 추천 앱 목록:\n1. **Forest** - 집중력 향상 앱\n2. **Todoist** - 할일 관리\n3. **Headspace** - 명상 및 수면\n4. **Duolingo** - 언어 학습\n5. **MyFitnessPal** - 건강 관리\n\n각각 무료 버전도 충분히 유용하니 한번 써보세요!',
+        category: 'share',
+        author: '앱마니아',
+        authorUsername: 'appmania',
+        createdAt: '2025-01-08',
+        views: 92
       },
       {
         id: 4,
-        title: "오늘 날씨 정말 좋네요!",
-        content: "오늘 하늘이 정말 맑고 파랗네요! ☀️\n\n이런 날엔 밖에 나가서 산책하거나 운동하기 딱 좋은 것 같아요.\n여러분은 좋은 날씨에 주로 뭘 하시나요?\n\n저는 오늘 한강 공원에 가서 자전거 타려고 합니다! 🚴‍♂️",
-        category: "free",
-        author: "햇살좋아",
-        createdAt: "2025-01-07",
-        views: 34,
-        pinned: false
+        title: '오늘 날씨 정말 좋네요!',
+        content: '오늘 하늘이 정말 맑고 파럗네요! ☀️\n\n이런 날엔 밖에 나가서 산책하거나 운동하기 딱 좋은 것 같아요.\n여러분은 좋은 날씨에 주로 뭘 하시나요?\n\n저는 오늘 한강 공원에 가서 자전거 타려고 합니다! 🚴‍♂️',
+        category: 'free',
+        author: '햇살좋아',
+        authorUsername: 'sunshine',
+        createdAt: '2025-01-07',
+        views: 34
       },
       {
         id: 5,
-        title: "프로그래밍 공부 방법 질문",
-        content: "프로그래밍을 처음 시작하려는데 어떤 언어부터 배우는 게 좋을까요?\n\n현재 상황:\n- 완전 초보자\n- 웹 개발에 관심\n- 시간은 하루 2-3시간 정도 투자 가능\n\n추천해주시는 학습 로드맵이나 강의가 있다면 알려주세요!",
-        category: "question",
-        author: "코딩초보",
-        createdAt: "2025-01-06",
-        views: 67,
-        pinned: false
+        title: '프로그래밍 공부 방법 질문',
+        content: '프로그래밍을 처음 시작하려는데 어떤 언어부터 배우는 게 좋을까요?\n\n현재 상황:\n- 완전 초보자\n- 웹 개발에 관심\n- 시간은 하루 2-3시간 정도 투자 가능\n\n추천해주시는 학습 로드맵이나 강의가 있다면 알려주세요!',
+        category: 'question',
+        author: '코딩초보',
+        authorUsername: 'codingnewbie',
+        createdAt: '2025-01-06',
+        views: 67
       }
-    ];
+      ];
+    }
     
+    // 게시글 데이터 초기화
+    let allPosts = loadPostsFromStorage();
     let currentPage = 1;
     let postsPerPage = 10;
     let filteredPosts = [...allPosts];
+    
+    // 현재 사용자 정보 (실제로는 로그인 시스템에서 가져와야 함)
+    let currentUser = {
+      username: 'yangeg2004', // 관리자 계정
+      name: '양은규'
+    };
+    
+    // 관리자 계정 확인
+    function isAdmin(username = currentUser.username) {
+      return username === 'yangeg2004';
+    }
+    
+    // 게시글 수정 권한 확인 (작성자만)
+    function canEditPost(post) {
+      return post.authorUsername === currentUser.username;
+    }
+    
+    // 게시글 삭제 권한 확인 (작성자 또는 관리자)
+    function canDeletePost(post) {
+      return post.authorUsername === currentUser.username || isAdmin();
+    }
     
     // 페이지 로드 시 초기화
     document.addEventListener('DOMContentLoaded', function() {
@@ -308,8 +410,8 @@
         document.getElementById('sidebar-container').innerHTML = sidebarHtml;
         
         // 사이드바 스크립트 실행
-        if (typeof initSidebar === 'function') {
-          initSidebar();
+        if (typeof initializeSidebar === 'function') {
+          initializeSidebar();
         }
       } catch (error) {
         console.error('사이드바 로드 오류:', error);
@@ -319,7 +421,7 @@
     // 이벤트 리스너 설정
     function setupEventListeners() {
       // 검색 기능
-      document.getElementById('searchInput').addEventListener('input', handleSearch);
+      document.getElementById('searchInput').addEventListener('input', searchPosts);
       
       // 카테고리 필터
       document.getElementById('categoryFilter').addEventListener('change', handleCategoryFilter);
@@ -333,6 +435,14 @@
       // 상세 모달 관련
       document.getElementById('closeDetailModal').addEventListener('click', closeDetailModal);
       document.getElementById('closeDetailModalBtn').addEventListener('click', closeDetailModal);
+      
+      // 수정 모달 관련
+      document.getElementById('closeEditModal').addEventListener('click', closeEditModal);
+      document.getElementById('cancelEditBtn').addEventListener('click', closeEditModal);
+      document.getElementById('editPostForm').addEventListener('submit', handleEditPost);
+      
+      // 댓글 관련
+      document.getElementById('submitComment').addEventListener('click', submitComment);
     }
 
     // 게시글 데이터 로드
@@ -341,18 +451,47 @@
       renderPagination();
     }
     
-    // 검색 처리
-    function handleSearch() {
-      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    // 한글 초성 추출 함수
+    function getChosung(str) {
+      const chosungList = ['ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'];
+      let result = '';
+      
+      for (let i = 0; i < str.length; i++) {
+        const code = str.charCodeAt(i) - 44032;
+        if (code > -1 && code < 11172) {
+          result += chosungList[Math.floor(code / 588)];
+        } else {
+          result += str.charAt(i);
+        }
+      }
+      return result;
+    }
+    
+    // 초성 검색 매칭 함수
+    function matchesChosung(text, searchTerm) {
+      const textChosung = getChosung(text.toLowerCase());
+      const searchChosung = getChosung(searchTerm.toLowerCase());
+      
+      // 일반 텍스트 검색
+      const normalMatch = text.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      // 초성 검색
+      const chosungMatch = textChosung.includes(searchChosung);
+      
+      return normalMatch || chosungMatch;
+    }
+
+    // 검색 기능 (초성 검색 포함)
+    function searchPosts() {
+      const searchTerm = document.getElementById('searchInput').value.trim();
       const category = document.getElementById('categoryFilter').value;
-      
+
       filteredPosts = allPosts.filter(post => {
-        const matchesSearch = post.title.toLowerCase().includes(searchTerm) || 
-                            post.content.toLowerCase().includes(searchTerm);
-        const matchesCategory = category === 'all' || category === '' || post.category === category;
-        return matchesSearch && matchesCategory;
+        const titleMatch = searchTerm === '' || matchesChosung(post.title, searchTerm);
+        const categoryMatch = category === '' || post.category === category;
+        return titleMatch && categoryMatch;
       });
-      
+
       currentPage = 1;
       renderPosts();
       renderPagination();
@@ -360,7 +499,7 @@
     
     // 카테고리 필터 처리
     function handleCategoryFilter() {
-      handleSearch(); // 검색과 동일한 로직 사용
+      searchPosts(); // 검색과 동일한 로직 사용
     }
     
     // 게시글 목록 렌더링
@@ -408,16 +547,29 @@
           <tr class="hover:bg-gray-50 transition-colors">
             <td class="px-4 py-3 text-center text-sm text-gray-900">${rowNumber}</td>
             <td class="px-4 py-3 text-center">
-              <span class="px-2 py-1 rounded-full text-xs font-medium ${categoryClass}">
+              <span class="px-2 py-1 rounded-full text-xs font-medium ${categoryClass} whitespace-nowrap">
                 ${categoryText}
               </span>
             </td>
             <td class="px-4 py-3">
-              <div class="flex items-center">
-                ${post.pinned ? '<span class="material-icons text-red-500 text-sm mr-2">push_pin</span>' : ''}
-                <button onclick="openPostDetail(${post.id})" class="text-left hover:text-green-600 transition-colors">
-                  <div class="font-medium text-gray-900">${post.title}</div>
-                </button>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center flex-1">
+                  <button onclick="openPostDetail(${post.id})" class="text-left hover:text-green-600 transition-colors">
+                    <div class="font-medium text-gray-900">${post.title}</div>
+                  </button>
+                </div>
+                <div class="flex items-center space-x-2 ml-4">
+                  ${canEditPost(post) ? `
+                    <button onclick="editPost(${post.id})" class="text-xs px-2 py-1 bg-blue-100 text-blue-600 rounded hover:bg-blue-200 transition-colors" title="수정">
+                      <span class="material-icons text-xs">edit</span>
+                    </button>
+                  ` : ''}
+                  ${canDeletePost(post) ? `
+                    <button onclick="deletePost(${post.id})" class="text-xs px-2 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200 transition-colors" title="삭제">
+                      <span class="material-icons text-xs">delete</span>
+                    </button>
+                  ` : ''}
+                </div>
               </div>
             </td>
             <td class="px-4 py-3 text-center text-sm text-gray-600">${post.author}</td>
@@ -486,10 +638,15 @@
       renderPagination();
     }
     
+    let currentPostId = null;
+    let comments = [];
+    
     // 게시글 상세 보기
     function openPostDetail(postId) {
       const post = allPosts.find(p => p.id === postId);
       if (!post) return;
+      
+      currentPostId = postId;
       
       // 조회수 증가
       post.views++;
@@ -519,12 +676,9 @@
       modalCategory.textContent = categoryTexts[post.category] || '자유';
       modalCategory.className = `px-3 py-1 rounded-full text-sm font-medium ${categoryColors[post.category] || categoryColors.free}`;
       
-      const modalPinned = document.getElementById('modalPinned');
-      if (post.pinned) {
-        modalPinned.classList.remove('hidden');
-      } else {
-        modalPinned.classList.add('hidden');
-      }
+      
+      // 댓글 로드
+      loadComments(postId);
       
       // 모달 표시
       document.getElementById('postDetailModal').classList.remove('hidden');
@@ -536,6 +690,8 @@
     // 상세 모달 닫기
     function closeDetailModal() {
       document.getElementById('postDetailModal').classList.add('hidden');
+      currentPostId = null;
+      document.getElementById('commentInput').value = '';
     }
     
     // 모달 관련 함수들
@@ -556,21 +712,25 @@
         title: formData.title,
         content: formData.content,
         category: formData.category,
-        author: '현재사용자', // 실제로는 로그인된 사용자 정보 사용
+        author: currentUser.name, // 로그인된 사용자 이름 사용
+        authorUsername: currentUser.username,
         createdAt: new Date().toISOString().split('T')[0],
-        views: 0,
-        pinned: false
+        views: 0
       };
       
       // 배열 맨 앞에 추가
       allPosts.unshift(newPost);
+      
+      // 로컬 스토리지에 저장
+      localStorage.setItem('communityPosts', JSON.stringify(allPosts));
       
       // 필터된 목록도 업데이트
       filteredPosts = [...allPosts];
       
       alert('게시글이 성공적으로 작성되었습니다!');
       closeCreateModal();
-      loadPosts(); // 목록 새로고침
+      renderPosts();
+      renderPagination();
     }
     
     // 폼 제출 처리
@@ -584,6 +744,259 @@
       };
       
       createPost(formData);
+    }
+    
+    // 게시글 수정
+    function editPost(postId) {
+      const post = allPosts.find(p => p.id === postId);
+      if (!post) return;
+      
+      if (!canEditPost(post)) {
+        alert('수정 권한이 없습니다.');
+        return;
+      }
+      
+      // 수정 폼에 기존 데이터 설정
+      document.getElementById('editPostId').value = post.id;
+      document.getElementById('editPostTitle').value = post.title;
+      document.getElementById('editPostCategory').value = post.category;
+      document.getElementById('editPostContent').value = post.content;
+      
+      // 수정 모달 표시
+      document.getElementById('editPostModal').classList.remove('hidden');
+    }
+    
+    // 수정 모달 닫기
+    function closeEditModal() {
+      document.getElementById('editPostModal').classList.add('hidden');
+      document.getElementById('editPostForm').reset();
+    }
+    
+    // 게시글 수정 처리
+    function handleEditPost(e) {
+      e.preventDefault();
+      
+      const postId = parseInt(document.getElementById('editPostId').value);
+      const formData = {
+        title: document.getElementById('editPostTitle').value,
+        content: document.getElementById('editPostContent').value,
+        category: document.getElementById('editPostCategory').value
+      };
+      
+      const post = allPosts.find(p => p.id === postId);
+      if (!post) return;
+      
+      // 게시글 수정 처리
+      const postIndex = allPosts.findIndex(p => p.id === postId);
+      if (postIndex > -1) {
+        allPosts[postIndex] = { ...allPosts[postIndex], ...formData };
+      }
+      
+      // 로컬 스토리지에 저장
+      localStorage.setItem('communityPosts', JSON.stringify(allPosts));
+      
+      // 필터된 목록도 업데이트
+      filteredPosts = [...allPosts];
+      
+      alert('게시글이 성공적으로 수정되었습니다!');
+      closeEditModal();
+      renderPosts();
+    }
+    
+    // 게시글 삭제
+    function deletePost(postId) {
+      const post = allPosts.find(p => p.id === postId);
+      if (!post) return;
+      
+      if (!canDeletePost(post)) {
+        alert('삭제 권한이 없습니다.');
+        return;
+      }
+      
+      if (!confirm('정말로 이 게시글을 삭제하시겠습니까?')) {
+        return;
+      }
+      
+      // 배열에서 제거
+      const index = allPosts.findIndex(p => p.id === postId);
+      if (index > -1) {
+        allPosts.splice(index, 1);
+      }
+      
+      // 로컬 스토리지에 저장
+      localStorage.setItem('communityPosts', JSON.stringify(allPosts));
+      
+      // 필터된 목록도 업데이트
+      filteredPosts = [...allPosts];
+      
+    }
+    
+    // 댓글 저장 함수
+    function saveCommentsToStorage() {
+      if (!currentPostId) return;
+      
+      const allComments = JSON.parse(localStorage.getItem('communityComments') || '{}');
+      allComments[currentPostId] = comments;
+      localStorage.setItem('communityComments', JSON.stringify(allComments));
+    }
+    
+    // 댓글 로드 함수
+    function loadCommentsFromStorage(postId) {
+      const allComments = JSON.parse(localStorage.getItem('communityComments') || '{}');
+      return allComments[postId] || [];
+    }
+    
+    // 댓글 로드
+    function loadComments(postId) {
+      // 로컬 스토리지에서 댓글 로드
+      const savedComments = loadCommentsFromStorage(postId);
+      
+      if (savedComments.length > 0) {
+        comments = savedComments;
+      } else {
+        // 더미 댓글 데이터 (처음 로드 시에만)
+        const dummyComments = {
+          1: [
+            {
+              id: 1,
+              content: '정말 유용한 정보네요! 감사합니다.',
+              author: '도움받은사람',
+              authorUsername: 'helpeduser',
+              createdAt: '2025-01-10'
+            },
+            {
+              id: 2,
+              content: '저도 같은 궁금증이 있었는데 덕분에 해결됐어요.',
+              author: '감사한사람',
+              authorUsername: 'thankfuluser',
+              createdAt: '2025-01-10'
+            }
+          ],
+          2: [
+            {
+              id: 3,
+              content: '환경보호는 정말 중요한 문제죠. 저도 실천해보겠습니다!',
+              author: '환경지킴이',
+              authorUsername: 'ecoguardian',
+              createdAt: '2025-01-09'
+            }
+          ]
+        };
+        
+        comments = dummyComments[postId] || [];
+        
+        // 처음 로드한 더미 데이터도 저장
+        if (comments.length > 0) {
+          saveCommentsToStorage();
+        }
+      }
+      
+      renderComments();
+    }
+    
+    // 댓글 렌더링
+    function renderComments() {
+      const commentsList = document.getElementById('commentsList');
+      
+      if (comments.length === 0) {
+        commentsList.innerHTML = `
+          <div class="text-center py-8 text-gray-500">
+            <span class="material-icons text-4xl mb-2">chat_bubble_outline</span>
+            <p>첫 번째 댓글을 작성해보세요!</p>
+          </div>
+        `;
+        return;
+      }
+      
+      commentsList.innerHTML = comments.map(comment => {
+        const canDeleteComment = comment.authorUsername === currentUser.username || isAdmin();
+        
+        return `
+          <div class="bg-gray-50 rounded-lg p-4">
+            <div class="flex items-start justify-between">
+              <div class="flex-1">
+                <div class="flex items-center space-x-2 mb-2">
+                  <span class="font-medium text-gray-900">${comment.author}</span>
+                  <span class="text-sm text-gray-500">${comment.createdAt}</span>
+                </div>
+                <p class="text-gray-700 whitespace-pre-wrap">${comment.content}</p>
+              </div>
+              ${canDeleteComment ? `
+                <button onclick="deleteComment(${comment.id})" class="ml-4 text-red-500 hover:text-red-700 transition-colors" title="삭제">
+                  <span class="material-icons text-sm">delete</span>
+                </button>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    // 댓글 작성
+    function submitComment() {
+      const content = document.getElementById('commentInput').value.trim();
+      
+      if (!content) {
+        alert('댓글 내용을 입력해주세요.');
+        return;
+      }
+      
+      if (!currentPostId) {
+        alert('게시글 정보를 찾을 수 없습니다.');
+        return;
+      }
+      
+      // 새 댓글 생성
+      const newComment = {
+        id: Date.now(),
+        content: content,
+        author: currentUser.name,
+        authorUsername: currentUser.username,
+        createdAt: new Date().toISOString().split('T')[0]
+      };
+      
+      // 댓글 배열에 추가
+      comments.push(newComment);
+      
+      // 로컬 스토리지에 댓글 저장
+      saveCommentsToStorage();
+      
+      // 댓글 입력창 초기화
+      document.getElementById('commentInput').value = '';
+      
+      // 댓글 목록 새로고침
+      renderComments();
+      
+      alert('댓글이 작성되었습니다!');
+    }
+    
+    // 댓글 삭제
+    function deleteComment(commentId) {
+      const comment = comments.find(c => c.id === commentId);
+      if (!comment) return;
+      
+      if (comment.authorUsername !== currentUser.username && !isAdmin()) {
+        alert('삭제 권한이 없습니다.');
+        return;
+      }
+      
+      if (!confirm('정말로 이 댓글을 삭제하시겠습니까?')) {
+        return;
+      }
+      
+      // 댓글 배열에서 제거
+      const index = comments.findIndex(c => c.id === commentId);
+      if (index > -1) {
+        comments.splice(index, 1);
+      }
+      
+      // 로컬 스토리지에 댓글 저장
+      saveCommentsToStorage();
+      
+      // 댓글 목록 새로고침
+      renderComments();
+      
+      alert('댓글이 삭제되었습니다!');
     }
     
     // 로그아웃 처리
@@ -601,7 +1014,13 @@
         alert('로그아웃 중 오류가 발생했습니다.');
       }
     }
+    
+    // 전역 함수로 노출 (HTML에서 호출하기 위해)
+    window.editPost = editPost;
+    window.deletePost = deletePost;
+    window.deleteComment = deleteComment;
   </script>
+  <script src="sidebar.js"></script>
   <script src="common.js"></script>
 </body>
 </html>

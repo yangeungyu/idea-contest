@@ -1,17 +1,19 @@
 require('dotenv').config();
 const express = require('express');
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
 const session = require('express-session');
-const MongoDBStore = require('connect-mongodb-session')(session);
+const bcrypt = require('bcryptjs');
+const mongoose = require('mongoose');
 const path = require('path');
+const multer = require('multer');
+const fs = require('fs');
+const MongoDBStore = require('connect-mongodb-session')(session);
 
 // Express 앱 생성
 const app = express();
 const PORT = process.env.PORT || 10000;
 
 // MongoDB 연결
-mongoose.connect(process.env.MONGODB_URL || 'mongodb://localhost:27017/hongcheon-academy', {
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/hongcheon-academy', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   serverSelectionTimeoutMS: 5000, // 5초 타임아웃
@@ -30,7 +32,7 @@ mongoose.connect(process.env.MONGODB_URL || 'mongodb://localhost:27017/hongcheon
 let store;
 try {
   store = new MongoDBStore({
-    uri: process.env.MONGODB_URL || 'mongodb://localhost:27017/hongcheon-academy',
+    uri: process.env.MONGODB_URI || 'mongodb://localhost:27017/hongcheon-academy',
     collection: 'sessions'
   });
   
@@ -94,6 +96,7 @@ const studySchema = new mongoose.Schema({
   meetingType: { type: String, enum: ['online', 'offline', 'both'], required: true },
   location: String,
   tags: [String],
+  imageUrl: { type: String }, // 이미지 URL 필드 추가
   status: { type: String, enum: ['recruiting', 'in_progress', 'completed'], default: 'recruiting' },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
@@ -123,10 +126,20 @@ const communityPostSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now }
 });
 
+// 댓글 모델
+const commentSchema = new mongoose.Schema({
+  content: { type: String, required: true },
+  author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  post: { type: mongoose.Schema.Types.ObjectId, ref: 'CommunityPost', required: true },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+});
+
 const User = mongoose.model('User', userSchema);
 const Study = mongoose.model('Study', studySchema);
 const Notice = mongoose.model('Notice', noticeSchema);
 const CommunityPost = mongoose.model('CommunityPost', communityPostSchema);
+const Comment = mongoose.model('Comment', commentSchema);
 
 // 미들웨어: 로그인 확인
 const isAuthenticated = (req, res, next) => {
@@ -141,6 +154,55 @@ const isAuthenticated = (req, res, next) => {
     res.redirect('/login');
   }
 };
+
+// uploads 디렉토리 생성 (없으면)
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+// Multer 설정 (이미지 업로드)
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/');
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, 'meeting-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ 
+  storage: storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB 제한
+  },
+  fileFilter: function (req, file, cb) {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('이미지 파일만 업로드 가능합니다.'), false);
+    }
+  }
+});
+
+// 정적 파일 제공 (업로드된 이미지)
+app.use('/uploads', express.static('uploads'));
+
+// 이미지 업로드 API
+app.post('/api/upload-image', isAuthenticated, upload.single('image'), (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: '이미지 파일이 필요합니다.' });
+    }
+    
+    const imageUrl = `/uploads/${req.file.filename}`;
+    res.json({ imageUrl: imageUrl });
+  } catch (error) {
+    console.error('이미지 업로드 오류:', error);
+    res.status(500).json({ message: '이미지 업로드 중 오류가 발생했습니다.' });
+  }
+});
 
 // 마이페이지
 app.get('/mypage', isAuthenticated, (req, res) => {
@@ -350,10 +412,27 @@ app.post('/api/studies', isAuthenticated, async (req, res) => {
       return res.status(404).json({ message: '사용자를 찾을 수 없습니다.' });
     }
 
+    // currentMembers 처리
+    let currentMembers = [userId];
+    if (req.body.currentMembers && Array.isArray(req.body.currentMembers)) {
+      // 클라이언트에서 보낸 currentMembers가 객체 배열인 경우
+      currentMembers = req.body.currentMembers.map(member => {
+        if (typeof member === 'object' && member.username) {
+          return {
+            userId: userId,
+            username: member.username,
+            name: member.name,
+            isLeader: member.isLeader || false
+          };
+        }
+        return userId;
+      });
+    }
+
     const studyData = {
       ...req.body,
       leader: userId,
-      currentMembers: [userId]
+      currentMembers: currentMembers
     };
     
     // 날짜 필드가 있는 경우에만 변환
@@ -653,19 +732,171 @@ app.delete('/api/studies/:id', isAuthenticated, async (req, res) => {
     const study = await Study.findById(req.params.id);
     const userId = req.session.user.id;
 
+    console.log('모임 삭제 요청 - 모임 ID:', req.params.id);
+    console.log('모임 삭제 요청 - 사용자 ID:', userId);
+    console.log('모임 삭제 요청 - 모임 리더 ID:', study?.leader);
+    console.log('리더 ID 타입:', typeof study?.leader);
+    console.log('사용자 ID 타입:', typeof userId);
+    console.log('리더 toString():', study?.leader?.toString());
+    console.log('비교 결과 (===):', study?.leader?.toString() === userId);
+
     if (!study) {
       return res.status(404).json({ message: '모임을 찾을 수 없습니다.' });
     }
 
-    if (study.leader.toString() !== userId) {
+    // ObjectId와 문자열 비교를 위해 toString() 사용
+    if (study.leader.toString() !== userId.toString()) {
+      console.log('권한 없음 - 리더가 아님');
       return res.status(403).json({ message: '모임 리더만 삭제할 수 있습니다.' });
     }
 
     await Study.findByIdAndDelete(req.params.id);
+    console.log('모임 삭제 성공');
     res.json({ message: '모임이 성공적으로 삭제되었습니다.' });
   } catch (error) {
     console.error('모임 삭제 오류:', error);
     res.status(500).json({ message: '모임 삭제 중 오류가 발생했습니다.' });
+  }
+});
+
+// 커뮤니티 게시글 수정
+app.put('/api/community/posts/:id', isAuthenticated, async (req, res) => {
+  try {
+    const postId = req.params.id;
+    const userId = req.session.user.id;
+    const { title, content, category } = req.body;
+
+    const post = await CommunityPost.findById(postId);
+    if (!post) {
+      return res.status(404).json({ message: '게시글을 찾을 수 없습니다.' });
+    }
+
+    // 작성자 또는 관리자만 수정 가능
+    if (post.author.toString() !== userId && req.session.user.username !== 'yangeg2004') {
+      return res.status(403).json({ message: '수정 권한이 없습니다.' });
+    }
+
+    post.title = title;
+    post.content = content;
+    post.category = category;
+    post.updatedAt = new Date();
+
+    await post.save();
+
+    res.json({ 
+      message: '게시글이 성공적으로 수정되었습니다.',
+      post: post
+    });
+  } catch (error) {
+    console.error('게시글 수정 오류:', error);
+    res.status(500).json({ message: '게시글 수정 중 오류가 발생했습니다.' });
+  }
+});
+
+// 커뮤니티 게시글 삭제
+app.delete('/api/community/posts/:id', isAuthenticated, async (req, res) => {
+  try {
+    const postId = req.params.id;
+    const userId = req.session.user.id;
+
+    const post = await CommunityPost.findById(postId);
+    if (!post) {
+      return res.status(404).json({ message: '게시글을 찾을 수 없습니다.' });
+    }
+
+    // 작성자 또는 관리자만 삭제 가능
+    if (post.author.toString() !== userId && req.session.user.username !== 'yangeg2004') {
+      return res.status(403).json({ message: '삭제 권한이 없습니다.' });
+    }
+
+    // 관련 댓글도 함께 삭제
+    await Comment.deleteMany({ post: postId });
+    await CommunityPost.findByIdAndDelete(postId);
+
+    res.json({ message: '게시글이 성공적으로 삭제되었습니다.' });
+  } catch (error) {
+    console.error('게시글 삭제 오류:', error);
+    res.status(500).json({ message: '게시글 삭제 중 오류가 발생했습니다.' });
+  }
+});
+
+// 댓글 목록 조회
+app.get('/api/community/posts/:id/comments', async (req, res) => {
+  try {
+    const postId = req.params.id;
+    
+    const comments = await Comment.find({ post: postId })
+      .populate('author', 'name username')
+      .sort({ createdAt: 1 });
+
+    res.json({ comments });
+  } catch (error) {
+    console.error('댓글 목록 조회 오류:', error);
+    res.status(500).json({ message: '댓글 목록을 불러오는 중 오류가 발생했습니다.' });
+  }
+});
+
+// 댓글 작성
+app.post('/api/community/posts/:id/comments', isAuthenticated, async (req, res) => {
+  try {
+    const postId = req.params.id;
+    const userId = req.session.user.id;
+    const { content } = req.body;
+
+    if (!content || content.trim() === '') {
+      return res.status(400).json({ message: '댓글 내용을 입력해주세요.' });
+    }
+
+    // 게시글 존재 확인
+    const post = await CommunityPost.findById(postId);
+    if (!post) {
+      return res.status(404).json({ message: '게시글을 찾을 수 없습니다.' });
+    }
+
+    const comment = new Comment({
+      content: content.trim(),
+      author: userId,
+      post: postId
+    });
+
+    await comment.save();
+    
+    // 작성자 정보와 함께 반환
+    const populatedComment = await Comment.findById(comment._id)
+      .populate('author', 'name username');
+
+    res.status(201).json({ 
+      message: '댓글이 성공적으로 작성되었습니다.',
+      comment: populatedComment
+    });
+  } catch (error) {
+    console.error('댓글 작성 오류:', error);
+    res.status(500).json({ message: '댓글 작성 중 오류가 발생했습니다.' });
+  }
+});
+
+// 댓글 삭제
+app.delete('/api/community/comments/:id', isAuthenticated, async (req, res) => {
+  try {
+    const commentId = req.params.id;
+    const userId = req.session.user.id;
+
+    const comment = await Comment.findById(commentId);
+    if (!comment) {
+      return res.status(404).json({ message: '댓글을 찾을 수 없습니다.' });
+    }
+
+    // 작성자 또는 관리자만 삭제 가능
+    if (comment.author.toString() !== userId && req.session.user.username !== 'yangeg2004') {
+      return res.status(403).json({ message: '삭제 권한이 없습니다.' });
+    }
+
+    await Comment.findByIdAndDelete(commentId);
+
+    res.json({ message: '댓글이 성공적으로 삭제되었습니다.' });
+  } catch (error) {
+    console.error('댓글 삭제 오류:', error);
+    res.status(500).json({ message: '댓글 삭제 중 오류가 발생했습니다.' });
   }
 });
 

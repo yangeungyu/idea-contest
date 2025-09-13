@@ -148,6 +148,9 @@
       }
     })();
 
+    // 전역 변수로 현재 사용자 정보 저장
+    let currentUser = null;
+
     // 사용자의 모임 데이터 로드 (생성한 모임 + 참가한 모임)
     async function loadStudies() {
       try {
@@ -155,6 +158,7 @@
           credentials: 'include'
         });
         const userData = await response.json();
+        currentUser = userData.user;
         const userId = userData.user.id;
         
         // 모든 모임 조회
@@ -164,10 +168,56 @@
         const allStudies = await studiesResponse.json();
         
         // 사용자가 생성했거나 참가한 모임만 필터링
-        const userStudies = (allStudies.studies || allStudies).filter(study => 
-          study.leader === userId || 
-          (study.currentMembers && study.currentMembers.includes(userId))
-        );
+        const userStudies = (allStudies.studies || allStudies).filter(study => {
+          console.log('모임 필터링 중:', study.title);
+          console.log('현재 사용자:', currentUser);
+          console.log('모임 참가자들:', study.currentMembers);
+          
+          // currentMembers가 문자열 배열인 경우 처리
+          let isLeader = false;
+          let isMember = false;
+          
+          if (study.currentMembers && Array.isArray(study.currentMembers)) {
+            if (typeof study.currentMembers[0] === 'string') {
+              // 문자열 배열인 경우 (ID만 저장된 경우)
+              isMember = study.currentMembers.includes(userId) || study.currentMembers.includes(currentUser._id);
+              // 첫 번째 멤버를 리더로 간주 (모임 생성자)
+              isLeader = (study.currentMembers[0] === userId || study.currentMembers[0] === currentUser._id);
+            } else {
+              // 객체 배열인 경우
+              isLeader = study.currentMembers.some(member => {
+                const usernameMatch = member.username === currentUser.username;
+                const idMatch = member._id === userId || member._id === currentUser._id;
+                const hasLeaderFlag = member.isLeader === true;
+                return (usernameMatch || idMatch) && hasLeaderFlag;
+              });
+              
+              isMember = study.currentMembers.some(member => {
+                const usernameMatch = member.username === currentUser.username;
+                const idMatch = member._id === userId || member._id === currentUser._id;
+                return usernameMatch || idMatch;
+              });
+            }
+          }
+          
+          // 추가: 레거시 leader 필드도 확인
+          const isLegacyLeader = study.leader === userId || study.leader === currentUser._id;
+          
+          console.log(`최종 결과 - isLeader: ${isLeader}, isMember: ${isMember}, isLegacyLeader: ${isLegacyLeader}`);
+          
+          return isLeader || isMember || isLegacyLeader;
+        });
+        
+        console.log('전체 모임 데이터:', allStudies);
+        console.log('필터링된 사용자 모임:', userStudies);
+        
+        // 각 모임의 리더 정보 상세 확인
+        userStudies.forEach(study => {
+          console.log(`모임 "${study.title}" - 리더 ID: ${study.leader}, 현재 사용자 ID: ${currentUser.id}`);
+          console.log('리더 타입:', typeof study.leader, '사용자 ID 타입:', typeof currentUser.id);
+          console.log('리더 === 사용자:', study.leader === currentUser.id);
+          console.log('리더 toString === 사용자:', study.leader?.toString() === currentUser.id);
+        });
         
         renderStudies(userStudies);
       } catch (error) {
@@ -190,8 +240,52 @@
       }
       
       studyList.innerHTML = studies.map(study => {
-        const isLeader = study.leader === getCurrentUserId();
-        const memberCount = study.currentMembers ? study.currentMembers.length : 0;
+        // 현재 사용자가 리더인지 확인 (데이터 구조에 따라 처리)
+        let isLeader = false;
+        let memberCount = 0;
+        
+        if (study.currentMembers && Array.isArray(study.currentMembers)) {
+          memberCount = study.currentMembers.length;
+          
+          if (typeof study.currentMembers[0] === 'string') {
+            // 문자열 배열인 경우 - 첫 번째 멤버를 리더로 간주
+            isLeader = (study.currentMembers[0] === currentUser.id || study.currentMembers[0] === currentUser._id);
+          } else {
+            // 객체 배열인 경우
+            isLeader = study.currentMembers.some(member => 
+              (member.username === currentUser.username || member._id === currentUser.id) && member.isLeader
+            );
+          }
+        }
+        
+        // 레거시 leader 필드 확인 (문자열 비교 추가)
+        if (study.leader === currentUser.id || 
+            study.leader === currentUser._id ||
+            study.leader?.toString() === currentUser.id ||
+            study.leader?.toString() === currentUser._id) {
+          isLeader = true;
+        }
+        
+        // 카테고리 색상 매핑
+        const categoryColors = {
+          'study': 'bg-blue-100 text-blue-800',
+          'hobby': 'bg-purple-100 text-purple-800',
+          'exercise': 'bg-red-100 text-red-800',
+          'culture': 'bg-yellow-100 text-yellow-800',
+          'volunteer': 'bg-green-100 text-green-800',
+          'networking': 'bg-indigo-100 text-indigo-800',
+          'other': 'bg-gray-100 text-gray-800'
+        };
+        
+        const categoryTexts = {
+          'study': '스터디',
+          'hobby': '취미',
+          'exercise': '운동',
+          'culture': '문화',
+          'volunteer': '봉사',
+          'networking': '네트워킹',
+          'other': '기타'
+        };
         
         return `
           <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
@@ -202,19 +296,27 @@
                   ${isLeader ? '내가 만든 모임' : '참가 중인 모임'}
                 </span>
               </div>
-              <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">${study.category}</span>
+              <span class="px-3 py-1 rounded-full text-sm ${categoryColors[study.category] || categoryColors.other}">
+                ${categoryTexts[study.category] || study.category || '기타'}
+              </span>
             </div>
             <p class="text-gray-600 mb-4">${study.description}</p>
             <div class="flex justify-between items-center text-sm text-gray-500 mb-4">
               <span>참가인원: ${memberCount}/${study.maxMembers}명</span>
-              <span>마감일: ${new Date(study.deadline).toLocaleDateString()}</span>
+              <span>시작일: ${new Date(study.startDate).toLocaleDateString()}</span>
             </div>
             <div class="flex justify-between items-center">
               <div class="flex space-x-2">
                 ${isLeader ? 
-                  `<button onclick="editStudy('${study._id}')" class="text-blue-600 hover:text-blue-700 font-medium text-sm">수정</button>
-                   <button onclick="deleteStudy('${study._id}')" class="text-red-600 hover:text-red-700 font-medium text-sm">삭제</button>` :
-                  `<button onclick="leaveStudy('${study._id}')" class="text-red-600 hover:text-red-700 font-medium text-sm">탈퇴</button>`
+                  `<button onclick="editStudy('${study._id}')" class="flex items-center text-blue-600 hover:text-blue-700 font-medium text-sm">
+                     <span class="material-icons text-sm mr-1">edit</span>수정
+                   </button>
+                   <button onclick="deleteStudy('${study._id}')" class="flex items-center text-red-600 hover:text-red-700 font-medium text-sm">
+                     <span class="material-icons text-sm mr-1">delete</span>모임 삭제
+                   </button>` :
+                  `<button onclick="leaveStudy('${study._id}')" class="flex items-center text-orange-600 hover:text-orange-700 font-medium text-sm">
+                     <span class="material-icons text-sm mr-1">exit_to_app</span>모임 탈퇴
+                   </button>`
                 }
               </div>
               <a href="study-detail.html?id=${study._id}" class="text-green-600 hover:text-green-700 font-medium">자세히 보기</a>
@@ -247,31 +349,46 @@
       window.location.href = `create-meeting.html?edit=${studyId}`;
     }
 
-    // 모임 삭제
+    // 모임 삭제 (리더만 가능)
     async function deleteStudy(studyId) {
-      if (!confirm('정말로 이 모임을 삭제하시겠습니까?')) return;
+      if (!confirm('정말로 이 모임을 삭제하시겠습니까?\n모임이 삭제되면 모든 참가자가 자동으로 제외됩니다.')) {
+        return;
+      }
       
       try {
+        console.log('삭제 요청 - 모임 ID:', studyId);
+        console.log('삭제 요청 - 현재 사용자 ID:', currentUser.id);
+        console.log('삭제 요청 - 현재 사용자 정보:', currentUser);
+        
         const response = await fetch(`/api/studies/${studyId}`, {
           method: 'DELETE',
-          credentials: 'include'
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json'
+          }
         });
+        
+        console.log('삭제 응답 상태:', response.status);
+        const responseData = await response.json();
+        console.log('삭제 응답 데이터:', responseData);
         
         if (response.ok) {
           alert('모임이 삭제되었습니다.');
-          loadStudies();
+          loadStudies(); // 목록 새로고침
         } else {
-          alert('모임 삭제에 실패했습니다.');
+          alert(`모임 삭제에 실패했습니다: ${responseData.message || '알 수 없는 오류'}`);
         }
       } catch (error) {
-        console.error('모임 삭제 오류:', error);
-        alert('모임 삭제 중 오류가 발생했습니다.');
+        console.error('삭제 오류:', error);
+        alert('삭제 중 오류가 발생했습니다.');
       }
     }
 
-    // 모임 탈퇴
+    // 모임 탈퇴 (일반 참가자만 가능)
     async function leaveStudy(studyId) {
-      if (!confirm('정말로 이 모임에서 탈퇴하시겠습니까?')) return;
+      if (!confirm('정말로 이 모임에서 탈퇴하시겠습니까?')) {
+        return;
+      }
       
       try {
         const response = await fetch(`/api/studies/${studyId}/leave`, {
