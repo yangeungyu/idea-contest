@@ -829,6 +829,10 @@
       // 필터된 목록도 업데이트
       filteredPosts = [...allPosts];
       
+      // 화면 즉시 업데이트
+      renderPosts();
+      
+      alert('게시글이 성공적으로 삭제되었습니다!');
     }
     
     // 댓글 저장 함수

@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>모임 채팅 - 홍숲쿨링</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            'sans': ['Pretendard Variable', 'Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'Roboto', 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { padding-top: 0px; }
+    .chat-container {
+      height: calc(100vh - 120px);
+    }
+    .messages-container {
+      height: calc(100% - 80px);
+      overflow-y: auto;
+      scroll-behavior: smooth;
+    }
+    .message-bubble {
+      max-width: 70%;
+      word-wrap: break-word;
+    }
+    .message-input {
+      resize: none;
+      min-height: 40px;
+      max-height: 120px;
+    }
+  </style>
+</head>
+<body class="bg-green-50 lg:ml-20" data-page="chat">
+  <!-- 상단 헤더 -->
+  <header class="bg-white shadow-sm border-b border-gray-200 fixed w-full z-40 lg:ml-20">
+    <div class="px-4 py-3 flex justify-between items-center">
+      <div class="flex items-center">
+        <!-- 뒤로가기 버튼 -->
+        <button onclick="goBack()" class="mr-4 p-2 hover:bg-gray-100 rounded-lg transition-colors">
+          <span class="material-icons text-gray-600">arrow_back</span>
+        </button>
+        
+        <!-- 모임 정보 -->
+        <div class="flex items-center">
+          <span class="material-icons text-green-600 text-2xl mr-3">chat</span>
+          <div>
+            <h1 id="studyTitle" class="text-lg font-bold text-gray-800">모임 채팅</h1>
+            <p id="memberCount" class="text-sm text-gray-600">참가자 0명</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 사용자 메뉴 -->
+      <div class="flex items-center space-x-4">
+        <div id="userMenu" class="dropdown relative">
+          <button class="flex items-center space-x-2 focus:outline-none">
+            <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
+              <span class="material-icons text-gray-600">person</span>
+            </div>
+            <span id="userName" class="text-gray-700">사용자이름</span>
+            <span class="material-icons text-gray-500">arrow_drop_down</span>
+          </button>
+          <div class="dropdown-menu absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10" style="display: none;">
+            <a href="mypage.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">마이페이지</a>
+            <a href="#" onclick="handleLogout()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">로그아웃</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 메인 채팅 영역 -->
+  <main class="container mx-auto px-4 py-8 mt-16">
+    <div class="bg-white rounded-lg shadow-md chat-container">
+      <!-- 메시지 영역 -->
+      <div id="messagesContainer" class="messages-container p-4 space-y-3">
+        <!-- 메시지들이 여기에 동적으로 추가됩니다 -->
+      </div>
+      
+      <!-- 메시지 입력 영역 -->
+      <div class="border-t border-gray-200 p-4">
+        <div class="flex items-end space-x-3">
+          <div class="flex-1">
+            <textarea 
+              id="messageInput" 
+              placeholder="메시지를 입력하세요..." 
+              class="message-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
+              rows="1"
+            ></textarea>
+          </div>
+          <button 
+            id="sendButton" 
+            onclick="sendMessage()" 
+            class="bg-green-600 text-white p-3 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center"
+          >
+            <span class="material-icons">send</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    let socket;
+    let currentUser = null;
+    let studyId = null;
+    let study = null;
+
+    // 페이지 로드 시 초기화
+    (async function() {
+      try {
+        // URL에서 studyId 가져오기
+        const urlParams = new URLSearchParams(window.location.search);
+        studyId = urlParams.get('studyId');
+        
+        if (!studyId) {
+          alert('잘못된 접근입니다.');
+          window.history.back();
+          return;
+        }
+
+        // 사용자 인증 확인
+        const userResponse = await fetch('/api/current-user', {
+          credentials: 'include'
+        });
+        const userData = await userResponse.json();
+        
+        if (!userData.isAuthenticated) {
+          alert('로그인이 필요한 페이지입니다.');
+          window.location.href = 'login.html';
+          return;
+        }
+        
+        currentUser = userData.user;
+        showUserMenu(currentUser.name || currentUser.username);
+
+        // 모임 정보 가져오기
+        const studyResponse = await fetch(`/api/studies/${studyId}`, {
+          credentials: 'include'
+        });
+        const studyData = await studyResponse.json();
+        
+        if (!studyResponse.ok) {
+          alert('모임을 찾을 수 없습니다.');
+          window.history.back();
+          return;
+        }
+        
+        study = studyData;
+        updateStudyInfo();
+
+        // Socket.IO 연결
+        initializeSocket();
+        
+      } catch (error) {
+        console.error('초기화 오류:', error);
+        alert('페이지 로드 중 오류가 발생했습니다.');
+        window.history.back();
+      }
+    })();
+
+    // Socket.IO 초기화
+    function initializeSocket() {
+      // Socket.IO가 사용 가능한지 확인
+      if (typeof io === 'undefined') {
+        console.error('Socket.IO를 로드할 수 없습니다.');
+        alert('실시간 채팅 기능을 사용할 수 없습니다. 페이지를 새로고침해주세요.');
+        return;
+      }
+
+      socket = io();
+      
+      socket.on('connect', () => {
+        console.log('Socket 연결됨');
+        // 채팅방 입장
+        socket.emit('join-chat', {
+          studyId: studyId,
+          userId: currentUser.id
+        });
+      });
+
+      socket.on('connect_error', (error) => {
+        console.error('Socket 연결 오류:', error);
+        alert('채팅 서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.');
+      });
+
+      socket.on('chat-history', (messages) => {
+        displayMessages(messages);
+      });
+
+      socket.on('new-message', (message) => {
+        displayMessage(message);
+        scrollToBottom();
+      });
+
+      socket.on('error', (error) => {
+        console.error('Socket 오류:', error);
+        alert(error.message);
+      });
+
+      socket.on('disconnect', () => {
+        console.log('Socket 연결 해제됨');
+      });
+    }
+
+    // 모임 정보 업데이트
+    function updateStudyInfo() {
+      document.getElementById('studyTitle').textContent = study.title;
+      const memberCount = study.currentMembers ? study.currentMembers.length : 0;
+      document.getElementById('memberCount').textContent = `참가자 ${memberCount}명`;
+    }
+
+    // 메시지들 표시
+    function displayMessages(messages) {
+      const container = document.getElementById('messagesContainer');
+      container.innerHTML = '';
+      
+      messages.forEach(message => {
+        displayMessage(message, false);
+      });
+      
+      scrollToBottom();
+    }
+
+    // 단일 메시지 표시
+    function displayMessage(message, animate = true) {
+      const container = document.getElementById('messagesContainer');
+      const isMyMessage = message.sender._id === currentUser.id;
+      
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `flex ${isMyMessage ? 'justify-end' : 'justify-start'}`;
+      
+      const messageTime = new Date(message.createdAt).toLocaleTimeString('ko-KR', {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+
+      messageDiv.innerHTML = `
+        <div class="message-bubble ${isMyMessage ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-800'} rounded-lg px-4 py-2">
+          ${!isMyMessage ? `<div class="text-xs font-medium mb-1 ${isMyMessage ? 'text-green-100' : 'text-gray-600'}">${message.sender.name}</div>` : ''}
+          <div class="text-sm">${escapeHtml(message.message)}</div>
+          <div class="text-xs mt-1 ${isMyMessage ? 'text-green-100' : 'text-gray-500'}">${messageTime}</div>
+        </div>
+      `;
+      
+      if (animate) {
+        messageDiv.style.opacity = '0';
+        messageDiv.style.transform = 'translateY(10px)';
+      }
+      
+      container.appendChild(messageDiv);
+      
+      if (animate) {
+        setTimeout(() => {
+          messageDiv.style.transition = 'all 0.3s ease';
+          messageDiv.style.opacity = '1';
+          messageDiv.style.transform = 'translateY(0)';
+        }, 10);
+      }
+    }
+
+    // 메시지 전송
+    function sendMessage() {
+      const input = document.getElementById('messageInput');
+      const message = input.value.trim();
+      
+      if (!message) return;
+      
+      socket.emit('send-message', { message });
+      input.value = '';
+      adjustTextareaHeight(input);
+    }
+
+    // 엔터키로 메시지 전송
+    document.addEventListener('DOMContentLoaded', function() {
+      const input = document.getElementById('messageInput');
+      
+      input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          sendMessage();
+        }
+      });
+      
+      input.addEventListener('input', function() {
+        adjustTextareaHeight(this);
+      });
+    });
+
+    // 텍스트영역 높이 자동 조절
+    function adjustTextareaHeight(textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+    }
+
+    // 채팅 하단으로 스크롤
+    function scrollToBottom() {
+      const container = document.getElementById('messagesContainer');
+      container.scrollTop = container.scrollHeight;
+    }
+
+    // HTML 이스케이프
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // 뒤로가기
+    function goBack() {
+      window.history.back();
+    }
+
+    // 사용자 메뉴 표시
+    function showUserMenu(name) {
+      const userName = document.getElementById('userName');
+      userName.textContent = name;
+    }
+
+    // 로그아웃 처리
+    function handleLogout() {
+      fetch('/api/logout', {
+        method: 'POST',
+        credentials: 'include'
+      })
+      .then(() => {
+        window.location.href = 'login.html';
+      })
+      .catch((error) => {
+        console.error('로그아웃 오류:', error);
+      });
+    }
+
+    // 페이지 언로드 시 소켓 연결 해제
+    window.addEventListener('beforeunload', () => {
+      if (socket) {
+        socket.disconnect();
+      }
+    });
+  </script>
+  
+  <script src="common.js"></script>
+  <script src="sidebar.js"></script>
+</body>
+</html>

@@ -25,89 +25,21 @@
   </style>
 </head>
 <body class="bg-green-50 lg:ml-20" data-page="studies">
-  <!-- 상단 헤더 -->
-  <header class="bg-white shadow-sm border-b border-gray-200 fixed w-full z-40 lg:ml-20">
-    <div class="px-4 py-3 flex justify-between items-center">
-        <div class="flex items-center">
-        <!-- 모바일에서도 로고 표시 (클릭 가능) -->
-        <div id="mobileLogoBtn" class="lg:hidden flex items-center cursor-pointer hover:bg-gray-50 rounded-lg p-2 transition-colors">
-          <img src="logo.png" alt="홍숲쿨링" class="w-8 h-8 object-contain mr-2">
-          <span class="text-lg font-semibold text-gray-900">홍숲쿨링</span>
-        </div>
-      </div>
-      
-      <!-- 로그인/회원가입 버튼 -->
-      <div class="flex items-center space-x-4">
-        <div id="auth-buttons" class="flex items-center space-x-4">
-          <a href="login.html" class="text-gray-700 hover:text-green-600">로그인</a>
-          <a href="register.html" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">회원가입</a>
-        </div>
-        <!-- 로그인 시 표시될 프로필 메뉴 -->
-        <div id="userMenu" class="hidden dropdown relative">
-          <button class="flex items-center space-x-2 focus:outline-none">
-            <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
-              <span class="material-icons text-gray-600">person</span>
-            </div>
-            <span id="userName" class="text-gray-700">사용자이름</span>
-            <span class="material-icons text-gray-500">arrow_drop_down</span>
-          </button>
-          <div class="dropdown-menu absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10" style="display: none;">
-            <a href="mypage.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">마이페이지</a>
-            <a href="#" onclick="handleLogout()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">로그아웃</a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </header>
-
   <!-- 메인 콘텐츠 -->
-  <main class="container mx-auto px-4 py-8">
-    <div class="bg-white p-6 rounded-lg shadow-md mb-8">
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-        <h1 class="text-2xl font-bold text-gray-800 mb-4 md:mb-0">내 모임 관리</h1>
-        <a href="create-study.html" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 text-center">
-          <i class="material-icons align-middle">add</i> 스터디 개설하기
-        </a>
-      </div>
-      
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div class="md:col-span-2">
-          <div class="relative">
-            <input type="text" id="searchInput" placeholder="스터디 검색" 
-                   class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 pl-10">
-            <i class="material-icons absolute left-3 top-2.5 text-gray-400">search</i>
-          </div>
-        </div>
-        
-        <select id="categoryFilter" class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-white">
-          <option value="">모든 카테고리</option>
-          <option value="프로그래밍">프로그래밍</option>
-          <option value="외국어">외국어</option>
-          <option value="자격증">자격증</option>
-          <option value="취업">취업</option>
-          <option value="기타">기타</option>
-        </select>
-        
-        <select id="statusFilter" class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-white">
-          <option value="">모든 상태</option>
-          <option value="recruiting">모집 중</option>
-          <option value="in_progress">진행 중</option>
-        </select>
+  <main class="container mx-auto px-4 py-8 lg:ml-20">
+    <div class="flex items-center mb-8">
+      <span class="material-icons text-green-600 text-3xl mr-3">group</span>
+      <div>
+        <h1 class="text-2xl font-bold text-gray-800">내 모임 관리</h1>
+        <p class="text-gray-600 mt-1">참가한 모임을 관리하고 활동을 확인하세요</p>
       </div>
     </div>
     
     <!-- 스터디 목록 -->
-    <div id="studyList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+    <div id="studyList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       <!-- 동적으로 로드됩니다 -->
     </div>
   </main>
-
-  <!-- 푸터 -->
-  <footer class="bg-green-800 text-white py-8 mt-12">
-    <div class="container mx-auto px-4 text-center">
-      <p>&copy; 2025 홍숲쿨링. All rights reserved.</p>
-    </div>
-  </footer>
 
   <style>
     .dropdown:hover .dropdown-menu {
@@ -141,7 +73,6 @@
         
         // 로그인된 경우에만 페이지 로드
         loadStudies();
-        showUserMenu(data.user.name || data.user.username);
       } catch (error) {
         console.error('인증 확인 오류:', error);
         window.location.href = 'login.html';
@@ -151,7 +82,9 @@
     // 전역 변수로 현재 사용자 정보 저장
     let currentUser = null;
 
-    // 사용자의 모임 데이터 로드 (생성한 모임 + 참가한 모임)
+    // 내 모임 데이터 로드
+    let myStudies = [];
+    
     async function loadStudies() {
       try {
         const response = await fetch('/api/current-user', {
@@ -165,65 +98,24 @@
         const studiesResponse = await fetch('/api/studies', {
           credentials: 'include'
         });
-        const allStudies = await studiesResponse.json();
+        const studiesData = await studiesResponse.json();
+        const allStudies = studiesData.studies || studiesData;
         
-        // 사용자가 생성했거나 참가한 모임만 필터링
-        const userStudies = (allStudies.studies || allStudies).filter(study => {
-          console.log('모임 필터링 중:', study.title);
-          console.log('현재 사용자:', currentUser);
-          console.log('모임 참가자들:', study.currentMembers);
-          
-          // currentMembers가 문자열 배열인 경우 처리
-          let isLeader = false;
-          let isMember = false;
-          
-          if (study.currentMembers && Array.isArray(study.currentMembers)) {
-            if (typeof study.currentMembers[0] === 'string') {
-              // 문자열 배열인 경우 (ID만 저장된 경우)
-              isMember = study.currentMembers.includes(userId) || study.currentMembers.includes(currentUser._id);
-              // 첫 번째 멤버를 리더로 간주 (모임 생성자)
-              isLeader = (study.currentMembers[0] === userId || study.currentMembers[0] === currentUser._id);
-            } else {
-              // 객체 배열인 경우
-              isLeader = study.currentMembers.some(member => {
-                const usernameMatch = member.username === currentUser.username;
-                const idMatch = member._id === userId || member._id === currentUser._id;
-                const hasLeaderFlag = member.isLeader === true;
-                return (usernameMatch || idMatch) && hasLeaderFlag;
-              });
-              
-              isMember = study.currentMembers.some(member => {
-                const usernameMatch = member.username === currentUser.username;
-                const idMatch = member._id === userId || member._id === currentUser._id;
-                return usernameMatch || idMatch;
-              });
-            }
-          }
-          
-          // 추가: 레거시 leader 필드도 확인
-          const isLegacyLeader = study.leader === userId || study.leader === currentUser._id;
-          
-          console.log(`최종 결과 - isLeader: ${isLeader}, isMember: ${isMember}, isLegacyLeader: ${isLegacyLeader}`);
-          
-          return isLeader || isMember || isLegacyLeader;
+        // 내가 참가한 모임만 필터링 (리더이거나 멤버인 경우)
+        myStudies = allStudies.filter(study => {
+          const isLeader = study.leader && (study.leader.toString() === userId.toString() || study.leader._id === userId);
+          const isMember = study.currentMembers && study.currentMembers.includes(userId);
+          return isLeader || isMember;
         });
         
-        console.log('전체 모임 데이터:', allStudies);
-        console.log('필터링된 사용자 모임:', userStudies);
+        renderStudies(myStudies);
         
-        // 각 모임의 리더 정보 상세 확인
-        userStudies.forEach(study => {
-          console.log(`모임 "${study.title}" - 리더 ID: ${study.leader}, 현재 사용자 ID: ${currentUser.id}`);
-          console.log('리더 타입:', typeof study.leader, '사용자 ID 타입:', typeof currentUser.id);
-          console.log('리더 === 사용자:', study.leader === currentUser.id);
-          console.log('리더 toString === 사용자:', study.leader?.toString() === currentUser.id);
-        });
-        
-        renderStudies(userStudies);
       } catch (error) {
         console.error('스터디 로드 오류:', error);
       }
     }
+    
+    
 
     // 스터디 목록 렌더링
     function renderStudies(studies) {
@@ -233,37 +125,18 @@
         studyList.innerHTML = `
           <div class="text-center py-12 text-gray-500">
             <span class="material-icons text-4xl mb-2">group</span>
-            <p>등록된 스터디가 없습니다.</p>
+            <p>참가한 모임이 없습니다.</p>
+            <p class="text-sm mt-2">새로운 모임에 참가해보세요!</p>
           </div>
         `;
         return;
       }
       
       studyList.innerHTML = studies.map(study => {
-        // 현재 사용자가 리더인지 확인 (데이터 구조에 따라 처리)
-        let isLeader = false;
+        // 참가자 수 계산
         let memberCount = 0;
-        
         if (study.currentMembers && Array.isArray(study.currentMembers)) {
           memberCount = study.currentMembers.length;
-          
-          if (typeof study.currentMembers[0] === 'string') {
-            // 문자열 배열인 경우 - 첫 번째 멤버를 리더로 간주
-            isLeader = (study.currentMembers[0] === currentUser.id || study.currentMembers[0] === currentUser._id);
-          } else {
-            // 객체 배열인 경우
-            isLeader = study.currentMembers.some(member => 
-              (member.username === currentUser.username || member._id === currentUser.id) && member.isLeader
-            );
-          }
-        }
-        
-        // 레거시 leader 필드 확인 (문자열 비교 추가)
-        if (study.leader === currentUser.id || 
-            study.leader === currentUser._id ||
-            study.leader?.toString() === currentUser.id ||
-            study.leader?.toString() === currentUser._id) {
-          isLeader = true;
         }
         
         // 카테고리 색상 매핑
@@ -287,14 +160,24 @@
           'other': '기타'
         };
         
+        // 모임 타입 표시
+        const meetingTypeText = study.meetingType === 'online' ? '온라인' : 
+                               study.meetingType === 'offline' ? '오프라인' : '온/오프라인 혼합형';
+        
+        // 현재 사용자가 리더인지 확인 (ObjectId 비교를 위해 toString() 사용)
+        const isLeader = study.leader && (study.leader.toString() === currentUser.id.toString() || study.leader._id === currentUser.id);
+        const isMember = study.currentMembers && study.currentMembers.includes(currentUser.id);
+        
         return `
-          <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+          <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer" onclick="viewStudyDetail('${study._id}')">
             <div class="flex justify-between items-start mb-4">
               <div>
                 <h3 class="text-xl font-bold text-gray-900">${study.title}</h3>
-                <span class="text-sm ${isLeader ? 'text-blue-600' : 'text-green-600'} font-medium">
-                  ${isLeader ? '내가 만든 모임' : '참가 중인 모임'}
-                </span>
+                <div class="flex items-center gap-2 mt-1">
+                  <span class="text-sm text-green-600 font-medium">${meetingTypeText}</span>
+                  ${isLeader ? '<span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full font-medium">리더</span>' : 
+                              '<span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full font-medium">참가자</span>'}
+                </div>
               </div>
               <span class="px-3 py-1 rounded-full text-sm ${categoryColors[study.category] || categoryColors.other}">
                 ${categoryTexts[study.category] || study.category || '기타'}
@@ -306,85 +189,42 @@
               <span>시작일: ${new Date(study.startDate).toLocaleDateString()}</span>
             </div>
             <div class="flex justify-between items-center">
-              <div class="flex space-x-2">
-                ${isLeader ? 
-                  `<button onclick="editStudy('${study._id}')" class="flex items-center text-blue-600 hover:text-blue-700 font-medium text-sm">
-                     <span class="material-icons text-sm mr-1">edit</span>수정
-                   </button>
-                   <button onclick="deleteStudy('${study._id}')" class="flex items-center text-red-600 hover:text-red-700 font-medium text-sm">
-                     <span class="material-icons text-sm mr-1">delete</span>모임 삭제
-                   </button>` :
-                  `<button onclick="leaveStudy('${study._id}')" class="flex items-center text-orange-600 hover:text-orange-700 font-medium text-sm">
-                     <span class="material-icons text-sm mr-1">exit_to_app</span>모임 탈퇴
-                   </button>`
+              <div class="flex items-center space-x-4">
+                <span class="text-sm text-gray-500 flex items-center">
+                  <span class="material-icons text-sm mr-1">visibility</span>
+                  ${study.views || 0}
+                </span>
+                ${study.tags && study.tags.length > 0 ? 
+                  `<div class="flex flex-wrap gap-1">
+                    ${study.tags.slice(0, 2).map(tag => 
+                      `<span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">#${tag}</span>`
+                    ).join('')}
+                    ${study.tags.length > 2 ? '<span class="text-xs text-gray-400">...</span>' : ''}
+                  </div>` : ''
                 }
               </div>
-              <a href="study-detail.html?id=${study._id}" class="text-green-600 hover:text-green-700 font-medium">자세히 보기</a>
+              <div class="flex gap-2">
+                ${isLeader ? 
+                  `<button class="text-red-600 hover:text-red-700 font-medium text-sm flex items-center" onclick="event.stopPropagation(); deleteStudy('${study._id}')">
+                    <span class="material-icons text-sm mr-1">delete</span>해체하기
+                  </button>` :
+                  `<button class="text-orange-600 hover:text-orange-700 font-medium text-sm flex items-center" onclick="event.stopPropagation(); leaveStudy('${study._id}')">
+                    <span class="material-icons text-sm mr-1">exit_to_app</span>탈퇴하기
+                  </button>`
+                }
+              </div>
             </div>
           </div>
         `;
       }).join('');
     }
-
-    // 로그인된 사용자 메뉴 표시
-    function showUserMenu(name) {
-      const userMenu = document.getElementById('userMenu');
-      const authButtons = document.getElementById('auth-buttons');
-      const userName = document.getElementById('userName');
-      
-      userName.textContent = name;
-      userMenu.classList.remove('hidden');
-      authButtons.classList.add('hidden');
-    }
-
-    // 현재 사용자 ID 가져오기
-    let currentUserId = null;
     
-    function getCurrentUserId() {
-      return currentUserId;
+    // 모임 상세보기
+    function viewStudyDetail(studyId) {
+      window.location.href = `study-detail.html?id=${studyId}`;
     }
-
-    // 모임 수정
-    function editStudy(studyId) {
-      window.location.href = `create-meeting.html?edit=${studyId}`;
-    }
-
-    // 모임 삭제 (리더만 가능)
-    async function deleteStudy(studyId) {
-      if (!confirm('정말로 이 모임을 삭제하시겠습니까?\n모임이 삭제되면 모든 참가자가 자동으로 제외됩니다.')) {
-        return;
-      }
-      
-      try {
-        console.log('삭제 요청 - 모임 ID:', studyId);
-        console.log('삭제 요청 - 현재 사용자 ID:', currentUser.id);
-        console.log('삭제 요청 - 현재 사용자 정보:', currentUser);
-        
-        const response = await fetch(`/api/studies/${studyId}`, {
-          method: 'DELETE',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        });
-        
-        console.log('삭제 응답 상태:', response.status);
-        const responseData = await response.json();
-        console.log('삭제 응답 데이터:', responseData);
-        
-        if (response.ok) {
-          alert('모임이 삭제되었습니다.');
-          loadStudies(); // 목록 새로고침
-        } else {
-          alert(`모임 삭제에 실패했습니다: ${responseData.message || '알 수 없는 오류'}`);
-        }
-      } catch (error) {
-        console.error('삭제 오류:', error);
-        alert('삭제 중 오류가 발생했습니다.');
-      }
-    }
-
-    // 모임 탈퇴 (일반 참가자만 가능)
+    
+    // 모임 탈퇴하기
     async function leaveStudy(studyId) {
       if (!confirm('정말로 이 모임에서 탈퇴하시겠습니까?')) {
         return;
@@ -396,16 +236,52 @@
           credentials: 'include'
         });
         
-        if (response.ok) {
-          alert('모임에서 탈퇴했습니다.');
-          loadStudies();
-        } else {
-          alert('모임 탈퇴에 실패했습니다.');
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.message || '모임 탈퇴에 실패했습니다.');
         }
+        
+        alert('모임에서 성공적으로 탈퇴했습니다.');
+        loadStudies(); // 목록 새로고침
+        
       } catch (error) {
         console.error('모임 탈퇴 오류:', error);
-        alert('모임 탈퇴 중 오류가 발생했습니다.');
+        alert(error.message || '모임 탈퇴 중 오류가 발생했습니다.');
       }
+    }
+    
+    // 모임 해체하기 (리더만 가능)
+    async function deleteStudy(studyId) {
+      if (!confirm('정말로 이 모임을 해체하시겠습니까?\n해체된 모임은 복구할 수 없습니다.')) {
+        return;
+      }
+      
+      try {
+        const response = await fetch(`/api/studies/${studyId}`, {
+          method: 'DELETE',
+          credentials: 'include'
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.message || '모임 해체에 실패했습니다.');
+        }
+        
+        alert('모임이 성공적으로 해체되었습니다.');
+        loadStudies(); // 목록 새로고침
+        
+      } catch (error) {
+        console.error('모임 해체 오류:', error);
+        alert(error.message || '모임 해체 중 오류가 발생했습니다.');
+      }
+    }
+
+    // 로그인된 사용자 메뉴 표시 (헤더가 제거되어 더 이상 필요 없음)
+    function showUserMenu(name) {
+      // 헤더가 제거되었으므로 이 함수는 더 이상 필요하지 않음
+      console.log('사용자 로그인됨:', name);
     }
 
     // 로그아웃 처리

@@ -6,27 +6,55 @@ const mongoose = require('mongoose');
 const path = require('path');
 const multer = require('multer');
 const fs = require('fs');
+const http = require('http');
 const MongoDBStore = require('connect-mongodb-session')(session);
+const LocalDataStore = require('./dataStore');
 
 // Express 앱 생성
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-// MongoDB 연결
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/hongcheon-academy', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  serverSelectionTimeoutMS: 5000, // 5초 타임아웃
-  connectTimeoutMS: 10000, // 10초 연결 타임아웃
-})
-.then(() => {
-  console.log('MongoDB에 성공적으로 연결되었습니다.');
-})
-.catch((error) => {
-  console.error('MongoDB 연결 오류:', error.message);
-  console.log('MongoDB 연결에 실패했지만 서버는 계속 실행됩니다.');
-  console.log('로컬 개발을 위해 MongoDB Atlas 사용을 권장합니다.');
-});
+// 데이터베이스 연결 상태 및 로컬 저장소
+let isMongoConnected = false;
+let localDataStore = null;
+
+// MongoDB 연결 (배포 환경에서는 Atlas, 로컬에서는 폴백)
+const connectToDatabase = async () => {
+  try {
+    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/hongcheon-academy', {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 10000, // 10초 타임아웃
+      connectTimeoutMS: 15000, // 15초 연결 타임아웃
+      maxPoolSize: 10, // 연결 풀 크기
+      retryWrites: true,
+      w: 'majority'
+    });
+    
+    console.log('MongoDB에 성공적으로 연결되었습니다.');
+    isMongoConnected = true;
+    
+    // MongoDB 연결 상태 모니터링
+    mongoose.connection.on('disconnected', () => {
+      console.log('MongoDB 연결이 끊어졌습니다.');
+      isMongoConnected = false;
+    });
+    
+    mongoose.connection.on('reconnected', () => {
+      console.log('MongoDB에 다시 연결되었습니다.');
+      isMongoConnected = true;
+    });
+    
+  } catch (error) {
+    console.error('MongoDB 연결 오류:', error.message);
+    console.log('MongoDB 연결에 실패했습니다. 로컬 파일 저장소를 사용합니다.');
+    isMongoConnected = false;
+    localDataStore = new LocalDataStore();
+    console.log('로컬 데이터 저장소가 초기화되었습니다.');
+  }
+};
+
+connectToDatabase();
 
 // MongoDB 스토어 설정 (MongoDB 연결 실패 시 메모리 스토어 사용)
 let store;
@@ -76,6 +104,7 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   name: { type: String, required: true },
   email: { type: String },
+  location: { type: String }, // 지역 정보 추가
   registrationDate: { type: Date, default: Date.now },
   createdAt: { type: Date, default: Date.now, immutable: true },
   securityQuestion: { type: String },
@@ -92,14 +121,28 @@ const studySchema = new mongoose.Schema({
   leader: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   deadline: { type: Date, required: true },
   startDate: { type: Date, required: true },
+  endDate: { type: Date }, // 스터디 종료일 필드 추가
   duration: { type: Number, required: true, min: 1, max: 52 }, // 주 단위
   meetingType: { type: String, enum: ['online', 'offline', 'both'], required: true },
   location: String,
+  time: String, // 모임 시간 필드 추가
+  frequency: { type: String, enum: ['once', 'weekly', 'biweekly', 'monthly', 'irregular'] }, // 모임 주기 필드 추가
+  requirements: String, // 참가 조건/요구사항 필드 추가
   tags: [String],
   imageUrl: { type: String }, // 이미지 URL 필드 추가
+  views: { type: Number, default: 0 }, // 조회수 필드 추가
   status: { type: String, enum: ['recruiting', 'in_progress', 'completed'], default: 'recruiting' },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
+});
+
+// 채팅 메시지 모델
+const chatMessageSchema = new mongoose.Schema({
+  studyId: { type: mongoose.Schema.Types.ObjectId, ref: 'Study', required: true },
+  sender: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  message: { type: String, required: true, maxlength: 1000 },
+  messageType: { type: String, enum: ['text', 'system'], default: 'text' },
+  createdAt: { type: Date, default: Date.now }
 });
 
 // 공지사항 모델
@@ -138,6 +181,7 @@ const commentSchema = new mongoose.Schema({
 const User = mongoose.model('User', userSchema);
 const Study = mongoose.model('Study', studySchema);
 const Notice = mongoose.model('Notice', noticeSchema);
+const ChatMessage = mongoose.model('ChatMessage', chatMessageSchema);
 const CommunityPost = mongoose.model('CommunityPost', communityPostSchema);
 const Comment = mongoose.model('Comment', commentSchema);
 
@@ -336,7 +380,7 @@ app.get('/api/current-user', (req, res) => {
 app.put('/api/profile', isAuthenticated, async (req, res) => {
   try {
     const userId = req.session.user.id;
-    const { name, email, currentPassword, newPassword, securityQuestion, securityAnswer } = req.body;
+    const { name, email, location, currentPassword, newPassword, securityQuestion, securityAnswer } = req.body;
     
     // 기본 유효성 검사
     if (!name) {
@@ -371,6 +415,9 @@ app.put('/api/profile', isAuthenticated, async (req, res) => {
     if (email !== undefined) {
       user.email = email;
     }
+    if (location !== undefined) {
+      user.location = location;
+    }
     
     // 보안 질문 업데이트
     if (securityQuestion !== undefined) {
@@ -388,7 +435,10 @@ app.put('/api/profile', isAuthenticated, async (req, res) => {
       username: user.username,
       name: user.name,
       email: user.email,
-      registrationDate: user.registrationDate
+      location: user.location,
+      registrationDate: user.registrationDate,
+      securityQuestion: user.securityQuestion,
+      securityAnswer: user.securityAnswer
     };
     
     res.json({ 
@@ -496,7 +546,7 @@ app.get('/api/studies', async (req, res) => {
   }
 });
 
-// 스터디 상세 조회
+// 스터디 상세 조회 (조회수 증가)
 app.get('/api/studies/:id', async (req, res) => {
   try {
     const study = await Study.findById(req.params.id)
@@ -506,6 +556,10 @@ app.get('/api/studies/:id', async (req, res) => {
     if (!study) {
       return res.status(404).json({ message: '스터디를 찾을 수 없습니다.' });
     }
+    
+    // 조회수 증가
+    study.views = (study.views || 0) + 1;
+    await study.save();
     
     res.json(study);
   } catch (error) {
@@ -983,6 +1037,22 @@ app.post('/api/verify-security-answer', async (req, res) => {
   }
 });
 
+// 인기 모임 조회 (TOP 3)
+app.get('/api/popular-studies', async (req, res) => {
+  try {
+    const popularStudies = await Study.find({ status: 'recruiting' })
+      .populate('leader', 'name')
+      .sort({ views: -1, createdAt: -1 }) // 조회수 내림차순, 최신순
+      .limit(3)
+      .exec();
+
+    res.json(popularStudies);
+  } catch (error) {
+    console.error('인기 모임 조회 오류:', error);
+    res.status(500).json({ message: '인기 모임 정보를 불러오는 중 오류가 발생했습니다.' });
+  }
+});
+
 // 비밀번호 재설정 API
 app.post('/api/reset-password', async (req, res) => {
   try {
@@ -1029,10 +1099,157 @@ app.post('/api/reset-password', async (req, res) => {
   }
 });
 
+// 채팅 메시지 조회 API
+app.get('/api/studies/:studyId/messages', isAuthenticated, async (req, res) => {
+  try {
+    const { studyId } = req.params;
+    const userId = req.session.user.id;
+    const { page = 1, limit = 50 } = req.query;
+
+    // 모임 참가자 확인
+    const study = await Study.findById(studyId);
+    if (!study) {
+      return res.status(404).json({ message: '모임을 찾을 수 없습니다.' });
+    }
+
+    const isLeader = study.leader.toString() === userId.toString();
+    const isMember = study.currentMembers.includes(userId);
+    
+    if (!isLeader && !isMember) {
+      return res.status(403).json({ message: '채팅방 접근 권한이 없습니다.' });
+    }
+
+    // 메시지 조회
+    const messages = await ChatMessage.find({ studyId })
+      .populate('sender', 'name')
+      .sort({ createdAt: -1 })
+      .limit(limit * 1)
+      .skip((page - 1) * limit);
+
+    res.json({
+      success: true,
+      messages: messages.reverse(),
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        hasMore: messages.length === parseInt(limit)
+      }
+    });
+
+  } catch (error) {
+    console.error('채팅 메시지 조회 오류:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: '메시지 조회 중 오류가 발생했습니다.' 
+    });
+  }
+});
+
 // 정적 파일 서빙 (API 라우팅 후에 배치)
 app.use(express.static(__dirname));
 
+// Socket.IO 설정
+const server = http.createServer(app);
+
+// Socket.IO 초기화
+let io;
+try {
+  const socketIo = require('socket.io');
+  io = new socketIo.Server(server, {
+    cors: {
+      origin: "*",
+      methods: ["GET", "POST"]
+    }
+  });
+  console.log('Socket.IO 서버가 초기화되었습니다.');
+} catch (error) {
+  console.log('Socket.IO를 찾을 수 없습니다. 채팅 기능이 비활성화됩니다.');
+  console.log('npm install socket.io 명령어로 Socket.IO를 설치해주세요.');
+  io = null;
+}
+
+// Socket.IO 연결 처리 (io가 있는 경우에만)
+if (io) {
+  io.on('connection', (socket) => {
+  console.log('사용자 연결:', socket.id);
+
+  // 채팅방 입장
+  socket.on('join-chat', async (data) => {
+    const { studyId, userId } = data;
+    
+    try {
+      // 모임 참가자 확인
+      const study = await Study.findById(studyId);
+      if (!study) {
+        socket.emit('error', { message: '모임을 찾을 수 없습니다.' });
+        return;
+      }
+
+      const isLeader = study.leader.toString() === userId.toString();
+      const isMember = study.currentMembers.includes(userId);
+      
+      if (!isLeader && !isMember) {
+        socket.emit('error', { message: '채팅방 접근 권한이 없습니다.' });
+        return;
+      }
+
+      socket.join(`study-${studyId}`);
+      socket.userId = userId;
+      socket.studyId = studyId;
+      
+      // 최근 메시지 전송
+      const messages = await ChatMessage.find({ studyId })
+        .populate('sender', 'name')
+        .sort({ createdAt: -1 })
+        .limit(50);
+      
+      socket.emit('chat-history', messages.reverse());
+      
+    } catch (error) {
+      console.error('채팅방 입장 오류:', error);
+      socket.emit('error', { message: '채팅방 입장 중 오류가 발생했습니다.' });
+    }
+  });
+
+  // 메시지 전송
+  socket.on('send-message', async (data) => {
+    const { message } = data;
+    const { userId, studyId } = socket;
+
+    if (!userId || !studyId) {
+      socket.emit('error', { message: '인증되지 않은 사용자입니다.' });
+      return;
+    }
+
+    try {
+      // 메시지 저장
+      const chatMessage = new ChatMessage({
+        studyId,
+        sender: userId,
+        message: message.trim(),
+        messageType: 'text'
+      });
+
+      await chatMessage.save();
+      await chatMessage.populate('sender', 'name');
+
+      // 채팅방의 모든 사용자에게 메시지 전송
+      io.to(`study-${studyId}`).emit('new-message', chatMessage);
+
+    } catch (error) {
+      console.error('메시지 전송 오류:', error);
+      socket.emit('error', { message: '메시지 전송 중 오류가 발생했습니다.' });
+    }
+  });
+
+  // 연결 해제
+  socket.on('disconnect', () => {
+    console.log('사용자 연결 해제:', socket.id);
+  });
+  });
+}
+
 // 서버 시작
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`서버가 http://localhost:${PORT} 에서 실행 중입니다.`);
 });

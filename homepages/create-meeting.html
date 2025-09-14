@@ -23,6 +23,41 @@
     .form-section { margin-bottom: 2rem; }
     .form-group { margin-bottom: 1rem; }
     .required { color: #dc2626; }
+    
+    /* Pinterest 스타일 Masonry Grid */
+    .masonry-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+      padding: 0;
+      justify-content: start;
+    }
+    
+    @media (min-width: 640px) {
+      .masonry-grid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 18px;
+        padding: 0;
+      }
+    }
+    
+    @media (min-width: 1024px) {
+      .masonry-grid {
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 20px;
+      }
+    }
+    
+    @media (min-width: 1280px) {
+      .masonry-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      }
+    }
+    
+    .masonry-item {
+      break-inside: avoid;
+      margin-bottom: 20px;
+    }
   </style>
 </head>
 <body class="bg-green-50 lg:ml-20" data-page="create-meeting">
@@ -85,13 +120,13 @@
               <p id="meetingDetailType" class="text-gray-600"></p>
             </div>
 
-            <!-- 일정 -->
+            <!-- 스터디 시작일 -->
             <div class="bg-gray-50 rounded-lg p-4">
               <div class="flex items-center mb-2">
-                <span class="material-icons text-green-600 mr-2">schedule</span>
-                <h4 class="font-semibold text-gray-900">일정</h4>
+                <span class="material-icons text-green-600 mr-2">event</span>
+                <h4 class="font-semibold text-gray-900">스터디 시작일</h4>
               </div>
-              <p id="meetingDetailSchedule" class="text-gray-600"></p>
+              <p id="meetingDetailStartDate" class="text-gray-600"></p>
             </div>
 
             <!-- 장소 -->
@@ -103,66 +138,42 @@
               <p id="meetingDetailLocation" class="text-gray-600"></p>
             </div>
 
-            <!-- 기간 -->
-            <div class="bg-gray-50 rounded-lg p-4">
-              <div class="flex items-center mb-2">
-                <span class="material-icons text-green-600 mr-2">timer</span>
-                <h4 class="font-semibold text-gray-900">진행 기간</h4>
-              </div>
-              <p id="meetingDetailDuration" class="text-gray-600"></p>
-            </div>
-
-            <!-- 모집 마감일 -->
+            <!-- 스터디 종료일 -->
             <div class="bg-gray-50 rounded-lg p-4">
               <div class="flex items-center mb-2">
                 <span class="material-icons text-green-600 mr-2">event_available</span>
-                <h4 class="font-semibold text-gray-900">모집 마감일</h4>
+                <h4 class="font-semibold text-gray-900">스터디 종료일</h4>
               </div>
               <p id="meetingDetailDeadline" class="text-gray-600"></p>
             </div>
-          </div>
 
-          <!-- 태그 -->
-          <div id="meetingDetailTagsSection" class="mb-6 hidden">
-            <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
-              <span class="material-icons text-green-600 mr-2">label</span>
-              태그
-            </h4>
-            <div id="meetingDetailTags" class="flex flex-wrap gap-2">
-              <!-- 태그들이 여기에 표시됩니다 -->
+            <!-- 모임 시간 -->
+            <div class="bg-gray-50 rounded-lg p-4">
+              <div class="flex items-center mb-2">
+                <span class="material-icons text-green-600 mr-2">access_time</span>
+                <h4 class="font-semibold text-gray-900">모임 시간</h4>
+              </div>
+              <p id="meetingDetailTime" class="text-gray-600"></p>
+            </div>
+
+            <!-- 모임 주기 -->
+            <div class="bg-gray-50 rounded-lg p-4">
+              <div class="flex items-center mb-2">
+                <span class="material-icons text-green-600 mr-2">repeat</span>
+                <h4 class="font-semibold text-gray-900">모임 주기</h4>
+              </div>
+              <p id="meetingDetailFrequency" class="text-gray-600"></p>
             </div>
           </div>
 
-          <!-- 참가 조건 -->
-          <div id="meetingDetailRequirementsSection" class="mb-6 hidden">
+          <!-- 참가 조건/요구사항 -->
+          <div id="meetingDetailRequirementsSection" class="mb-6">
             <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
               <span class="material-icons text-green-600 mr-2">rule</span>
-              참가 조건
+              참가 조건/요구사항
             </h4>
             <div class="bg-blue-50 rounded-lg p-4">
               <p id="meetingDetailRequirements" class="text-gray-700"></p>
-            </div>
-          </div>
-
-          <!-- 모임 설정 -->
-          <div class="mb-6">
-            <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
-              <span class="material-icons text-green-600 mr-2">settings</span>
-              모임 설정
-            </h4>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div class="bg-gray-50 rounded-lg p-3">
-                <div class="flex items-center justify-between">
-                  <span class="text-gray-700">공개 모임</span>
-                  <span id="meetingDetailIsPublic" class="text-sm font-medium"></span>
-                </div>
-              </div>
-              <div class="bg-gray-50 rounded-lg p-3">
-                <div class="flex items-center justify-between">
-                  <span class="text-gray-700">대기자 명단</span>
-                  <span id="meetingDetailAllowWaitlist" class="text-sm font-medium"></span>
-                </div>
-              </div>
             </div>
           </div>
 
@@ -174,6 +185,17 @@
             </h4>
             <div id="meetingDetailMembersList" class="space-y-2">
               <!-- 참가자들이 여기에 표시됩니다 -->
+            </div>
+          </div>
+
+          <!-- 태그 -->
+          <div id="meetingDetailTagsSection" class="mb-6 hidden">
+            <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
+              <span class="material-icons text-green-600 mr-2">label</span>
+              태그
+            </h4>
+            <div id="meetingDetailTags" class="flex flex-wrap gap-2">
+              <!-- 태그들이 여기에 표시됩니다 -->
             </div>
           </div>
 
@@ -207,53 +229,45 @@
   </div>
 
   <!-- 메인 콘텐츠 -->
-  <main class="p-4">
-    <div class="max-w-7xl mx-auto">
+  <main class="pl-4 pr-4">
+    <div class="max-w-7xl ml-0 mr-auto">
       <!-- 모임 목록 화면 -->
-      <div id="meetingListView" class="max-w-6xl mx-auto">
-        <!-- 페이지 헤더 -->
-        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
-          <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-            <div class="flex items-center mb-4 md:mb-0">
-              <span class="material-icons text-green-600 text-3xl mr-3">event</span>
-              <div>
-                <h2 class="text-2xl font-bold text-gray-800">모임 찾기</h2>
-                <p class="text-gray-600 mt-1">다양한 모임을 둘러보고 참가하거나 새로운 모임을 만들어보세요</p>
+      <div id="meetingListView" class="max-w-7xl ml-0 mr-auto">
+        <!-- 상단 검색 영역 (Pinterest 스타일) -->
+        <div class="sticky top-0 bg-green-50 z-10 py-6 mb-8">
+          <div class="flex items-center gap-4">
+            <!-- 검색 및 필터 -->
+            <div class="flex-1 flex items-center gap-3">
+              <div class="flex-1 relative">
+                <input type="text" id="searchInput" placeholder="모임 검색..." 
+                       class="w-full px-4 py-3 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent pl-12 bg-white shadow-sm"
+                       oninput="filterMeetings()" onkeyup="filterMeetings()">
+                <span class="material-icons absolute left-4 top-3.5 text-gray-400 text-xl">search</span>
               </div>
-            </div>
-            <button id="createNewMeetingBtn" class="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 text-center flex items-center" onclick="showCreateForm()">
-              <span class="material-icons mr-2">add</span>
-              새 모임 만들기
-            </button>
-          </div>
-          
-          <!-- 검색 및 필터 -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="md:col-span-2">
-              <div class="relative">
-                <input type="text" id="searchInput" placeholder="모임 제목, 설명으로 검색" 
-                       class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 pl-10">
-                <span class="material-icons absolute left-3 top-2.5 text-gray-400">search</span>
-              </div>
+              
+              <select id="categoryFilter" class="px-4 py-3 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-green-500 bg-white min-w-[140px] shadow-sm" onchange="filterMeetings()">
+                <option value="">모든 카테고리</option>
+                <option value="study">스터디</option>
+                <option value="hobby">취미</option>
+                <option value="exercise">운동</option>
+                <option value="culture">문화</option>
+                <option value="volunteer">봉사</option>
+                <option value="networking">네트워킹</option>
+                <option value="other">기타</option>
+              </select>
             </div>
             
-            <select id="categoryFilter" class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-white">
-              <option value="">모든 카테고리</option>
-              <option value="study">스터디</option>
-              <option value="hobby">취미</option>
-              <option value="exercise">운동</option>
-              <option value="culture">문화</option>
-              <option value="volunteer">봉사</option>
-              <option value="networking">네트워킹</option>
-              <option value="other">기타</option>
-            </select>
+            <!-- 새 모임 만들기 버튼 (Pinterest 스타일) -->
+            <button id="createNewMeetingBtn" class="bg-green-600 hover:bg-green-700 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all duration-200 hover:scale-105" onclick="showCreateForm()" title="새 모임 만들기">
+              <span class="material-icons text-xl">add</span>
+            </button>
           </div>
         </div>
         
         <!-- 모임 목록 (Pinterest 스타일) -->
-        <div id="meetingList" class="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-6 mb-8">
+        <div id="meetingList" class="masonry-grid">
           <!-- 모임들이 여기에 동적으로 로드됩니다 -->
-          <div class="text-center py-12 text-gray-500 w-full">
+          <div class="text-center py-12 text-gray-500 w-full col-span-full">
             <span class="material-icons text-4xl mb-2">event_note</span>
             <p>등록된 모임이 없습니다.</p>
           </div>
@@ -435,7 +449,7 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="form-group">
               <label for="startDate" class="block text-sm font-medium text-gray-700 mb-2">
-                시작일 <span class="required">*</span>
+                스터디 시작일 <span class="required">*</span>
               </label>
               <input type="date" id="startDate" name="startDate" required
                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
@@ -443,9 +457,9 @@
             
             <div class="form-group">
               <label for="endDate" class="block text-sm font-medium text-gray-700 mb-2">
-                종료일
+                스터디 종료일 <span class="required">*</span>
               </label>
-              <input type="date" id="endDate" name="endDate"
+              <input type="date" id="endDate" name="endDate" required
                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
             </div>
           </div>
@@ -487,12 +501,12 @@
               <label for="meetingType" class="block text-sm font-medium text-gray-700 mb-2">
                 모임 형태 <span class="required">*</span>
               </label>
-              <select id="meetingType" name="type" required
+              <select id="meetingType" name="meetingType" required
                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
                 <option value="">선택해주세요</option>
                 <option value="offline">오프라인</option>
                 <option value="online">온라인</option>
-                <option value="hybrid">혼합형</option>
+                <option value="both">혼합형</option>
               </select>
             </div>
             
@@ -541,19 +555,6 @@
                       placeholder="모임 참가를 위한 특별한 조건이나 준비물이 있다면 작성해주세요..."></textarea>
           </div>
           
-          <div class="flex items-center space-x-4">
-            <label class="flex items-center">
-              <input type="checkbox" id="isPublic" name="isPublic" checked
-                     class="rounded border-gray-300 text-green-600 focus:ring-green-500">
-              <span class="ml-2 text-sm text-gray-700">공개 모임 (누구나 참가 신청 가능)</span>
-            </label>
-            
-            <label class="flex items-center">
-              <input type="checkbox" id="allowWaitlist" name="allowWaitlist"
-                     class="rounded border-gray-300 text-green-600 focus:ring-green-500">
-              <span class="ml-2 text-sm text-gray-700">대기자 명단 허용</span>
-            </label>
-          </div>
         </div>
 
         <!-- 제출 버튼 -->
@@ -632,7 +633,7 @@
           
           if (startDateInput) {
             startDateInput.min = today;
-            // 시작일 변경 시 종료일 최소값 업데이트
+            // 시작일 변경 시 스터디 종료일 최소값 업데이트
             startDateInput.addEventListener('change', function() {
               if (endDateInput) {
                 endDateInput.min = this.value;
@@ -661,16 +662,11 @@
       for (let [key, value] of formData.entries()) {
         if (key === 'tags') {
           meetingData[key] = value.split(',').map(tag => tag.trim()).filter(tag => tag);
-        } else if (key === 'isPublic' || key === 'allowWaitlist') {
-          meetingData[key] = true;
         } else {
           meetingData[key] = value;
         }
       }
       
-      // 체크박스 처리 (체크되지 않은 경우)
-      if (!formData.has('isPublic')) meetingData.isPublic = false;
-      if (!formData.has('allowWaitlist')) meetingData.allowWaitlist = false;
       
       // 이미지 처리
       const selectedImageUrl = document.getElementById('selectedImageUrl').value;
@@ -711,9 +707,7 @@
         meetingData.imageUrl = `https://picsum.photos/seed/${titleSeed}/400/300`;
       }
       
-      // 스키마에 맞게 필드명 변경
-      meetingData.meetingType = meetingData.type; // type -> meetingType
-      delete meetingData.type;
+      // meetingType 필드는 이미 올바른 이름으로 설정됨
       
       // 필수 필드 검증
       const requiredFields = ['title', 'description', 'category', 'startDate', 'meetingType', 'maxMembers'];
@@ -740,13 +734,15 @@
         meetingData.duration = parseInt(meetingData.duration);
       }
       
-      // deadline 필드 추가 (endDate를 deadline으로 사용)
+      // deadline 필드 추가 (스터디 종료일 1주 전을 모집 마감일로 설정)
       if (meetingData.endDate) {
-        meetingData.deadline = meetingData.endDate;
+        const endDate = new Date(meetingData.endDate);
+        endDate.setDate(endDate.getDate() - 7); // 종료일 1주 전을 모집 마감일로
+        meetingData.deadline = endDate.toISOString().split('T')[0];
       } else {
-        // endDate가 없으면 startDate + 4주를 기본값으로 설정
+        // endDate가 없으면 startDate + 3주를 모집 마감일로 설정
         const startDate = new Date(meetingData.startDate);
-        startDate.setDate(startDate.getDate() + 28); // 4주 후
+        startDate.setDate(startDate.getDate() + 21); // 3주 후
         meetingData.deadline = startDate.toISOString().split('T')[0];
       }
       
@@ -801,6 +797,18 @@
         const data = await response.json();
         allMeetings = data.studies || data;
         renderMeetings(allMeetings);
+        
+        // 로드 완료 후 URL 검색어 처리
+        const urlParams = new URLSearchParams(window.location.search);
+        const searchQuery = urlParams.get('search');
+        
+        if (searchQuery) {
+          const searchInput = document.getElementById('searchInput');
+          if (searchInput) {
+            searchInput.value = searchQuery;
+            filterMeetings(); // 검색 실행
+          }
+        }
       } catch (error) {
         console.error('모임 목록 로드 오류:', error);
       }
@@ -813,9 +821,10 @@
       
       if (!meetings || meetings.length === 0) {
         meetingList.innerHTML = `
-          <div class="text-center py-12 text-gray-500 w-full">
-            <span class="material-icons text-4xl mb-2">event_note</span>
-            <p>등록된 모임이 없습니다.</p>
+          <div class="col-span-full text-center py-16 text-gray-500">
+            <span class="material-icons text-5xl mb-4 text-gray-300">event_note</span>
+            <p class="text-lg">등록된 모임이 없습니다.</p>
+            <p class="text-sm mt-2">새로운 모임을 만들어보세요!</p>
           </div>
         `;
         pagination.classList.add('hidden');
@@ -852,43 +861,49 @@
         const imageUrl = meeting.imageUrl || `https://picsum.photos/seed/${meeting._id}/300/200`;
         
         return `
-          <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group cursor-pointer mb-6 break-inside-avoid" onclick="openMeetingDetail('${meeting._id}')">
+          <div class="masonry-item bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden group cursor-pointer" onclick="openMeetingDetail('${meeting._id}')">
             <!-- 이미지 섹션 -->
             <div class="relative overflow-hidden">
-              <img src="${imageUrl}" alt="${meeting.title}" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
-              <div class="absolute top-3 left-3">
-                <span class="px-3 py-1 rounded-full text-xs font-medium ${categoryColors[meeting.category] || categoryColors.other}">
+              <img src="${imageUrl}" alt="${meeting.title}" class="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-500">
+              <div class="absolute top-2 left-2">
+                <span class="px-2 py-1 rounded-full text-xs font-semibold bg-white/90 backdrop-blur-sm text-gray-700 shadow-sm">
                   ${categoryTexts[meeting.category] || '기타'}
                 </span>
               </div>
-              <div class="absolute top-3 right-3">
-                <div class="bg-white bg-opacity-90 backdrop-blur-sm rounded-full px-2 py-1">
-                  <span class="text-xs text-gray-700 font-medium">${startDate}</span>
+              <div class="absolute top-2 right-2">
+                <div class="bg-black/20 backdrop-blur-sm rounded-full px-2 py-1">
+                  <span class="text-xs text-white font-medium">${startDate}</span>
                 </div>
               </div>
+              <!-- 그라데이션 오버레이 -->
+              <div class="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </div>
             
             <!-- 콘텐츠 섹션 -->
             <div class="p-4">
-              <h3 class="text-lg font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-green-600 transition-colors">${meeting.title}</h3>
-              <p class="text-gray-600 text-sm mb-3 line-clamp-2">${meeting.description}</p>
+              <h3 class="text-base font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-green-600 transition-colors leading-tight">${meeting.title}</h3>
+              <p class="text-gray-600 text-sm mb-3 line-clamp-2 leading-relaxed">${meeting.description}</p>
               
-              <!-- 하단 정보 -->
-              <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                  <span class="text-xs text-gray-500 flex items-center">
+              <!-- 메타 정보 -->
+              <div class="flex items-center justify-between text-xs text-gray-500 mb-3">
+                <div class="flex items-center space-x-2">
+                  <span class="flex items-center">
                     <span class="material-icons text-sm mr-1">people</span>
                     ${meeting.currentMembers?.length || 0}/${meeting.maxMembers}
                   </span>
-                  <span class="text-xs text-gray-500 flex items-center">
-                    <span class="material-icons text-sm mr-1">location_on</span>
+                  <span class="flex items-center">
+                    <span class="material-icons text-sm mr-1">
+                      ${meeting.meetingType === 'online' ? 'computer' : meeting.meetingType === 'offline' ? 'place' : 'hub'}
+                    </span>
                     ${meeting.meetingType === 'online' ? '온라인' : meeting.meetingType === 'offline' ? '오프라인' : '혼합형'}
                   </span>
                 </div>
-                <button class="bg-green-600 text-white px-3 py-1 rounded-full text-xs font-medium hover:bg-green-700 transition-colors" onclick="event.stopPropagation(); joinMeeting('${meeting._id}')">
-                  참가하기
-                </button>
               </div>
+              
+              <!-- 참가 버튼 -->
+              <button class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]" onclick="event.stopPropagation(); joinMeeting('${meeting._id}')">
+                참가하기
+              </button>
             </div>
           </div>
         `;
@@ -965,26 +980,30 @@
       
       // 상세 정보 설정
       document.getElementById('meetingDetailMembers').textContent = `${meeting.currentMembers?.length || 0}명 / ${meeting.maxMembers}명`;
-      document.getElementById('meetingDetailType').textContent = meeting.meetingType === 'online' ? '온라인' : meeting.meetingType === 'offline' ? '오프라인' : '혼합형';
+      document.getElementById('meetingDetailType').textContent = meeting.meetingType === 'online' ? '온라인' : meeting.meetingType === 'offline' ? '오프라인' : '온/오프라인 혼합형';
       
-      // 일정 정보
+      // 스터디 시작일
       const startDate = new Date(meeting.startDate);
-      const endDate = meeting.endDate ? new Date(meeting.endDate) : null;
-      let scheduleText = startDate.toLocaleDateString('ko-KR');
-      if (endDate) {
-        scheduleText += ` ~ ${endDate.toLocaleDateString('ko-KR')}`;
-      }
-      document.getElementById('meetingDetailSchedule').textContent = scheduleText;
+      document.getElementById('meetingDetailStartDate').textContent = startDate.toLocaleDateString('ko-KR');
       
-      // 장소 정보
-      document.getElementById('meetingDetailLocation').textContent = meeting.location || '미정';
+      // 스터디 종료일
+      const endDateForDeadline = meeting.endDate ? new Date(meeting.endDate) : new Date(meeting.deadline);
+      document.getElementById('meetingDetailDeadline').textContent = endDateForDeadline.toLocaleDateString('ko-KR');
       
-      // 진행 기간
-      document.getElementById('meetingDetailDuration').textContent = `${meeting.duration || 4}주`;
+      // 모임 시간
+      const timeText = meeting.time ? meeting.time : '미정';
+      document.getElementById('meetingDetailTime').textContent = timeText;
       
-      // 모집 마감일
-      const deadline = new Date(meeting.deadline);
-      document.getElementById('meetingDetailDeadline').textContent = deadline.toLocaleDateString('ko-KR');
+      // 모임 주기
+      const frequencyTexts = {
+        'once': '일회성',
+        'weekly': '매주',
+        'biweekly': '격주',
+        'monthly': '매월',
+        'irregular': '비정기'
+      };
+      const frequencyText = meeting.frequency ? frequencyTexts[meeting.frequency] || meeting.frequency : '미정';
+      document.getElementById('meetingDetailFrequency').textContent = frequencyText;
       
       // 태그 표시
       const tagsSection = document.getElementById('meetingDetailTagsSection');
@@ -998,24 +1017,20 @@
         tagsSection.classList.add('hidden');
       }
       
-      // 참가 조건 표시
-      const requirementsSection = document.getElementById('meetingDetailRequirementsSection');
+      // 참가 조건/요구사항 표시 (항상 표시)
+      const requirementsText = document.getElementById('meetingDetailRequirements');
       if (meeting.requirements && meeting.requirements.trim()) {
-        requirementsSection.classList.remove('hidden');
-        document.getElementById('meetingDetailRequirements').textContent = meeting.requirements;
+        requirementsText.textContent = meeting.requirements;
       } else {
-        requirementsSection.classList.add('hidden');
+        requirementsText.textContent = '특별한 참가 조건이나 요구사항이 없습니다.';
       }
       
-      // 모임 설정
-      document.getElementById('meetingDetailIsPublic').textContent = meeting.isPublic ? '예' : '아니오';
-      document.getElementById('meetingDetailIsPublic').className = `text-sm font-medium ${meeting.isPublic ? 'text-green-600' : 'text-gray-600'}`;
-      
-      document.getElementById('meetingDetailAllowWaitlist').textContent = meeting.allowWaitlist ? '허용' : '비허용';
-      document.getElementById('meetingDetailAllowWaitlist').className = `text-sm font-medium ${meeting.allowWaitlist ? 'text-green-600' : 'text-gray-600'}`;
-      
-      // 장소 정보
-      document.getElementById('meetingDetailLocation').textContent = meeting.location || (meeting.meetingType === 'online' ? '온라인' : '미정');
+      // 장소/링크 정보 개선
+      let locationText = meeting.location || '미정';
+      if (meeting.meetingType === 'online' && !meeting.location) {
+        locationText = '온라인 (링크는 참가 후 공개)';
+      }
+      document.getElementById('meetingDetailLocation').textContent = locationText;
       
       // 참가자 목록 표시 (리더 확인)
       const membersList = document.getElementById('meetingDetailMembersList');
@@ -1247,17 +1262,63 @@
 
     // 검색 및 필터링 기능
     function filterMeetings() {
-      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-      const selectedCategory = document.getElementById('categoryFilter').value;
+      console.log('filterMeetings 함수 호출됨');
+      
+      // 모임 목록 화면이 보이는지 확인
+      const meetingListView = document.getElementById('meetingListView');
+      if (!meetingListView || meetingListView.classList.contains('hidden')) {
+        console.log('모임 목록 화면이 숨겨져 있습니다.');
+        return;
+      }
+      
+      const searchInput = document.getElementById('searchInput');
+      const categoryFilter = document.getElementById('categoryFilter');
+      
+      if (!searchInput) {
+        console.log('검색 입력 요소를 찾을 수 없습니다.');
+        return;
+      }
+      
+      if (!categoryFilter) {
+        console.log('카테고리 필터 요소를 찾을 수 없습니다.');
+        return;
+      }
+      
+      if (!allMeetings) {
+        console.log('allMeetings가 정의되지 않았습니다.');
+        return;
+      }
+      
+      if (allMeetings.length === 0) {
+        console.log('모임 데이터가 없습니다.');
+        const meetingList = document.getElementById('meetingList');
+        if (meetingList) {
+          meetingList.innerHTML = `
+            <div class="text-center py-12 text-gray-500 w-full">
+              <span class="material-icons text-4xl mb-2">event_note</span>
+              <p>등록된 모임이 없습니다.</p>
+            </div>
+          `;
+        }
+        return;
+      }
+      
+      const searchTerm = searchInput.value.toLowerCase().trim();
+      const selectedCategory = categoryFilter.value;
+      
+      console.log('검색어:', searchTerm, '카테고리:', selectedCategory, '전체 모임 수:', allMeetings.length);
       
       const filteredMeetings = allMeetings.filter(meeting => {
-        const matchesSearch = meeting.title.toLowerCase().includes(searchTerm) ||
-                             meeting.description.toLowerCase().includes(searchTerm);
+        const matchesSearch = !searchTerm || 
+                             (meeting.title && meeting.title.toLowerCase().includes(searchTerm)) ||
+                             (meeting.description && meeting.description.toLowerCase().includes(searchTerm)) ||
+                             (meeting.tags && Array.isArray(meeting.tags) && meeting.tags.some(tag => tag.toLowerCase().includes(searchTerm)));
         const matchesCategory = !selectedCategory || meeting.category === selectedCategory;
         
         return matchesSearch && matchesCategory;
       });
       
+      console.log('필터링된 모임 수:', filteredMeetings.length);
       renderMeetings(filteredMeetings);
     }
 
@@ -1266,17 +1327,13 @@
       checkLoginStatus();
       loadMeetings();
       
-      // 검색 및 필터 이벤트 리스너
-      const searchInput = document.getElementById('searchInput');
-      const categoryFilter = document.getElementById('categoryFilter');
+      // URL에서 검색어 파라미터 확인
+      const urlParams = new URLSearchParams(window.location.search);
+      const searchQuery = urlParams.get('search');
       
-      if (searchInput) {
-        searchInput.addEventListener('input', filterMeetings);
-      }
       
-      if (categoryFilter) {
-        categoryFilter.addEventListener('change', filterMeetings);
-      }
+      // HTML에 인라인 이벤트가 있으므로 추가 이벤트 리스너는 제거
+      console.log('페이지 로드 완료 - 인라인 이벤트 사용');
       
       // 드롭다운 메뉴 토글
       document.addEventListener('click', function(e) {

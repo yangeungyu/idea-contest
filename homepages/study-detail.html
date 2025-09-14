@@ -28,43 +28,8 @@
   </style>
 </head>
 <body class="bg-green-50 lg:ml-20" data-page="study-detail">
-  <!-- 상단 헤더 -->
-  <header class="bg-white shadow-sm border-b border-gray-200 fixed w-full z-40 lg:ml-20">
-    <div class="px-4 py-3 flex justify-between items-center">
-      <div class="flex items-center">
-        <!-- 모바일에서도 로고 표시 (클릭 가능) -->
-        <div id="mobileLogoBtn" class="lg:hidden flex items-center cursor-pointer hover:bg-gray-50 rounded-lg p-2 transition-colors">
-          <img src="logo.png" alt="홍숲쿨링" class="w-8 h-8 object-contain mr-2">
-          <span class="text-lg font-semibold text-gray-900">홍숲쿨링</span>
-        </div>
-      </div>
-      
-      <!-- 로그인/회원가입 버튼 -->
-      <div class="flex items-center space-x-4">
-        <div id="auth-buttons" class="flex items-center space-x-4">
-          <a href="login.html" class="text-gray-700 hover:text-green-600">로그인</a>
-          <a href="register.html" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">회원가입</a>
-        </div>
-        <!-- 로그인 시 표시될 프로필 메뉴 -->
-        <div id="userMenu" class="hidden dropdown relative">
-          <button class="flex items-center space-x-2 focus:outline-none">
-            <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
-              <span class="material-icons text-gray-600">person</span>
-            </div>
-            <span id="userName" class="text-gray-700">사용자이름</span>
-            <span class="material-icons text-gray-500">arrow_drop_down</span>
-          </button>
-          <div class="dropdown-menu absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10" style="display: none;">
-            <a href="mypage.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">마이페이지</a>
-            <a href="#" onclick="handleLogout()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">로그아웃</a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </header>
-
   <!-- 메인 콘텐츠 -->
-  <main class="container mx-auto px-4 py-8">
+  <main id="mainContent" class="max-w-4xl mx-auto px-4 py-8 transition-all duration-300">
     <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
       <!-- 스터디 헤더 -->
       <div class="p-6 border-b border-gray-100">
@@ -72,28 +37,34 @@
           <div>
             <div class="flex items-center mb-2">
               <span id="studyCategory" class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
-                프로그래밍
+                로딩 중...
               </span>
               <span id="studyStatus" class="ml-2 bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
-                모집 중
+                로딩 중...
               </span>
             </div>
-            <h1 id="studyTitle" class="text-2xl font-bold text-gray-900 mb-2">스터디 제목</h1>
+            <h1 id="studyTitle" class="text-2xl font-bold text-gray-900 mb-2">로딩 중...</h1>
             <div class="flex items-center text-sm text-gray-500">
               <span id="studyLeader" class="flex items-center">
                 <i class="material-icons text-sm mr-1">person</i>
-                리더: 홍길동
+                리더: 로딩 중...
               </span>
               <span class="mx-2">•</span>
               <span id="studyCreatedAt" class="flex items-center">
                 <i class="material-icons text-sm mr-1">schedule</i>
-                2023-11-15
+                로딩 중...
+              </span>
+              <span class="mx-2">•</span>
+              <span id="studyViews" class="flex items-center">
+                <i class="material-icons text-sm mr-1">visibility</i>
+                조회수: 0
               </span>
             </div>
           </div>
-          <div class="mt-4 md:mt-0">
-            <button id="joinButton" class="w-full md:w-auto bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
-              참여하기
+          <div class="mt-4 md:mt-0 flex gap-3">
+            <button id="chatButton" class="w-full md:w-auto bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center">
+              <span class="material-icons mr-2">chat</span>
+              채팅하기
             </button>
           </div>
         </div>
@@ -101,8 +72,8 @@
       
       <!-- 스터디 정보 -->
       <div class="p-6">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div class="md:col-span-2">
+        <div id="contentGrid" class="grid grid-cols-1 lg:grid-cols-3 gap-6 transition-all duration-300">
+          <div id="mainContentArea" class="lg:col-span-2">
             <!-- 탭 메뉴 -->
             <div class="border-b border-gray-200 mb-6">
               <nav class="-mb-px flex space-x-8">
@@ -124,23 +95,22 @@
               <div id="infoTab" class="tab-pane">
                 <h3 class="text-lg font-medium text-gray-900 mb-4">스터디 소개</h3>
                 <div id="studyDescription" class="text-gray-700 whitespace-pre-line">
-                  스터디에 대한 상세한 설명이 여기에 표시됩니다.
+                  로딩 중...
                 </div>
                 
                 <h3 class="text-lg font-medium text-gray-900 mt-8 mb-4">진행 방식</h3>
                 <div class="flex items-center text-gray-700 mb-2">
                   <i class="material-icons text-green-500 mr-2">meeting_room</i>
-                  <span id="meetingType">온라인/오프라인 병행</span>
+                  <span id="meetingType">로딩 중...</span>
                 </div>
-                <div id="studyLocation" class="flex items-center text-gray-700 mb-4">
+                <div id="studyLocation" class="flex items-center text-gray-700 mb-4" style="display: none;">
                   <i class="material-icons text-green-500 mr-2">location_on</i>
-                  <span>서울시 강남구</span>
+                  <span>로딩 중...</span>
                 </div>
                 
                 <h3 class="text-lg font-medium text-gray-900 mt-8 mb-4">태그</h3>
                 <div id="studyTags" class="flex flex-wrap gap-2">
-                  <span class="bg-green-100 text-green-800 text-xs px-3 py-1 rounded-full">#JavaScript</span>
-                  <span class="bg-green-100 text-green-800 text-xs px-3 py-1 rounded-full">#프론트엔드</span>
+                  <span class="bg-gray-100 text-gray-600 text-xs px-3 py-1 rounded-full">태그 로딩 중...</span>
                 </div>
               </div>
               
@@ -162,7 +132,7 @@
                     </div>
                     <div class="ml-3">
                       <h4 class="text-sm font-medium text-green-800">시작일</h4>
-                      <p id="startDate" class="text-sm text-green-700">2023년 12월 1일</p>
+                      <p id="startDate" class="text-sm text-green-700">로딩 중...</p>
                     </div>
                   </div>
                   <div class="mt-4 flex items-start">
@@ -171,7 +141,7 @@
                     </div>
                     <div class="ml-3">
                       <h4 class="text-sm font-medium text-green-800">마감일</h4>
-                      <p id="deadline" class="text-sm text-green-700">2023년 11월 30일</p>
+                      <p id="deadline" class="text-sm text-green-700">로딩 중...</p>
                     </div>
                   </div>
                 </div>
@@ -187,35 +157,30 @@
             </div>
           </div>
           
-          <!-- 사이드바 -->
-          <div class="md:col-span-1">
-            <div class="bg-white border border-gray-200 rounded-lg p-4 sticky top-24">
+          <!-- 스터디 정보 -->
+          <div id="sidebarArea" class="lg:col-span-1">
+            <div id="studyInfoSidebar" class="bg-white border border-gray-200 rounded-lg p-4 sticky top-24">
               <h3 class="text-lg font-medium text-gray-900 mb-4">스터디 정보</h3>
               
               <div class="space-y-4">
                 <div>
                   <h4 class="text-sm font-medium text-gray-500">모집 인원</h4>
-                  <p id="memberInfo" class="mt-1 text-sm text-gray-900">3/5명</p>
-                </div>
-                
-                <div>
-                  <h4 class="text-sm font-medium text-gray-500">진행 기간</h4>
-                  <p id="duration" class="mt-1 text-sm text-gray-900">8주</p>
+                  <p id="memberInfo" class="mt-1 text-sm text-gray-900">0/0명</p>
                 </div>
                 
                 <div>
                   <h4 class="text-sm font-medium text-gray-500">카테고리</h4>
-                  <p id="category" class="mt-1 text-sm text-gray-900">프로그래밍</p>
+                  <p id="category" class="mt-1 text-sm text-gray-900">로딩 중...</p>
                 </div>
                 
                 <div>
                   <h4 class="text-sm font-medium text-gray-500">생성일</h4>
-                  <p id="createdAt" class="mt-1 text-sm text-gray-900">2023-11-15</p>
+                  <p id="createdAt" class="mt-1 text-sm text-gray-900">로딩 중...</p>
                 </div>
                 
                 <div class="pt-4 border-t border-gray-200">
                   <button id="reportButton" class="text-sm text-red-600 hover:text-red-800">
-                    <i class="material-icons text-sm align-middle">report</i> 신고하기
+                    <span class="material-icons text-sm align-middle">report</span> 신고하기
                   </button>
                 </div>
               </div>
@@ -226,12 +191,40 @@
     </div>
   </main>
 
-  <!-- 푸터 -->
-  <footer class="bg-green-800 text-white py-8 mt-12">
-    <div class="container mx-auto px-4 text-center">
-      <p>&copy; 2025 홍숲쿨링. All rights reserved.</p>
+  <!-- 채팅 영역 (오른쪽에 슬라이드 인) -->
+  <div id="chatArea" class="fixed top-0 right-0 h-full w-96 bg-white border-l border-gray-200 shadow-lg transform translate-x-full transition-transform duration-300 z-50">
+    <!-- 채팅 헤더 -->
+    <div class="bg-blue-50 px-4 py-3 border-b border-gray-200">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-medium text-gray-900 flex items-center">
+          <span class="material-icons text-blue-600 mr-2">chat</span>
+          모임 채팅
+        </h3>
+        <button id="closeChatButton" class="text-gray-500 hover:text-gray-700">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
     </div>
-  </footer>
+    
+    <!-- 채팅 메시지 영역 -->
+    <div id="chatMessages" class="h-full overflow-y-auto p-4 space-y-3 pb-20">
+      <div class="text-center text-gray-500 text-sm py-4">
+        채팅을 시작해보세요!
+      </div>
+    </div>
+    
+    <!-- 메시지 입력 영역 -->
+    <div class="absolute bottom-0 left-0 right-0 border-t border-gray-200 p-4 bg-white">
+      <div class="flex gap-2">
+        <input type="text" id="messageInput" placeholder="메시지를 입력하세요..." 
+               class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+        <button id="sendMessageButton" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <span class="material-icons">send</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
 
   <script>
     // URL에서 스터디 ID 추출
@@ -267,32 +260,73 @@
     
     // 스터디 정보 렌더링
     function renderStudy(study) {
+      console.log('렌더링할 스터디 데이터:', study);
+      
+      // 현재 사용자 정보 가져오기
+      getCurrentUser().then(currentUser => {
+        if (currentUser) {
+          updateChatButtonVisibility(study, currentUser);
+        }
+      });
+      
       // 기본 정보
       document.title = `${study.title} - 홍숲쿨링`;
-      document.getElementById('studyTitle').textContent = study.title;
-      document.getElementById('studyDescription').textContent = study.description;
-      document.getElementById('studyCategory').textContent = study.category;
-      document.getElementById('category').textContent = study.category;
-      document.getElementById('studyStatus').textContent = study.status === 'recruiting' ? '모집 중' : '진행 중';
+      document.getElementById('studyTitle').textContent = study.title || '제목 없음';
+      document.getElementById('studyDescription').textContent = study.description || '설명이 없습니다.';
+      document.getElementById('studyCategory').textContent = study.category || '미분류';
+      document.getElementById('category').textContent = study.category || '미분류';
+      
+      // 상태 표시
+      const statusText = {
+        'recruiting': '모집 중',
+        'in_progress': '진행 중',
+        'completed': '완료'
+      };
+      document.getElementById('studyStatus').textContent = statusText[study.status] || study.status || '알 수 없음';
       
       // 날짜 포맷팅
       const formatDate = (dateString) => {
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        return new Date(dateString).toLocaleDateString('ko-KR', options);
+        if (!dateString) return '날짜 없음';
+        try {
+          const options = { year: 'numeric', month: 'long', day: 'numeric' };
+          return new Date(dateString).toLocaleDateString('ko-KR', options);
+        } catch (error) {
+          console.error('날짜 포맷 오류:', error);
+          return '날짜 오류';
+        }
+      };
+      
+      const formatShortDate = (dateString) => {
+        if (!dateString) return '날짜 없음';
+        try {
+          return new Date(dateString).toISOString().split('T')[0];
+        } catch (error) {
+          console.error('날짜 포맷 오류:', error);
+          return '날짜 오류';
+        }
       };
       
       // 날짜 정보
       document.getElementById('startDate').textContent = formatDate(study.startDate);
       document.getElementById('deadline').textContent = formatDate(study.deadline);
-      document.getElementById('createdAt').textContent = new Date(study.createdAt).toISOString().split('T')[0];
+      document.getElementById('createdAt').textContent = formatShortDate(study.createdAt);
+      document.getElementById('studyCreatedAt').innerHTML = `
+        <i class="material-icons text-sm mr-1">schedule</i>
+        ${formatShortDate(study.createdAt)}
+      `;
+      
+      // 조회수 표시
+      document.getElementById('studyViews').innerHTML = `
+        <i class="material-icons text-sm mr-1">visibility</i>
+        조회수: ${study.views || 0}
+      `;
       
       // 멤버 정보
-      const memberCount = study.currentMembers?.length || 0;
+      const memberCount = Array.isArray(study.currentMembers) ? study.currentMembers.length : 0;
+      const maxMembers = study.maxMembers || 0;
       document.getElementById('memberCount').textContent = memberCount;
-      document.getElementById('memberInfo').textContent = `${memberCount}/${study.maxMembers}명`;
+      document.getElementById('memberInfo').textContent = `${memberCount}/${maxMembers}명`;
       
-      // 진행 기간
-      document.getElementById('duration').textContent = `${study.duration}주`;
       
       // 진행 방식
       const meetingTypeText = {
@@ -300,31 +334,72 @@
         'offline': '오프라인',
         'both': '온라인/오프라인 병행'
       };
-      document.getElementById('meetingType').textContent = meetingTypeText[study.meetingType] || study.meetingType;
+      document.getElementById('meetingType').textContent = meetingTypeText[study.meetingType] || study.meetingType || '미정';
       
       // 위치 정보
-      if (study.location) {
-        document.getElementById('studyLocation').innerHTML = `
+      const locationElement = document.getElementById('studyLocation');
+      if (study.location && study.location.trim()) {
+        locationElement.style.display = 'flex';
+        locationElement.innerHTML = `
           <i class="material-icons text-green-500 mr-2">location_on</i>
           <span>${study.location}</span>
         `;
+      } else {
+        locationElement.style.display = 'none';
       }
       
       // 태그
-      if (study.tags && study.tags.length > 0) {
+      const tagsElement = document.getElementById('studyTags');
+      if (study.tags && Array.isArray(study.tags) && study.tags.length > 0) {
         const tagsHtml = study.tags.map(tag => 
           `<span class="bg-green-100 text-green-800 text-xs px-3 py-1 rounded-full">#${tag}</span>`
         ).join('');
-        document.getElementById('studyTags').innerHTML = tagsHtml;
+        tagsElement.innerHTML = tagsHtml;
+      } else {
+        tagsElement.innerHTML = '<span class="bg-gray-100 text-gray-600 text-xs px-3 py-1 rounded-full">태그 없음</span>';
       }
       
       // 리더 정보
-      if (study.leader) {
-        document.getElementById('studyLeader').innerHTML = `
-          <i class="material-icons text-sm mr-1">person</i>
-          리더: ${study.leader.name || '익명'}
+      const leaderName = study.leader?.name || '익명';
+      document.getElementById('studyLeader').innerHTML = `
+        <i class="material-icons text-sm mr-1">person</i>
+        리더: ${leaderName}
+      `;
+      
+      // 멤버 목록 렌더링
+      renderMembers(study.currentMembers || []);
+    }
+    
+    // 멤버 목록 렌더링
+    function renderMembers(members) {
+      const memberListElement = document.getElementById('memberList');
+      
+      if (!members || members.length === 0) {
+        memberListElement.innerHTML = `
+          <div class="text-center py-8 text-gray-500">
+            <i class="material-icons text-4xl mb-2 block">group</i>
+            <p>아직 참여한 멤버가 없습니다.</p>
+          </div>
         `;
+        return;
       }
+      
+      const membersHtml = members.map(member => {
+        const memberName = member?.name || member || '익명';
+        return `
+          <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+            <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
+              <i class="material-icons text-green-600">person</i>
+            </div>
+            <div>
+              <p class="font-medium text-gray-900">${memberName}</p>
+              <p class="text-sm text-gray-500">멤버</p>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      memberListElement.innerHTML = membersHtml;
     }
     
     // 탭 전환
@@ -372,18 +447,314 @@
         alert(error.message || '스터디 참여 중 오류가 발생했습니다.');
       }
     }
+
+    // 현재 사용자 정보 가져오기
+    async function getCurrentUser() {
+      try {
+        const response = await fetch('/api/current-user', {
+          credentials: 'include'
+        });
+        const data = await response.json();
+        return data.isAuthenticated ? data.user : null;
+      } catch (error) {
+        console.error('사용자 정보 가져오기 오류:', error);
+        return null;
+      }
+    }
+
+    // 채팅 버튼 표시 여부 업데이트
+    function updateChatButtonVisibility(study, currentUser) {
+      const chatButton = document.getElementById('chatButton');
+      if (!chatButton || !currentUser) return;
+
+      // 현재 사용자가 리더이거나 멤버인지 확인
+      const isLeader = study.leader && (study.leader._id === currentUser.id || study.leader.toString() === currentUser.id.toString());
+      const isMember = study.currentMembers && study.currentMembers.some(member => 
+        (typeof member === 'string' ? member : member._id) === currentUser.id
+      );
+
+      if (isLeader || isMember) {
+        chatButton.classList.remove('hidden');
+      } else {
+        chatButton.classList.add('hidden');
+      }
+    }
+
+    // 채팅 상태 저장/복원
+    function saveChatState(isOpen) {
+      console.log('채팅 상태 저장:', studyId, isOpen);
+      localStorage.setItem(`chatOpen_${studyId}`, isOpen.toString());
+    }
+    
+    function getChatState() {
+      const state = localStorage.getItem(`chatOpen_${studyId}`) === 'true';
+      console.log('채팅 상태 조회:', studyId, state);
+      return state;
+    }
+    
+    // 채팅하기 버튼 이벤트
+    async function handleChat() {
+      const chatArea = document.getElementById('chatArea');
+      const mainContent = document.getElementById('mainContent');
+      
+      if (chatArea.classList.contains('translate-x-full')) {
+        // 채팅 열기
+        chatArea.classList.remove('translate-x-full');
+        mainContent.style.marginRight = '400px';
+        saveChatState(true);
+        
+        // Socket.IO 초기화 및 메시지 로드
+        await initializeSocket();
+        loadChatMessages();
+      } else {
+        // 채팅 닫기
+        chatArea.classList.add('translate-x-full');
+        mainContent.style.marginRight = '0';
+        saveChatState(false);
+      }
+    }
+
+    // 채팅 닫기 버튼 이벤트
+    function handleCloseChat() {
+      const chatArea = document.getElementById('chatArea');
+      const mainContent = document.getElementById('mainContent');
+      
+      // 채팅 영역 슬라이드 아웃
+      chatArea.classList.add('translate-x-full');
+      
+      // 메인 콘텐츠 여백 제거
+      mainContent.style.marginRight = '0';
+      
+      // 상태 저장
+      saveChatState(false);
+    }
+    
+    // 페이지 로드 시 채팅 상태 복원
+    async function restoreChatState() {
+      if (getChatState()) {
+        const chatArea = document.getElementById('chatArea');
+        const mainContent = document.getElementById('mainContent');
+        
+        if (chatArea && mainContent) {
+          // 채팅 영역 표시
+          chatArea.classList.remove('translate-x-full');
+          mainContent.style.marginRight = '24rem';
+          
+          // 채팅 메시지 로드
+          await initializeSocket();
+          loadChatMessages();
+          
+          console.log('채팅 상태 복원 완료');
+        }
+      }
+    }
+    
+    // 채팅 메시지 로드 (서버에서 가져오기)
+    async function loadChatMessages() {
+      try {
+        const response = await fetch(`/api/studies/${studyId}/messages`, {
+          credentials: 'include'
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          const messages = data.messages || data;
+          const chatMessages = document.getElementById('chatMessages');
+          const currentUserId = getCurrentUserId();
+          
+          chatMessages.innerHTML = messages.map(msg => {
+            const isMe = msg.sender._id === currentUserId;
+            const time = new Date(msg.createdAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+            
+            if (isMe) {
+              return `
+                <div class="flex flex-col space-y-1 items-end">
+                  <div class="flex items-center space-x-2">
+                    <span class="text-xs text-gray-500">${time}</span>
+                    <span class="text-sm font-medium text-gray-900">나</span>
+                  </div>
+                  <div class="bg-blue-500 text-white rounded-lg px-3 py-2 text-sm max-w-xs">
+                    ${msg.message}
+                  </div>
+                </div>
+              `;
+            } else {
+              return `
+                <div class="flex flex-col space-y-1">
+                  <div class="flex items-center space-x-2">
+                    <span class="text-sm font-medium text-gray-900">${msg.sender.name}</span>
+                    <span class="text-xs text-gray-500">${time}</span>
+                  </div>
+                  <div class="bg-gray-100 rounded-lg px-3 py-2 text-sm text-gray-800">
+                    ${msg.message}
+                  </div>
+                </div>
+              `;
+            }
+          }).join('');
+          
+          // 스크롤을 맨 아래로
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+      } catch (error) {
+        console.error('채팅 메시지 로드 오류:', error);
+      }
+    }
+    
+    // 메시지 전송
+    function sendMessage() {
+      const messageInput = document.getElementById('messageInput');
+      const message = messageInput.value.trim();
+      
+      if (!message) return;
+      
+      if (socket && isSocketConnected) {
+        // 먼저 화면에 내 메시지 표시
+        const myMessage = {
+          sender: { _id: currentUser.id, name: currentUser.name },
+          message: message,
+          createdAt: new Date().toISOString()
+        };
+        addMessageToChat(myMessage);
+        
+        // Socket.IO로 메시지 전송
+        socket.emit('send-message', { message });
+        messageInput.value = '';
+      } else {
+        alert('채팅 서버에 연결되지 않았습니다.');
+      }
+    }
     
     // 초기화
     document.addEventListener('DOMContentLoaded', () => {
       loadStudy();
       setupTabs();
       
-      // 참여하기 버튼 이벤트 리스너
-      const joinButton = document.getElementById('joinButton');
-      if (joinButton) {
-        joinButton.addEventListener('click', handleJoin);
+      // 채팅하기 버튼 이벤트 리스너
+      const chatButton = document.getElementById('chatButton');
+      if (chatButton) {
+        chatButton.addEventListener('click', handleChat);
       }
+      
+      // 채팅 닫기 버튼 이벤트 리스너
+      const closeChatButton = document.getElementById('closeChatButton');
+      if (closeChatButton) {
+        closeChatButton.addEventListener('click', handleCloseChat);
+      }
+      
+      // 메시지 전송 버튼 이벤트 리스너
+      const sendMessageButton = document.getElementById('sendMessageButton');
+      if (sendMessageButton) {
+        sendMessageButton.addEventListener('click', sendMessage);
+      }
+      
+      // 엔터키로 메시지 전송
+      const messageInput = document.getElementById('messageInput');
+      if (messageInput) {
+        messageInput.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            sendMessage();
+          }
+        });
+      }
+      
+      // 채팅 상태 복원 (약간의 지연 후)
+      setTimeout(async () => {
+        await restoreChatState();
+      }, 500);
     });
+  </script>
+  <!-- Socket.IO 클라이언트 -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    // 채팅 기능 초기화
+    let socket = null;
+    let isSocketConnected = false;
+    let currentUser = null;
+    
+    async function initializeSocket() {
+      if (socket) return;
+      
+      // 먼저 현재 사용자 정보를 가져옴
+      currentUser = await getCurrentUser();
+      if (!currentUser) {
+        console.log('사용자 인증이 필요합니다.');
+        return;
+      }
+      
+      socket = io();
+      
+      socket.on('connect', () => {
+        console.log('Socket.IO 연결됨');
+        isSocketConnected = true;
+        
+        // 채팅방 입장
+        if (studyId && currentUser) {
+          socket.emit('join-chat', { studyId, userId: currentUser.id });
+        }
+      });
+      
+      socket.on('disconnect', () => {
+        console.log('Socket.IO 연결 끊어짐');
+        isSocketConnected = false;
+      });
+      
+      // 새 메시지 수신
+      socket.on('new-message', (message) => {
+        // 자신이 보낸 메시지는 이미 화면에 표시되었으므로 중복 방지
+        if (message.sender._id !== currentUser.id) {
+          addMessageToChat(message);
+        }
+      });
+      
+      // 오류 처리
+      socket.on('error', (error) => {
+        console.error('Socket 오류:', error.message);
+        alert(error.message);
+      });
+    }
+    
+    // 채팅에 메시지 추가
+    function addMessageToChat(message) {
+      const chatMessages = document.getElementById('chatMessages');
+      const currentUserId = getCurrentUserId();
+      const isMe = message.sender._id === currentUserId;
+      
+      const messageElement = document.createElement('div');
+      messageElement.className = isMe ? 'flex flex-col space-y-1 items-end' : 'flex flex-col space-y-1';
+      
+      const time = new Date(message.createdAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+      
+      if (isMe) {
+        messageElement.innerHTML = `
+          <div class="flex items-center space-x-2">
+            <span class="text-xs text-gray-500">${time}</span>
+            <span class="text-sm font-medium text-gray-900">나</span>
+          </div>
+          <div class="bg-blue-500 text-white rounded-lg px-3 py-2 text-sm max-w-xs">
+            ${message.message}
+          </div>
+        `;
+      } else {
+        messageElement.innerHTML = `
+          <div class="flex items-center space-x-2">
+            <span class="text-sm font-medium text-gray-900">${message.sender.name}</span>
+            <span class="text-xs text-gray-500">${time}</span>
+          </div>
+          <div class="bg-gray-100 rounded-lg px-3 py-2 text-sm text-gray-800">
+            ${message.message}
+          </div>
+        `;
+      }
+      
+      chatMessages.appendChild(messageElement);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    
+    // 현재 사용자 ID 가져오기
+    function getCurrentUserId() {
+      return currentUser ? currentUser.id : null;
+    }
   </script>
   <script src="common.js"></script>
   <script src="sidebar.js"></script>

@@ -92,8 +92,8 @@
       <h1 class="text-5xl md:text-6xl font-light text-gray-900 mb-6 tracking-tight">홍천에서 만나는<br>특별한 배움</h1>
       <p class="text-lg text-gray-600 mb-12 max-w-2xl leading-relaxed">군 장병과 지역민이 함께하는 다양한 교육 프로그램을 만나보세요</p>
       <div class="w-full max-w-2xl relative">
-        <input type="text" placeholder="어떤 행사를 찾고 계신가요?" class="w-full px-6 py-4 rounded-lg text-gray-800 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#168d63] focus:border-transparent transition-all">
-        <button class="absolute right-2 top-2 bg-[#168d63] text-white px-6 py-2 rounded-md hover:bg-[#0f6b4a] transition-colors">
+        <input type="text" id="homeSearchInput" placeholder="어떤 행사를 찾고 계신가요?" class="w-full px-6 py-4 rounded-lg text-gray-800 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#168d63] focus:border-transparent transition-all">
+        <button id="homeSearchBtn" class="absolute right-2 top-2 bg-[#168d63] text-white px-6 py-2 rounded-md hover:bg-[#0f6b4a] transition-colors">
           <span class="material-icons">search</span>
         </button>
       </div>
@@ -105,63 +105,13 @@
     <div class="container mx-auto px-4">
       <div class="flex justify-between items-center mb-12">
         <h2 class="text-3xl font-light text-gray-900">인기 행사</h2>
-        <a href="#" class="text-[#168d63] hover:text-[#0f6b4a] font-medium transition-colors flex items-center">
-          더보기 <span class="material-icons ml-1">arrow_forward</span>
-        </a>
       </div>
       <div id="events-container" class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <!-- 샘플 카드 -->
-        <div class="group bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-xl hover:border-[#168d63] transition-all duration-300 cursor-pointer">
-          <div class="aspect-video bg-gray-100 overflow-hidden">
-            <img src="https://picsum.photos/400/225?random=1" alt="행사 이미지" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-          </div>
-          <div class="p-6">
-            <div class="flex items-center justify-between mb-3">
-              <span class="px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full">교육/강연</span>
-              <span class="text-sm text-gray-500">2024.12.15</span>
-            </div>
-            <h3 class="text-lg font-medium text-gray-900 mb-2 group-hover:text-[#168d63] transition-colors">프로그래밍 기초 강좌</h3>
-            <p class="text-gray-600 text-sm mb-4 line-clamp-2">초보자를 위한 프로그래밍 기초 강좌입니다. 실습 위주로 진행됩니다.</p>
-            <div class="flex items-center justify-between">
-              <span class="text-sm text-gray-500">참가자 24명</span>
-              <span class="text-[#168d63] font-medium">무료</span>
-            </div>
-          </div>
-        </div>
-        
-        <div class="group bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-xl hover:border-[#168d63] transition-all duration-300 cursor-pointer">
-          <div class="aspect-video bg-gray-100 overflow-hidden">
-            <img src="https://picsum.photos/400/225?random=2" alt="행사 이미지" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-          </div>
-          <div class="p-6">
-            <div class="flex items-center justify-between mb-3">
-              <span class="px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full">문화/예술</span>
-              <span class="text-sm text-gray-500">2024.12.20</span>
-            </div>
-            <h3 class="text-lg font-medium text-gray-900 mb-2 group-hover:text-[#168d63] transition-colors">전통 서예 체험</h3>
-            <p class="text-gray-600 text-sm mb-4 line-clamp-2">전통 서예의 아름다움을 직접 체험해보는 시간을 가져보세요.</p>
-            <div class="flex items-center justify-between">
-              <span class="text-sm text-gray-500">참가자 15명</span>
-              <span class="text-[#168d63] font-medium">5,000원</span>
-            </div>
-          </div>
-        </div>
-        
-        <div class="group bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-xl hover:border-[#168d63] transition-all duration-300 cursor-pointer">
-          <div class="aspect-video bg-gray-100 overflow-hidden">
-            <img src="https://picsum.photos/400/225?random=3" alt="행사 이미지" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-          </div>
-          <div class="p-6">
-            <div class="flex items-center justify-between mb-3">
-              <span class="px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full">스포츠</span>
-              <span class="text-sm text-gray-500">2024.12.25</span>
-            </div>
-            <h3 class="text-lg font-medium text-gray-900 mb-2 group-hover:text-[#168d63] transition-colors">배드민턴 동호회</h3>
-            <p class="text-gray-600 text-sm mb-4 line-clamp-2">함께 운동하며 건강한 취미생활을 만들어가요.</p>
-            <div class="flex items-center justify-between">
-              <span class="text-sm text-gray-500">참가자 32명</span>
-              <span class="text-[#168d63] font-medium">무료</span>
-            </div>
+        <!-- 로딩 메시지 -->
+        <div class="col-span-full text-center py-8">
+          <div class="inline-flex items-center px-4 py-2 bg-gray-100 rounded-lg">
+            <span class="material-icons animate-spin mr-2 text-gray-600">refresh</span>
+            <span class="text-gray-600">인기 모임을 불러오는 중...</span>
           </div>
         </div>
       </div>
@@ -281,5 +231,136 @@
   <script src="common.js"></script>
   <script src="sidebar.js"></script>
   <script src="script.js"></script>
+  
+  <script>
+    // 인기 모임 데이터 로드
+    async function loadPopularStudies() {
+      try {
+        const response = await fetch('/api/popular-studies');
+        const studies = await response.json();
+        
+        const container = document.getElementById('events-container');
+        
+        if (studies.length === 0) {
+          container.innerHTML = `
+            <div class="col-span-full text-center py-8">
+              <div class="text-gray-500">
+                <span class="material-icons text-4xl mb-2 block">event_busy</span>
+                <p>등록된 모임이 아직 없습니다.</p>
+                <a href="create-meeting.html" class="inline-block mt-4 px-6 py-2 bg-[#168d63] text-white rounded-lg hover:bg-[#0f6b4a] transition-colors">
+                  첫 모임 만들기
+                </a>
+              </div>
+            </div>
+          `;
+          return;
+        }
+        
+        container.innerHTML = studies.map(study => {
+          const startDate = new Date(study.startDate);
+          const formattedDate = startDate.toLocaleDateString('ko-KR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+          }).replace(/\. /g, '.').replace(/\.$/, '');
+          
+          // 카테고리에 따른 아이콘 매핑
+          const categoryIcons = {
+            '교육/강연': 'school',
+            '문화/예술': 'palette',
+            '스포츠': 'sports_soccer',
+            'IT/기술': 'computer',
+            '음악': 'music_note',
+            '요리': 'restaurant',
+            '피트니스': 'fitness_center'
+          };
+          
+          const icon = categoryIcons[study.category] || 'event';
+          const imageUrl = study.imageUrl || `https://picsum.photos/400/225?random=${study._id}`;
+          
+          return `
+            <div class="group bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-xl hover:border-[#168d63] transition-all duration-300 cursor-pointer" onclick="viewStudyDetail('${study._id}')">
+              <div class="aspect-video bg-gray-100 overflow-hidden">
+                <img src="${imageUrl}" alt="모임 이미지" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='https://picsum.photos/400/225?random=${study._id}'">
+              </div>
+              <div class="p-6">
+                <div class="flex items-center justify-between mb-3">
+                  <span class="px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full flex items-center">
+                    <span class="material-icons text-sm mr-1">${icon}</span>
+                    ${study.category}
+                  </span>
+                  <span class="text-sm text-gray-500">${formattedDate}</span>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 mb-2 group-hover:text-[#168d63] transition-colors line-clamp-1">${study.title}</h3>
+                <p class="text-gray-600 text-sm mb-4 line-clamp-2">${study.description}</p>
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center space-x-4">
+                    <span class="text-sm text-gray-500 flex items-center">
+                      <span class="material-icons text-sm mr-1">group</span>
+                      ${study.currentMembers.length}/${study.maxMembers}명
+                    </span>
+                    <span class="text-sm text-gray-500 flex items-center">
+                      <span class="material-icons text-sm mr-1">visibility</span>
+                      ${study.views || 0}
+                    </span>
+                  </div>
+                  <span class="text-[#168d63] font-medium">${study.meetingType === 'online' ? '온라인' : study.meetingType === 'offline' ? '오프라인' : '온/오프라인 혼합형'}</span>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+        
+      } catch (error) {
+        console.error('인기 모임 로드 오류:', error);
+        const container = document.getElementById('events-container');
+        container.innerHTML = `
+          <div class="col-span-full text-center py-8">
+            <div class="text-red-500">
+              <span class="material-icons text-4xl mb-2 block">error</span>
+              <p>모임 정보를 불러오는 중 오류가 발생했습니다.</p>
+              <button onclick="loadPopularStudies()" class="inline-block mt-4 px-6 py-2 bg-[#168d63] text-white rounded-lg hover:bg-[#0f6b4a] transition-colors">
+                다시 시도
+              </button>
+            </div>
+          </div>
+        `;
+      }
+    }
+    
+    // 모임 상세 보기
+    function viewStudyDetail(studyId) {
+      window.location.href = `study-detail.html?id=${studyId}`;
+    }
+    
+    // 홈 화면 검색 기능
+    function handleHomeSearch() {
+      const searchInput = document.getElementById('homeSearchInput');
+      const searchQuery = searchInput.value.trim();
+      
+      if (searchQuery) {
+        // 새 모임 탭으로 이동하면서 검색어 전달
+        window.location.href = `create-meeting.html?search=${encodeURIComponent(searchQuery)}`;
+      }
+    }
+    
+    // 페이지 로드 시 실행
+    document.addEventListener('DOMContentLoaded', function() {
+      loadPopularStudies();
+      
+      // 검색 버튼 클릭 이벤트
+      const searchBtn = document.getElementById('homeSearchBtn');
+      const searchInput = document.getElementById('homeSearchInput');
+      
+      searchBtn.addEventListener('click', handleHomeSearch);
+      
+      // 엔터키 검색
+      searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          handleHomeSearch();
+        }
+      });
+    });
+  </script>
 </body>
 </html>
