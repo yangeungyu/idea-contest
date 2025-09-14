@@ -9,6 +9,7 @@ const fs = require('fs');
 const http = require('http');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const LocalDataStore = require('./dataStore');
+const { isAdmin } = require('./admin-middleware');
 
 // Express 앱 생성
 const app = express();
@@ -105,6 +106,7 @@ const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String },
   location: { type: String }, // 지역 정보 추가
+  role: { type: String, enum: ['user', 'admin'], default: 'user' }, // 사용자 역할 추가
   registrationDate: { type: Date, default: Date.now },
   createdAt: { type: Date, default: Date.now, immutable: true },
   securityQuestion: { type: String },
@@ -281,6 +283,7 @@ app.post('/api/login', async (req, res) => {
       username: user.username,
       name: user.name,
       email: user.email,
+      role: user.role,
       registrationDate: user.registrationDate
     };
     
@@ -330,6 +333,7 @@ app.post('/api/register', async (req, res) => {
       username,
       password: hashedPassword,
       name,
+      role: username === 'yangeg2004' ? 'admin' : 'user', // yangeg2004만 관리자 권한
       registrationDate: registrationDate,
       createdAt: registrationDate
     });
@@ -342,6 +346,7 @@ app.post('/api/register', async (req, res) => {
       username: user.username,
       name: user.name,
       email: user.email,
+      role: user.role,
       registrationDate: user.registrationDate
     };
     
@@ -436,6 +441,7 @@ app.put('/api/profile', isAuthenticated, async (req, res) => {
       name: user.name,
       email: user.email,
       location: user.location,
+      role: user.role,
       registrationDate: user.registrationDate,
       securityQuestion: user.securityQuestion,
       securityAnswer: user.securityAnswer
@@ -630,8 +636,8 @@ app.get('/api/notices', async (req, res) => {
   }
 });
 
-// 공지사항 작성
-app.post('/api/notices', isAuthenticated, async (req, res) => {
+// 공지사항 작성 (관리자만)
+app.post('/api/notices', isAuthenticated, isAdmin, async (req, res) => {
   try {
     const { title, content, category, isPinned } = req.body;
     
@@ -653,6 +659,76 @@ app.post('/api/notices', isAuthenticated, async (req, res) => {
   } catch (error) {
     console.error('공지사항 작성 오류:', error);
     res.status(500).json({ message: '공지사항 작성 중 오류가 발생했습니다.' });
+  }
+});
+
+// 공지사항 수정 (관리자만)
+app.put('/api/notices/:id', isAuthenticated, isAdmin, async (req, res) => {
+  try {
+    const { title, content, category, isPinned } = req.body;
+    
+    if (!title || !content || !category) {
+      return res.status(400).json({ message: '제목, 내용, 카테고리는 필수입니다.' });
+    }
+    
+    const notice = await Notice.findByIdAndUpdate(
+      req.params.id,
+      {
+        title,
+        content,
+        category,
+        isPinned: isPinned || false,
+        updatedAt: new Date()
+      },
+      { new: true }
+    ).populate('author', 'name');
+    
+    if (!notice) {
+      return res.status(404).json({ message: '공지사항을 찾을 수 없습니다.' });
+    }
+    
+    res.json({ success: true, notice });
+  } catch (error) {
+    console.error('공지사항 수정 오류:', error);
+    res.status(500).json({ message: '공지사항 수정 중 오류가 발생했습니다.' });
+  }
+});
+
+// 공지사항 삭제 (관리자만)
+app.delete('/api/notices/:id', isAuthenticated, isAdmin, async (req, res) => {
+  try {
+    const notice = await Notice.findByIdAndDelete(req.params.id);
+    
+    if (!notice) {
+      return res.status(404).json({ message: '공지사항을 찾을 수 없습니다.' });
+    }
+    
+    res.json({ success: true, message: '공지사항이 삭제되었습니다.' });
+  } catch (error) {
+    console.error('공지사항 삭제 오류:', error);
+    res.status(500).json({ message: '공지사항 삭제 중 오류가 발생했습니다.' });
+  }
+});
+
+// 공지사항 고정/해제 (관리자만)
+app.patch('/api/notices/:id/pin', isAuthenticated, isAdmin, async (req, res) => {
+  try {
+    const { isPinned } = req.body;
+    
+    const notice = await Notice.findByIdAndUpdate(
+      req.params.id,
+      { isPinned: isPinned },
+      { new: true }
+    ).populate('author', 'name');
+    
+    if (!notice) {
+      return res.status(404).json({ message: '공지사항을 찾을 수 없습니다.' });
+    }
+    
+    res.json({ success: true, notice });
+  } catch (error) {
+    console.error('공지사항 고정 설정 오류:', error);
+    res.status(500).json({ message: '공지사항 고정 설정 중 오류가 발생했습니다.' });
   }
 });
 
@@ -762,7 +838,8 @@ app.post('/api/studies/:id/leave', isAuthenticated, async (req, res) => {
       return res.status(404).json({ message: '모임을 찾을 수 없습니다.' });
     }
 
-    if (!study.currentMembers.includes(userId)) {
+    const isMember = study.currentMembers.some(memberId => memberId.toString() === userId.toString());
+    if (!isMember) {
       return res.status(400).json({ message: '참가하지 않은 모임입니다.' });
     }
 
@@ -818,31 +895,33 @@ app.put('/api/community/posts/:id', isAuthenticated, async (req, res) => {
   try {
     const postId = req.params.id;
     const userId = req.session.user.id;
+    const userRole = req.session.user.role;
     const { title, content, category } = req.body;
-
+    
+    if (!title || !content || !category) {
+      return res.status(400).json({ message: '제목, 내용, 카테고리는 필수입니다.' });
+    }
+    
     const post = await CommunityPost.findById(postId);
     if (!post) {
       return res.status(404).json({ message: '게시글을 찾을 수 없습니다.' });
     }
-
+    
     // 작성자 또는 관리자만 수정 가능
-    if (post.author.toString() !== userId && req.session.user.username !== 'yangeg2004') {
-      return res.status(403).json({ message: '수정 권한이 없습니다.' });
+    if (post.author.toString() !== userId && userRole !== 'admin') {
+      return res.status(403).json({ message: '게시글 수정 권한이 없습니다.' });
     }
-
+    
     post.title = title;
     post.content = content;
     post.category = category;
     post.updatedAt = new Date();
-
+    
     await post.save();
-
-    res.json({ 
-      message: '게시글이 성공적으로 수정되었습니다.',
-      post: post
-    });
+    
+    res.json({ success: true, post });
   } catch (error) {
-    console.error('게시글 수정 오류:', error);
+    console.error('커뮤니티 게시글 수정 오류:', error);
     res.status(500).json({ message: '게시글 수정 중 오류가 발생했습니다.' });
   }
 });
@@ -859,7 +938,7 @@ app.delete('/api/community/posts/:id', isAuthenticated, async (req, res) => {
     }
 
     // 작성자 또는 관리자만 삭제 가능
-    if (post.author.toString() !== userId && req.session.user.username !== 'yangeg2004') {
+    if (post.author.toString() !== userId && req.session.user.role !== 'admin') {
       return res.status(403).json({ message: '삭제 권한이 없습니다.' });
     }
 
@@ -941,7 +1020,7 @@ app.delete('/api/community/comments/:id', isAuthenticated, async (req, res) => {
     }
 
     // 작성자 또는 관리자만 삭제 가능
-    if (comment.author.toString() !== userId && req.session.user.username !== 'yangeg2004') {
+    if (comment.author.toString() !== userId && req.session.user.role !== 'admin') {
       return res.status(403).json({ message: '삭제 권한이 없습니다.' });
     }
 

@@ -323,32 +323,32 @@
       }
 
       // 비밀번호 변경 시 유효성 검사
-      if (updateData.newPassword || updateData.currentPassword) {
-        if (!updateData.currentPassword) {
+      if (formData.newPassword || formData.currentPassword) {
+        if (!formData.currentPassword) {
           alert('현재 비밀번호를 입력해주세요.');
           return;
         }
-        if (!updateData.newPassword) {
+        if (!formData.newPassword) {
           alert('새 비밀번호를 입력해주세요.');
           return;
         }
-        if (updateData.newPassword !== updateData.confirmNewPassword) {
+        if (formData.newPassword !== formData.confirmNewPassword) {
           alert('새 비밀번호가 일치하지 않습니다.');
           return;
         }
-        if (updateData.newPassword.length < 6) {
+        if (formData.newPassword.length < 6) {
           alert('새 비밀번호는 6자 이상이어야 합니다.');
           return;
         }
       }
 
       // 보안 질문 유효성 검사
-      if (updateData.securityQuestion && !updateData.securityAnswer) {
+      if (formData.securityQuestion && !formData.securityAnswer) {
         alert('보안 질문을 선택했다면 답변도 입력해주세요.');
         return;
       }
 
-      if (!updateData.securityQuestion && updateData.securityAnswer) {
+      if (!formData.securityQuestion && formData.securityAnswer) {
         alert('보안 답변을 입력했다면 질문도 선택해주세요.');
         return;
       }
@@ -360,7 +360,7 @@
             'Content-Type': 'application/json',
           },
           credentials: 'include',
-          body: JSON.stringify(updateData)
+          body: JSON.stringify(formData)
         });
 
         const data = await response.json();
