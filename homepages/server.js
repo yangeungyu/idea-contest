@@ -283,6 +283,7 @@ app.post('/api/login', async (req, res) => {
       username: user.username,
       name: user.name,
       email: user.email,
+      location: user.location,
       role: user.role,
       registrationDate: user.registrationDate
     };
@@ -333,9 +334,13 @@ app.post('/api/register', async (req, res) => {
       username,
       password: hashedPassword,
       name,
+      email,
+      location,
       role: username === 'yangeg2004' ? 'admin' : 'user', // yangeg2004만 관리자 권한
       registrationDate: registrationDate,
-      createdAt: registrationDate
+      createdAt: registrationDate,
+      securityQuestion,
+      securityAnswer
     });
     
     await user.save();
@@ -346,6 +351,7 @@ app.post('/api/register', async (req, res) => {
       username: user.username,
       name: user.name,
       email: user.email,
+      location: user.location,
       role: user.role,
       registrationDate: user.registrationDate
     };
@@ -378,6 +384,36 @@ app.get('/api/current-user', (req, res) => {
     res.json({ isAuthenticated: true, user: req.session.user });
   } else {
     res.json({ isAuthenticated: false });
+  }
+});
+
+// 프로필 정보 가져오기
+app.get('/api/profile', (req, res) => {
+  console.log('프로필 API 호출 - 세션 사용자:', req.session.user);
+  if (req.session.user) {
+    res.json(req.session.user);
+  } else {
+    res.status(401).json({ message: '로그인이 필요합니다.' });
+  }
+});
+
+// 임시 관리자 권한 업데이트 API
+app.post('/api/update-admin', async (req, res) => {
+  try {
+    const result = await User.updateOne(
+      { username: 'yangeg2004' },
+      { $set: { role: 'admin' } }
+    );
+    
+    // 세션도 업데이트
+    if (req.session.user && req.session.user.username === 'yangeg2004') {
+      req.session.user.role = 'admin';
+    }
+    
+    res.json({ success: true, message: 'yangeg2004 계정이 관리자로 업데이트되었습니다.', result });
+  } catch (error) {
+    console.error('관리자 권한 업데이트 오류:', error);
+    res.status(500).json({ success: false, message: '업데이트 중 오류가 발생했습니다.' });
   }
 });
 
@@ -625,11 +661,7 @@ app.get('/api/notices', async (req, res) => {
 
     const count = await Notice.countDocuments(query);
 
-    res.json({
-      notices,
-      totalPages: Math.ceil(count / limit),
-      currentPage: page
-    });
+    res.json(notices);
   } catch (error) {
     console.error('공지사항 목록 조회 오류:', error);
     res.status(500).json({ message: '공지사항 목록을 불러오는 중 오류가 발생했습니다.' });
@@ -842,13 +874,19 @@ app.post('/api/studies/:id/leave', isAuthenticated, async (req, res) => {
     if (!isMember) {
       return res.status(400).json({ message: '참가하지 않은 모임입니다.' });
     }
+    
+    console.log('탈퇴 요청 - 사용자 ID:', userId);
+    console.log('리더 ID:', study.leader.toString());
+    console.log('현재 멤버들:', study.currentMembers.map(m => m.toString()));
 
     if (study.leader.toString() === userId) {
       return res.status(400).json({ message: '모임 리더는 탈퇴할 수 없습니다.' });
     }
 
-    study.currentMembers = study.currentMembers.filter(memberId => memberId.toString() !== userId);
+    study.currentMembers = study.currentMembers.filter(memberId => memberId.toString() !== userId.toString());
     await study.save();
+    
+    console.log('탈퇴 후 멤버들:', study.currentMembers.map(m => m.toString()));
 
     res.json({ message: '모임에서 성공적으로 탈퇴했습니다.' });
   } catch (error) {

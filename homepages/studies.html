@@ -231,12 +231,19 @@
       }
       
       try {
+        console.log('탈퇴 요청 시작 - 스터디 ID:', studyId);
+        
         const response = await fetch(`/api/studies/${studyId}/leave`, {
           method: 'POST',
-          credentials: 'include'
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json'
+          }
         });
         
+        console.log('응답 상태:', response.status);
         const data = await response.json();
+        console.log('응답 데이터:', data);
         
         if (!response.ok) {
           throw new Error(data.message || '모임 탈퇴에 실패했습니다.');

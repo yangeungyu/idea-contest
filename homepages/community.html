@@ -302,82 +302,39 @@
   </style>
 
   <script>
-    // 게시글 데이터 로드 (로컬 스토리지에서 불러오기)
-    function loadPostsFromStorage() {
-      const savedPosts = localStorage.getItem('communityPosts');
-      if (savedPosts) {
-        return JSON.parse(savedPosts);
+    // 게시글 데이터 로드 (서버에서 불러오기)
+    async function loadPosts() {
+      try {
+        const response = await fetch('/api/community/posts');
+        if (response.ok) {
+          allPosts = await response.json();
+        } else {
+          console.error('게시글 로드 실패:', response.status);
+          allPosts = [];
+        }
+        
+        filteredPosts = [...allPosts];
+        renderPosts();
+        renderPagination();
+      } catch (error) {
+        console.error('게시글 로드 중 오류:', error);
+        allPosts = [];
+        filteredPosts = [];
       }
-      // 기본 더미 데이터
-      return [
-      {
-        id: 1,
-        title: "홍숲쿨링 사용법에 대해 궁금합니다",
-        content: "안녕하세요! 홍숲쿨링을 처음 사용하는데, 기본적인 사용법을 알고 싶습니다.\n\n특히 다음과 같은 부분이 궁금해요:\n1. 회원가입 후 첫 설정\n2. 주요 기능 사용법\n3. 커뮤니티 이용 규칙\n\n자세한 답변 부탁드립니다!",
-        category: "question",
-        author: "새내기사용자",
-        authorUsername: "newuser",
-        createdAt: "2025-01-10",
-        views: 45
-      },
-      {
-        id: 2,
-        title: '환경보호 실천 방법 토론해요',
-        content: '요즘 환경 문제가 심각한데, 우리가 일상에서 실천할 수 있는 환경보호 방법에 대해 이야기해봐요.\n\n제가 실천하고 있는 것들:\n- 텀블러 사용하기\n- 대중교통 이용\n- 분리수거 철저히\n- 일회용품 줄이기\n\n여러분은 어떤 방법으로 환경보호를 실천하고 계신가요?',
-        category: 'discussion',
-        author: '그린라이프',
-        authorUsername: 'yangeg2004',
-        createdAt: '2025-01-09',
-        views: 78
-      },
-      {
-        id: 3,
-        title: '유용한 앱 추천 정보 공유',
-        content: '최근에 발견한 정말 유용한 앱들을 공유합니다! 📱\n\n🌟 추천 앱 목록:\n1. **Forest** - 집중력 향상 앱\n2. **Todoist** - 할일 관리\n3. **Headspace** - 명상 및 수면\n4. **Duolingo** - 언어 학습\n5. **MyFitnessPal** - 건강 관리\n\n각각 무료 버전도 충분히 유용하니 한번 써보세요!',
-        category: 'share',
-        author: '앱마니아',
-        authorUsername: 'appmania',
-        createdAt: '2025-01-08',
-        views: 92
-      },
-      {
-        id: 4,
-        title: '오늘 날씨 정말 좋네요!',
-        content: '오늘 하늘이 정말 맑고 파럗네요! ☀️\n\n이런 날엔 밖에 나가서 산책하거나 운동하기 딱 좋은 것 같아요.\n여러분은 좋은 날씨에 주로 뭘 하시나요?\n\n저는 오늘 한강 공원에 가서 자전거 타려고 합니다! 🚴‍♂️',
-        category: 'free',
-        author: '햇살좋아',
-        authorUsername: 'sunshine',
-        createdAt: '2025-01-07',
-        views: 34
-      },
-      {
-        id: 5,
-        title: '프로그래밍 공부 방법 질문',
-        content: '프로그래밍을 처음 시작하려는데 어떤 언어부터 배우는 게 좋을까요?\n\n현재 상황:\n- 완전 초보자\n- 웹 개발에 관심\n- 시간은 하루 2-3시간 정도 투자 가능\n\n추천해주시는 학습 로드맵이나 강의가 있다면 알려주세요!',
-        category: 'question',
-        author: '코딩초보',
-        authorUsername: 'codingnewbie',
-        createdAt: '2025-01-06',
-        views: 67
-      }
-      ];
     }
     
     // 게시글 데이터 초기화
-    let allPosts = loadPostsFromStorage();
+    let allPosts = [];
     let currentPage = 1;
     let postsPerPage = 10;
-    let filteredPosts = [...allPosts];
+    let filteredPosts = [];
     
-    // 현재 사용자 정보 (실제로는 로그인 시스템에서 가져와야 함)
-    let currentUser = {
-      username: 'yangeg2004', // 관리자 계정
-      name: '양은규'
-    };
+    // 현재 사용자 정보
+    let currentUser = null;
     
-    // 관리자 계정 확인
-    function isAdmin(username = currentUser.username) {
-      return username === 'yangeg2004';
+    // 관리자 권한 확인
+    function isAdmin() {
+      return currentUser && currentUser.role === 'admin';
     }
     
     // 게시글 수정 권한 확인 (작성자만)
@@ -390,16 +347,27 @@
       return post.authorUsername === currentUser.username || isAdmin();
     }
     
+    // 사용자 정보 로드
+    async function loadUserInfo() {
+      try {
+        const response = await fetch('/api/profile');
+        if (response.ok) {
+          currentUser = await response.json();
+        } else {
+          console.error('사용자 정보 로드 실패');
+          window.location.href = '/login.html';
+        }
+      } catch (error) {
+        console.error('사용자 정보 로드 중 오류:', error);
+        window.location.href = '/login.html';
+      }
+    }
+
     // 페이지 로드 시 초기화
-    document.addEventListener('DOMContentLoaded', function() {
-      // 사이드바 로드
-      loadSidebar();
-      
-      // 게시글 로드
-      loadPosts();
-      
-      // 이벤트 리스너 등록
-      setupEventListeners();
+    document.addEventListener('DOMContentLoaded', async function() {
+      await loadUserInfo();
+      await loadSidebar();
+      await loadPosts();
     });
     
     // 사이드바 로드
@@ -559,12 +527,12 @@
                   </button>
                 </div>
                 <div class="flex items-center space-x-2 ml-4">
-                  ${canEditPost(post) ? `
+                  ${currentUser && canEditPost(post) ? `
                     <button onclick="editPost(${post.id})" class="text-xs px-2 py-1 bg-blue-100 text-blue-600 rounded hover:bg-blue-200 transition-colors" title="수정">
                       <span class="material-icons text-xs">edit</span>
                     </button>
                   ` : ''}
-                  ${canDeletePost(post) ? `
+                  ${currentUser && canDeletePost(post) ? `
                     <button onclick="deletePost(${post.id})" class="text-xs px-2 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200 transition-colors" title="삭제">
                       <span class="material-icons text-xs">delete</span>
                     </button>
@@ -804,7 +772,7 @@
     }
     
     // 게시글 삭제
-    function deletePost(postId) {
+    async function deletePost(postId) {
       const post = allPosts.find(p => p.id === postId);
       if (!post) return;
       
@@ -817,22 +785,33 @@
         return;
       }
       
-      // 배열에서 제거
-      const index = allPosts.findIndex(p => p.id === postId);
-      if (index > -1) {
-        allPosts.splice(index, 1);
+      try {
+        const response = await fetch(`/api/community/posts/${postId}`, {
+          method: 'DELETE'
+        });
+        
+        if (response.ok) {
+          // 배열에서 제거
+          const index = allPosts.findIndex(p => p.id === postId);
+          if (index > -1) {
+            allPosts.splice(index, 1);
+          }
+          
+          // 필터된 목록도 업데이트
+          filteredPosts = [...allPosts];
+          
+          // 화면 즉시 업데이트
+          renderPosts();
+          
+          alert('게시글이 성공적으로 삭제되었습니다!');
+        } else {
+          const error = await response.json();
+          alert(error.message || '삭제 중 오류가 발생했습니다.');
+        }
+      } catch (error) {
+        console.error('삭제 중 오류:', error);
+        alert('삭제 중 오류가 발생했습니다.');
       }
-      
-      // 로컬 스토리지에 저장
-      localStorage.setItem('communityPosts', JSON.stringify(allPosts));
-      
-      // 필터된 목록도 업데이트
-      filteredPosts = [...allPosts];
-      
-      // 화면 즉시 업데이트
-      renderPosts();
-      
-      alert('게시글이 성공적으로 삭제되었습니다!');
     }
     
     // 댓글 저장 함수

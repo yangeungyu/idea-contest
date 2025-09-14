@@ -86,7 +86,7 @@
             </div>
           </div>
           
-          <button id="createNoticeBtn" class="bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-3 rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-300 flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+          <button id="createNoticeBtn" class="bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-3 rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-300 flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5" style="display: none;">
             <span class="material-icons text-sm">edit</span>
             새 공지 작성
           </button>
@@ -175,9 +175,10 @@
     <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-screen overflow-y-auto">
       <div class="p-6">
         <div class="flex justify-between items-center mb-6">
-          <h2 class="text-xl font-bold text-gray-900">공지사항 수정</h2>
-          <button id="closeEditModal" class="text-gray-400 hover:text-gray-600">
-            <span class="material-icons">close</span>
+          <h1 class="text-2xl font-bold text-gray-900">공지사항</h1>
+          <button id="createNoticeBtn" onclick="openCreateModal()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors" style="display: none;">
+            <span class="material-icons text-sm mr-2">add</span>
+            공지사항 작성
           </button>
         </div>
         
@@ -291,19 +292,12 @@
     let currentPage = 1;
     const noticesPerPage = 10;
     
-    // 현재 사용자 정보 (실제로는 로그인 시스템에서 가져와야 함)
-    let currentUser = {
-      username: 'yangeg2004', // 테스트용
-      name: '양은규',
-      isAdmin: false
-    };
+    // 현재 사용자 정보
+    let currentUser = null;
     
-    // 관리자 계정 설정
-    const ADMIN_USERS = ['yangeg2004'];
-    
-    // 사용자 권한 확인
-    function isAdmin(username = currentUser.username) {
-      return ADMIN_USERS.includes(username);
+    // 사용자 권한 확인 (서버에서 받아온 정보 사용)
+    function isAdmin() {
+      return currentUser && currentUser.role === 'admin';
     }
     
     // 공지사항 관리 권한 확인 (작성자 또는 관리자)
@@ -373,36 +367,12 @@
     // 공지사항 목록 로드 (로컬 스토리지에서 불러오기)
     async function loadNotices() {
       try {
-        // 로컬 스토리지에서 데이터 불러오기
-        const savedNotices = localStorage.getItem('notices');
-        if (savedNotices) {
-          allNotices = JSON.parse(savedNotices);
+        const response = await fetch('/api/notices');
+        if (response.ok) {
+          allNotices = await response.json();
         } else {
-          // 초기 더미 데이터
-          allNotices = [
-            {
-              id: 1,
-              title: "홍숲쿨링 서비스 이용 안내",
-              content: "안녕하세요, 홍숲쿨링을 이용해 주셔서 감사합니다.\n\n다음과 같은 주요 기능들을 제공하고 있습니다:\n\n🌟 주요 기능\n• 실시간 환경 데이터 모니터링\n• 개인 맞춤형 환경 관리 솔루션\n• 커뮤니티 기반 정보 공유\n• 친환경 생활 가이드\n\n📱 모바일 앱도 곧 출시 예정이니 많은 관심 부탁드립니다!\n\n문의사항이 있으시면 언제든지 고객센터로 연락해 주세요.",
-              category: "general",
-              author: "yangeg2004",
-              createdAt: "2025-01-10",
-              views: 156,
-              pinned: true
-            },
-            {
-              id: 2,
-              title: "2025년 새해 인사",
-              content: "새해 복 많이 받으세요! 올해도 홍숲쿨링과 함께 건강한 환경을 만들어 나가요.",
-              category: "event",
-              author: "yangeg2004",
-              createdAt: "2025-01-01",
-              views: 89,
-              pinned: false
-            }
-          ];
-          // 로컬 스토리지에 초기 데이터 저장
-          localStorage.setItem('notices', JSON.stringify(allNotices));
+          console.error('공지사항 로드 실패:', response.status);
+          allNotices = [];
         }
         
         // 필터된 목록 초기화
@@ -477,7 +447,7 @@
                   </div>
                 </div>
                 <div class="flex items-center space-x-2 ml-4">
-                  ${canManageNotice(notice) ? `
+                  ${isAdmin() ? `
                     <button onclick="editNotice(${notice.id})" class="text-xs px-2 py-1 bg-blue-100 text-blue-600 rounded hover:bg-blue-200 transition-colors" title="수정">
                       <span class="material-icons text-xs">edit</span>
                     </button>
@@ -569,7 +539,7 @@
     }
     
     // 공지사항 삭제
-    function deleteNotice(noticeId) {
+    async function deleteNotice(noticeId) {
       const notice = allNotices.find(n => n.id === noticeId);
       if (!notice) return;
       
@@ -582,21 +552,32 @@
         return;
       }
       
-      // 배열에서 제거
-      const index = allNotices.findIndex(n => n.id === noticeId);
-      if (index > -1) {
-        allNotices.splice(index, 1);
+      try {
+        const response = await fetch(`/api/notices/${noticeId}`, {
+          method: 'DELETE'
+        });
+        
+        if (response.ok) {
+          // 배열에서 제거
+          const index = allNotices.findIndex(n => n.id === noticeId);
+          if (index > -1) {
+            allNotices.splice(index, 1);
+          }
+          
+          // 필터된 목록도 업데이트
+          filteredNotices = [...allNotices];
+          
+          alert('공지사항이 삭제되었습니다.');
+          renderNotices(); // 목록 새로고침
+          renderPagination(); // 페이지네이션 업데이트
+        } else {
+          const error = await response.json();
+          alert(error.message || '삭제 중 오류가 발생했습니다.');
+        }
+      } catch (error) {
+        console.error('삭제 중 오류:', error);
+        alert('삭제 중 오류가 발생했습니다.');
       }
-      
-      // 로컬 스토리지에 저장하여 새로고침 시에도 유지
-      localStorage.setItem('notices', JSON.stringify(allNotices));
-      
-      // 필터된 목록도 업데이트
-      filteredNotices = [...allNotices];
-      
-      alert('공지사항이 삭제되었습니다.');
-      renderNotices(); // 목록 새로고침
-      renderPagination(); // 페이지네이션 업데이트
     }
 
     // 공지사항 상세 보기
@@ -832,6 +813,22 @@
       createNotice(formData);
     }
     
+    // 사용자 정보 로드
+    async function loadUserInfo() {
+      try {
+        const response = await fetch('/api/profile');
+        if (response.ok) {
+          currentUser = await response.json();
+        } else {
+          console.error('사용자 정보 로드 실패');
+          window.location.href = '/login.html';
+        }
+      } catch (error) {
+        console.error('사용자 정보 로드 중 오류:', error);
+        window.location.href = '/login.html';
+      }
+    }
+    
     // 사이드바 로드
     async function loadSidebar() {
       try {
@@ -848,49 +845,63 @@
       }
     }
     
-    // 이벤트 리스너 설정
-    function setupEventListeners() {
+    // 페이지 로드 시 초기화
+    document.addEventListener('DOMContentLoaded', async function() {
+      await loadUserInfo();
+      await loadSidebar();
+      await loadNotices();
+      
+      // 관리자만 공지 작성 버튼 표시
+      console.log('현재 사용자:', currentUser);
+      console.log('관리자 여부:', isAdmin());
+      if (isAdmin()) {
+        document.getElementById('createNoticeBtn').style.display = 'flex';
+        console.log('관리자 버튼 표시됨');
+      } else {
+        console.log('관리자가 아님 - 버튼 숨김');
+      }
+      
       // 검색 기능
-      document.getElementById('searchInput').addEventListener('input', searchNotices);
+      document.getElementById('searchInput').addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        if (searchTerm === '') {
+          filteredNotices = [...allNotices];
+        } else {
+          filteredNotices = allNotices.filter(notice => 
+            notice.title.toLowerCase().includes(searchTerm) ||
+            notice.content.toLowerCase().includes(searchTerm) ||
+            notice.category.toLowerCase().includes(searchTerm)
+          );
+        }
+        currentPage = 1; // 검색 시 첫 페이지로 이동
+        renderNotices();
+        renderPagination();
+      });
       
       // 카테고리 필터
-      document.getElementById('categoryFilter').addEventListener('change', searchNotices);
+      document.getElementById('categoryFilter').addEventListener('change', function() {
+        const selectedCategory = this.value;
+        if (selectedCategory === '') {
+          filteredNotices = [...allNotices];
+        } else {
+          filteredNotices = allNotices.filter(notice => notice.category === selectedCategory);
+        }
+        currentPage = 1; // 필터 시 첫 페이지로 이동
+        renderNotices();
+        renderPagination();
+      });
       
-      // 모달 관련 - 관리자만 공지 작성 가능
-      const createBtn = document.getElementById('createNoticeBtn');
-      if (isAdmin()) {
-        createBtn.addEventListener('click', openCreateModal);
-        createBtn.style.display = 'block';
-      } else {
-        createBtn.style.display = 'none';
+      // 공지사항 작성 폼 제출 (폼이 존재하는 경우에만)
+      const noticeForm = document.getElementById('noticeForm');
+      if (noticeForm) {
+        noticeForm.addEventListener('submit', handleCreateNotice);
       }
-      document.getElementById('closeModal').addEventListener('click', closeCreateModal);
-      document.getElementById('cancelBtn').addEventListener('click', closeCreateModal);
-      document.getElementById('createNoticeForm').addEventListener('submit', handleCreateNotice);
       
-      // 상세 모달 관련 - 이벤트 리스너 제거 (onclick으로 처리)
-      
-      // 수정 모달 관련
-      document.getElementById('closeEditModal').addEventListener('click', closeEditModal);
-      document.getElementById('cancelEditBtn').addEventListener('click', closeEditModal);
-      document.getElementById('editNoticeForm').addEventListener('submit', handleEditNotice);
-      
-      // 모달 외부 클릭 이벤트 제거 (onclick으로 처리)
-    }
-    
-    // 페이지 로드 시 초기화
-    document.addEventListener('DOMContentLoaded', function() {
-      // 현재 사용자 정보 설정 (실제로는 로그인 시스템에서 가져와야 함)
-      currentUser.isAdmin = isAdmin(currentUser.username);
-      
-      // 사이드바 로드
-      loadSidebar();
-      
-      // 공지사항 로드
-      loadNotices();
-      
-      // 이벤트 리스너 등록
-      setupEventListeners();
+      // 공지사항 수정 폼 제출 (폼이 존재하는 경우에만)
+      const editNoticeForm = document.getElementById('editNoticeForm');
+      if (editNoticeForm) {
+        editNoticeForm.addEventListener('submit', handleEditNotice);
+      }
     });
   </script>
   <script src="sidebar.js"></script>
