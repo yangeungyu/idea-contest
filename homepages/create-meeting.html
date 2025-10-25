@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>새 모임 만들기 - 홍숲쿨링</title>
+  <title>새 모임 만들기 - 무화과</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
   <script src="https://cdn.tailwindcss.com"></script>
@@ -60,7 +60,7 @@
     }
   </style>
 </head>
-<body class="bg-green-50 lg:ml-20" data-page="create-meeting">
+<body class="bg-gray-50 lg:ml-20" data-page="create-meeting">
 
   <!-- 모임 상세 정보 모달 -->
   <div id="meetingDetailModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
@@ -79,7 +79,7 @@
       <div id="meetingDetailContent" class="p-6">
         <!-- 로딩 상태 -->
         <div id="meetingDetailLoading" class="text-center py-12">
-          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-[#6B4E71] mx-auto mb-4"></div>
           <p class="text-gray-500">모임 정보를 불러오는 중...</p>
         </div>
 
@@ -105,7 +105,7 @@
             <!-- 참가자 정보 -->
             <div class="bg-gray-50 rounded-lg p-4">
               <div class="flex items-center mb-2">
-                <span class="material-icons text-green-600 mr-2">people</span>
+                <span class="material-icons text-[#6B4E71] mr-2">people</span>
                 <h4 class="font-semibold text-gray-900">참가자</h4>
               </div>
               <p id="meetingDetailMembers" class="text-gray-600"></p>
@@ -114,7 +114,7 @@
             <!-- 모임 방식 -->
             <div class="bg-gray-50 rounded-lg p-4">
               <div class="flex items-center mb-2">
-                <span class="material-icons text-green-600 mr-2">location_on</span>
+                <span class="material-icons text-[#6B4E71] mr-2">location_on</span>
                 <h4 class="font-semibold text-gray-900">모임 방식</h4>
               </div>
               <p id="meetingDetailType" class="text-gray-600"></p>
@@ -123,7 +123,7 @@
             <!-- 스터디 시작일 -->
             <div class="bg-gray-50 rounded-lg p-4">
               <div class="flex items-center mb-2">
-                <span class="material-icons text-green-600 mr-2">event</span>
+                <span class="material-icons text-[#6B4E71] mr-2">event</span>
                 <h4 class="font-semibold text-gray-900">스터디 시작일</h4>
               </div>
               <p id="meetingDetailStartDate" class="text-gray-600"></p>
@@ -132,7 +132,7 @@
             <!-- 장소 -->
             <div class="bg-gray-50 rounded-lg p-4">
               <div class="flex items-center mb-2">
-                <span class="material-icons text-green-600 mr-2">place</span>
+                <span class="material-icons text-[#6B4E71] mr-2">place</span>
                 <h4 class="font-semibold text-gray-900">장소</h4>
               </div>
               <p id="meetingDetailLocation" class="text-gray-600"></p>
@@ -141,7 +141,7 @@
             <!-- 스터디 종료일 -->
             <div class="bg-gray-50 rounded-lg p-4">
               <div class="flex items-center mb-2">
-                <span class="material-icons text-green-600 mr-2">event_available</span>
+                <span class="material-icons text-[#6B4E71] mr-2">event_available</span>
                 <h4 class="font-semibold text-gray-900">스터디 종료일</h4>
               </div>
               <p id="meetingDetailDeadline" class="text-gray-600"></p>
@@ -150,7 +150,7 @@
             <!-- 모임 시간 -->
             <div class="bg-gray-50 rounded-lg p-4">
               <div class="flex items-center mb-2">
-                <span class="material-icons text-green-600 mr-2">access_time</span>
+                <span class="material-icons text-[#6B4E71] mr-2">access_time</span>
                 <h4 class="font-semibold text-gray-900">모임 시간</h4>
               </div>
               <p id="meetingDetailTime" class="text-gray-600"></p>
@@ -159,7 +159,7 @@
             <!-- 모임 주기 -->
             <div class="bg-gray-50 rounded-lg p-4">
               <div class="flex items-center mb-2">
-                <span class="material-icons text-green-600 mr-2">repeat</span>
+                <span class="material-icons text-[#6B4E71] mr-2">repeat</span>
                 <h4 class="font-semibold text-gray-900">모임 주기</h4>
               </div>
               <p id="meetingDetailFrequency" class="text-gray-600"></p>
@@ -169,7 +169,7 @@
           <!-- 참가 조건/요구사항 -->
           <div id="meetingDetailRequirementsSection" class="mb-6">
             <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
-              <span class="material-icons text-green-600 mr-2">rule</span>
+              <span class="material-icons text-[#6B4E71] mr-2">rule</span>
               참가 조건/요구사항
             </h4>
             <div class="bg-blue-50 rounded-lg p-4">
@@ -180,7 +180,7 @@
           <!-- 참가자 목록 -->
           <div class="mb-6">
             <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
-              <span class="material-icons text-green-600 mr-2">group</span>
+              <span class="material-icons text-[#6B4E71] mr-2">group</span>
               참가자 목록
             </h4>
             <div id="meetingDetailMembersList" class="space-y-2">
@@ -191,7 +191,7 @@
           <!-- 태그 -->
           <div id="meetingDetailTagsSection" class="mb-6 hidden">
             <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
-              <span class="material-icons text-green-600 mr-2">label</span>
+              <span class="material-icons text-[#6B4E71] mr-2">label</span>
               태그
             </h4>
             <div id="meetingDetailTags" class="flex flex-wrap gap-2">
@@ -218,7 +218,7 @@
               <button id="closeMeetingDetailBtn" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors" onclick="closeMeetingDetailModal()">
                 닫기
               </button>
-              <button id="joinMeetingBtn" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+              <button id="joinMeetingBtn" class="px-6 py-2 bg-[#6B4E71] text-white rounded-lg hover:bg-[#5A3D5F] transition-colors">
                 참가하기
               </button>
             </div>
@@ -234,18 +234,18 @@
       <!-- 모임 목록 화면 -->
       <div id="meetingListView" class="max-w-7xl ml-0 mr-auto">
         <!-- 상단 검색 영역 (Pinterest 스타일) -->
-        <div class="sticky top-0 bg-green-50 z-10 py-6 mb-8">
+        <div class="sticky top-0 bg-gray-50 z-10 py-6 mb-8">
           <div class="flex items-center gap-4">
             <!-- 검색 및 필터 -->
             <div class="flex-1 flex items-center gap-3">
               <div class="flex-1 relative">
                 <input type="text" id="searchInput" placeholder="모임 검색..." 
-                       class="w-full px-4 py-3 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent pl-12 bg-white shadow-sm"
+                       class="w-full px-4 py-3 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-[#6B4E71] focus:border-transparent pl-12 bg-white shadow-sm"
                        oninput="filterMeetings()" onkeyup="filterMeetings()">
                 <span class="material-icons absolute left-4 top-3.5 text-gray-400 text-xl">search</span>
               </div>
               
-              <select id="categoryFilter" class="px-4 py-3 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-green-500 bg-white min-w-[140px] shadow-sm" onchange="filterMeetings()">
+              <select id="categoryFilter" class="px-4 py-3 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-[#6B4E71] bg-white min-w-[140px] shadow-sm" onchange="filterMeetings()">
                 <option value="">모든 카테고리</option>
                 <option value="study">스터디</option>
                 <option value="hobby">취미</option>
@@ -258,7 +258,7 @@
             </div>
             
             <!-- 새 모임 만들기 버튼 (Pinterest 스타일) -->
-            <button id="createNewMeetingBtn" class="bg-green-600 hover:bg-green-700 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all duration-200 hover:scale-105" onclick="showCreateForm()" title="새 모임 만들기">
+            <button id="createNewMeetingBtn" class="bg-[#6B4E71] hover:bg-[#5A3D5F] text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all duration-200 hover:scale-105" onclick="showCreateForm()" title="새 모임 만들기">
               <span class="material-icons text-xl">add</span>
             </button>
           </div>
@@ -292,7 +292,7 @@
       <!-- 페이지 설명 -->
       <div class="bg-white p-6 rounded-lg shadow-md mb-8">
         <div class="flex items-center mb-4">
-          <span class="material-icons text-green-600 text-3xl mr-3">event</span>
+          <span class="material-icons text-[#6B4E71] text-3xl mr-3">event</span>
           <div>
             <h2 class="text-2xl font-bold text-gray-800">새로운 모임을 만들어보세요</h2>
             <p class="text-gray-600 mt-1">다양한 사람들과 함께할 수 있는 모임을 개설하고 관리할 수 있습니다.</p>
@@ -305,7 +305,7 @@
         <!-- 기본 정보 섹션 -->
         <div class="form-section">
           <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
-            <span class="material-icons text-green-600 mr-2">info</span>
+            <span class="material-icons text-[#6B4E71] mr-2">info</span>
             기본 정보
           </h3>
           
@@ -315,7 +315,7 @@
                 모임 제목 <span class="required">*</span>
               </label>
               <input type="text" id="meetingTitle" name="title" required
-                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B4E71] focus:border-[#6B4E71]"
                      placeholder="예: 홍천 독서 모임">
             </div>
             
@@ -324,7 +324,7 @@
                 카테고리 <span class="required">*</span>
               </label>
               <select id="meetingCategory" name="category" required
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B4E71] focus:border-[#6B4E71]">
                 <option value="">카테고리 선택</option>
                 <option value="study">스터디</option>
                 <option value="hobby">취미</option>
@@ -342,7 +342,7 @@
               모임 설명 <span class="required">*</span>
             </label>
             <textarea id="meetingDescription" name="description" rows="4" required
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B4E71] focus:border-[#6B4E71]"
                       placeholder="모임에 대한 자세한 설명을 작성해주세요..."></textarea>
           </div>
           
@@ -442,7 +442,7 @@
         <!-- 일정 정보 섹션 -->
         <div class="form-section">
           <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
-            <span class="material-icons text-green-600 mr-2">schedule</span>
+            <span class="material-icons text-[#6B4E71] mr-2">schedule</span>
             일정 정보
           </h3>
           
@@ -452,7 +452,7 @@
                 스터디 시작일 <span class="required">*</span>
               </label>
               <input type="date" id="startDate" name="startDate" required
-                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B4E71] focus:border-[#6B4E71]">
             </div>
             
             <div class="form-group">
@@ -460,7 +460,7 @@
                 스터디 종료일 <span class="required">*</span>
               </label>
               <input type="date" id="endDate" name="endDate" required
-                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B4E71] focus:border-[#6B4E71]">
             </div>
           </div>
           
@@ -470,7 +470,7 @@
                 모임 시간
               </label>
               <input type="time" id="meetingTime" name="time"
-                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B4E71] focus:border-[#6B4E71]">
             </div>
             
             <div class="form-group">
@@ -478,7 +478,7 @@
                 모임 주기
               </label>
               <select id="frequency" name="frequency"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B4E71] focus:border-[#6B4E71]">
                 <option value="once">일회성</option>
                 <option value="weekly">매주</option>
                 <option value="biweekly">격주</option>
@@ -492,7 +492,7 @@
         <!-- 장소 정보 섹션 -->
         <div class="form-section">
           <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
-            <span class="material-icons text-green-600 mr-2">location_on</span>
+            <span class="material-icons text-[#6B4E71] mr-2">location_on</span>
             장소 정보
           </h3>
           
@@ -502,7 +502,7 @@
                 모임 형태 <span class="required">*</span>
               </label>
               <select id="meetingType" name="meetingType" required
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B4E71] focus:border-[#6B4E71]">
                 <option value="">선택해주세요</option>
                 <option value="offline">오프라인</option>
                 <option value="online">온라인</option>
@@ -515,7 +515,7 @@
                 최대 인원 <span class="required">*</span>
               </label>
               <input type="number" id="maxMembers" name="maxMembers" min="2" max="20" required
-                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B4E71] focus:border-[#6B4E71]"
                      placeholder="2">
             </div>
           </div>
@@ -525,7 +525,7 @@
               장소/링크
             </label>
             <input type="text" id="location" name="location"
-                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B4E71] focus:border-[#6B4E71]"
                    placeholder="오프라인: 구체적인 주소 / 온라인: 화상회의 링크">
           </div>
         </div>
@@ -533,7 +533,7 @@
         <!-- 추가 정보 섹션 -->
         <div class="form-section">
           <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
-            <span class="material-icons text-green-600 mr-2">settings</span>
+            <span class="material-icons text-[#6B4E71] mr-2">settings</span>
             추가 설정
           </h3>
           
@@ -542,7 +542,7 @@
               태그 (쉼표로 구분)
             </label>
             <input type="text" id="tags" name="tags"
-                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B4E71] focus:border-[#6B4E71]"
                    placeholder="예: 독서, 토론, 자기계발">
           </div>
           
@@ -551,7 +551,7 @@
               참가 조건/요구사항
             </label>
             <textarea id="requirements" name="requirements" rows="3"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B4E71] focus:border-[#6B4E71]"
                       placeholder="모임 참가를 위한 특별한 조건이나 준비물이 있다면 작성해주세요..."></textarea>
           </div>
           

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>공지사항 - 홍숲쿨링</title>
+  <title>공지사항 - 무화과</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
   <script src="https://cdn.tailwindcss.com"></script>
@@ -62,7 +62,7 @@
       <!-- 페이지 헤더 -->
       <div class="text-center mb-8">
         <h1 class="text-4xl font-bold text-gray-900 mb-3">공지사항</h1>
-        <p class="text-gray-600 text-lg">홍숲쿨링의 최신 소식과 중요한 공지사항을 확인하세요</p>
+        <p class="text-gray-600 text-lg">무화과의 최신 소식과 중요한 공지사항을 확인하세요</p>
       </div>
       
       <!-- 검색 및 필터 섹션 -->
@@ -71,11 +71,11 @@
           <div class="flex flex-col sm:flex-row gap-4 items-center flex-1">
             <div class="relative">
               <input type="text" id="searchInput" placeholder="검색어를 입력하세요" 
-                     class="w-full sm:w-80 pl-10 pr-4 py-2 border-b-2 border-gray-300 bg-transparent focus:outline-none focus:border-green-500">
+                     class="w-full sm:w-80 pl-10 pr-4 py-2 border-b-2 border-gray-300 bg-transparent focus:outline-none focus:border-[#6B4E71]">
               <span class="material-icons absolute left-2 top-2.5 text-gray-400">search</span>
             </div>
             <div class="flex gap-2">
-              <select id="categoryFilter" class="px-3 py-2 border-b-2 border-gray-300 bg-transparent focus:outline-none focus:border-green-500">
+              <select id="categoryFilter" class="px-3 py-2 border-b-2 border-gray-300 bg-transparent focus:outline-none focus:border-[#6B4E71]">
                 <option value="">전체</option>
                 <option value="general">일반</option>
                 <option value="event">이벤트</option>
@@ -86,7 +86,7 @@
             </div>
           </div>
           
-          <button id="createNoticeBtn" class="bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-3 rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-300 flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5" style="display: none;">
+          <button id="createNoticeBtn" class="bg-gradient-to-r from-[#6B4E71] to-[#5A3D5F] text-white px-6 py-3 rounded-lg hover:from-[#5A3D5F] hover:to-[#4A2D4F] transition-all duration-300 flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5" style="display: none;">
             <span class="material-icons text-sm">edit</span>
             새 공지 작성
           </button>
@@ -125,7 +125,7 @@
   <!-- 푸터 -->
   <footer class="mt-16 py-6 border-t border-gray-200">
     <div class="container mx-auto px-4 text-center text-gray-600 text-sm">
-      <p>&copy; 2025 홍숲쿨링. All rights reserved.</p>
+      <p>&copy; 2025 무화과. All rights reserved.</p>
     </div>
   </footer>
 
@@ -176,7 +176,7 @@
       <div class="p-6">
         <div class="flex justify-between items-center mb-6">
           <h1 class="text-2xl font-bold text-gray-900">공지사항</h1>
-          <button id="createNoticeBtn" onclick="openCreateModal()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors" style="display: none;">
+          <button id="createNoticeBtn" onclick="openCreateModal()" class="bg-[#6B4E71] hover:bg-[#5A3D5F] text-white px-4 py-2 rounded-lg transition-colors" style="display: none;">
             <span class="material-icons text-sm mr-2">add</span>
             공지사항 작성
           </button>
@@ -188,13 +188,13 @@
           <div>
             <label for="editNoticeTitle" class="block text-sm font-medium text-gray-700 mb-2">제목</label>
             <input type="text" id="editNoticeTitle" name="title" required
-                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B4E71] focus:border-transparent">
           </div>
           
           <div>
             <label for="editNoticeCategory" class="block text-sm font-medium text-gray-700 mb-2">카테고리</label>
             <select id="editNoticeCategory" name="category" required
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B4E71] focus:border-transparent">
               <option value="general">일반</option>
               <option value="event">이벤트</option>
               <option value="maintenance">점검</option>

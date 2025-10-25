@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>스터디 모임 - 홍숲쿨링</title>
+  <title>스터디 모임 - 무화과</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
   <script src="https://cdn.tailwindcss.com"></script>
@@ -24,11 +24,11 @@
     .study-card:hover { transform: translateY(-3px); }
   </style>
 </head>
-<body class="bg-green-50 lg:ml-20" data-page="studies">
+<body class="bg-gray-50 lg:ml-20" data-page="studies">
   <!-- 메인 콘텐츠 -->
   <main class="container mx-auto px-4 py-8 lg:ml-20">
     <div class="flex items-center mb-8">
-      <span class="material-icons text-green-600 text-3xl mr-3">group</span>
+      <span class="material-icons text-[#6B4E71] text-3xl mr-3">group</span>
       <div>
         <h1 class="text-2xl font-bold text-gray-800">내 모임 관리</h1>
         <p class="text-gray-600 mt-1">참가한 모임을 관리하고 활동을 확인하세요</p>
@@ -145,7 +145,7 @@
           'hobby': 'bg-purple-100 text-purple-800',
           'exercise': 'bg-red-100 text-red-800',
           'culture': 'bg-yellow-100 text-yellow-800',
-          'volunteer': 'bg-green-100 text-green-800',
+          'volunteer': 'bg-purple-100 text-[#6B4E71]',
           'networking': 'bg-indigo-100 text-indigo-800',
           'other': 'bg-gray-100 text-gray-800'
         };
@@ -174,7 +174,7 @@
               <div>
                 <h3 class="text-xl font-bold text-gray-900">${study.title}</h3>
                 <div class="flex items-center gap-2 mt-1">
-                  <span class="text-sm text-green-600 font-medium">${meetingTypeText}</span>
+                  <span class="text-sm text-[#6B4E71] font-medium">${meetingTypeText}</span>
                   ${isLeader ? '<span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full font-medium">리더</span>' : 
                               '<span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full font-medium">참가자</span>'}
                 </div>

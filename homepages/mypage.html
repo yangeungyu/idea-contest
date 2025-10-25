@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>마이페이지 - 홍숲쿨링</title>
+  <title>마이페이지 - 무화과</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
   <script src="https://cdn.tailwindcss.com"></script>
@@ -33,15 +33,15 @@
     }
   </style>
 </head>
-<body class="bg-green-50 lg:ml-20" data-page="mypage">
+<body class="bg-gray-50 lg:ml-20" data-page="mypage">
   <!-- 메인 콘텐츠 -->
   <main class="container mx-auto px-4 py-8">
     
     <!-- 프로필 정보 카드 -->
     <div class="bg-white rounded-lg shadow-md p-6 mb-8 profile-card">
       <div class="flex items-center mb-6">
-        <div class="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mr-4">
-          <span class="material-icons text-3xl text-green-600">person</span>
+        <div class="w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center mr-4">
+          <span class="material-icons text-3xl text-[#6B4E71]">person</span>
         </div>
         <div>
           <h2 class="text-xl font-semibold text-gray-800" id="profileName">사용자 이름</h2>
@@ -53,32 +53,32 @@
       <form id="profileForm" class="space-y-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label for="editName" class="block text-sm font-medium text-green-700 mb-2">이름</label>
+            <label for="editName" class="block text-sm font-medium text-gray-700 mb-2">이름</label>
             <input type="text" id="editName" name="name" required
-                   class="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B4E71] focus:border-[#6B4E71]">
           </div>
           
           <div>
-            <label for="editUsername" class="block text-sm font-medium text-green-700 mb-2">아이디</label>
+            <label for="editUsername" class="block text-sm font-medium text-gray-700 mb-2">아이디</label>
             <input type="text" id="editUsername" name="username" required readonly
                    class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-500 cursor-not-allowed">
             <p class="text-xs text-gray-500 mt-1">아이디는 변경할 수 없습니다.</p>
           </div>
           
           <div>
-            <label for="editEmail" class="block text-sm font-medium text-green-700 mb-2">이메일</label>
+            <label for="editEmail" class="block text-sm font-medium text-gray-700 mb-2">이메일</label>
             <input type="email" id="editEmail" name="email"
-                   class="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B4E71] focus:border-[#6B4E71]">
           </div>
           
           <div>
-            <label for="editLocation" class="block text-sm font-medium text-green-700 mb-2">지역</label>
+            <label for="editLocation" class="block text-sm font-medium text-gray-700 mb-2">지역</label>
             <input type="text" id="editLocation" name="location" placeholder="예: 서울특별시 강남구"
-                   class="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B4E71] focus:border-[#6B4E71]">
           </div>
           
           <div>
-            <label for="registrationDate" class="block text-sm font-medium text-green-700 mb-2">가입일</label>
+            <label for="registrationDate" class="block text-sm font-medium text-gray-700 mb-2">가입일</label>
             <input type="text" id="registrationDate" name="registrationDate" readonly
                    class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-500 cursor-not-allowed">
           </div>
@@ -88,34 +88,34 @@
           <h3 class="text-lg font-medium text-gray-800 mb-4">비밀번호 변경</h3>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label for="currentPassword" class="block text-sm font-medium text-green-700 mb-2">현재 비밀번호</label>
+              <label for="currentPassword" class="block text-sm font-medium text-gray-700 mb-2">현재 비밀번호</label>
               <div class="relative">
                 <input type="password" id="currentPassword" name="currentPassword"
-                       class="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 pr-10">
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B4E71] focus:border-[#6B4E71] pr-10">
                 <button type="button" id="toggleCurrentPassword" class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                  <i class="material-icons text-green-500">visibility</i>
+                  <i class="material-icons text-[#6B4E71]">visibility</i>
                 </button>
               </div>
             </div>
             
             <div>
-              <label for="newPassword" class="block text-sm font-medium text-green-700 mb-2">새 비밀번호</label>
+              <label for="newPassword" class="block text-sm font-medium text-gray-700 mb-2">새 비밀번호</label>
               <div class="relative">
                 <input type="password" id="newPassword" name="newPassword"
-                       class="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 pr-10">
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B4E71] focus:border-[#6B4E71] pr-10">
                 <button type="button" id="toggleNewPassword" class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                  <i class="material-icons text-green-500">visibility</i>
+                  <i class="material-icons text-[#6B4E71]">visibility</i>
                 </button>
               </div>
             </div>
             
             <div class="md:col-span-2">
-              <label for="confirmNewPassword" class="block text-sm font-medium text-green-700 mb-2">새 비밀번호 확인</label>
+              <label for="confirmNewPassword" class="block text-sm font-medium text-gray-700 mb-2">새 비밀번호 확인</label>
               <div class="relative">
                 <input type="password" id="confirmNewPassword" name="confirmNewPassword"
-                       class="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 pr-10">
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B4E71] focus:border-[#6B4E71] pr-10">
                 <button type="button" id="toggleConfirmNewPassword" class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                  <i class="material-icons text-green-500">visibility</i>
+                  <i class="material-icons text-[#6B4E71]">visibility</i>
                 </button>
               </div>
               <!-- 비밀번호 일치 확인 메시지 -->
@@ -131,9 +131,9 @@
           
           <div class="space-y-4">
             <div>
-              <label for="securityQuestion" class="block text-sm font-medium text-green-700 mb-2">보안 질문</label>
+              <label for="securityQuestion" class="block text-sm font-medium text-gray-700 mb-2">보안 질문</label>
               <select id="securityQuestion" name="securityQuestion" 
-                      class="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B4E71] focus:border-[#6B4E71]">
                 <option value="">보안 질문을 선택하세요</option>
                 <option value="childhood_pet">어린 시절 기르던 애완동물의 이름은?</option>
                 <option value="first_school">처음 다닌 초등학교의 이름은?</option>
@@ -147,10 +147,10 @@
             </div>
             
             <div>
-              <label for="securityAnswer" class="block text-sm font-medium text-green-700 mb-2">보안 답변</label>
+              <label for="securityAnswer" class="block text-sm font-medium text-gray-700 mb-2">보안 답변</label>
               <input type="text" id="securityAnswer" name="securityAnswer" 
                      placeholder="보안 질문에 대한 답변을 입력하세요"
-                     class="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B4E71] focus:border-[#6B4E71]">
               <p class="text-xs text-gray-500 mt-1">답변은 대소문자를 구분하지 않으며, 공백은 제거됩니다.</p>
             </div>
           </div>
@@ -160,7 +160,7 @@
           <button type="button" id="cancelBtn" class="px-6 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50">
             취소
           </button>
-          <button type="submit" class="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+          <button type="submit" class="px-6 py-2 bg-[#6B4E71] text-white rounded-md hover:bg-[#5A3D5F]">
             프로필 업데이트
           </button>
         </div>
@@ -170,7 +170,7 @@
 
   <!-- 푸터 -->
   <div class="text-center py-8 mt-12">
-    <p class="text-gray-600">&copy; 2025 홍숲쿨링. All rights reserved.</p>
+    <p class="text-gray-600">&copy; 2025 무화과. All rights reserved.</p>
   </div>
 
   <style>
@@ -278,7 +278,7 @@
       
       if (newPassword === confirmPassword) {
         messageDiv.textContent = '✓ 비밀번호가 일치합니다';
-        messageDiv.className = 'text-sm mt-2 text-green-600';
+        messageDiv.className = 'text-sm mt-2 text-[#6B4E71]';
       } else {
         messageDiv.textContent = '✗ 비밀번호가 일치하지 않습니다';
         messageDiv.className = 'text-sm mt-2 text-red-600';

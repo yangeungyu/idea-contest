@@ -1,7 +1,7 @@
 {
   "name": "hongcheon-academy",
   "version": "1.0.0",
-  "description": "홍숲쿨링 웹사이트",
+  "description": "무화과 웹사이트",
   "main": "server.js",
   "engines": {
     "node": ">=18.0.0"
@@ -27,6 +27,6 @@
     "socket.io": "^4.8.1"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.1.10"
   }
 }

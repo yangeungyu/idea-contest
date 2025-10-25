@@ -57,21 +57,10 @@ const connectToDatabase = async () => {
 
 connectToDatabase();
 
-// MongoDB 스토어 설정 (MongoDB 연결 실패 시 메모리 스토어 사용)
-let store;
-try {
-  store = new MongoDBStore({
-    uri: process.env.MONGODB_URI || 'mongodb://localhost:27017/hongcheon-academy',
-    collection: 'sessions'
-  });
-  
-  store.on('error', function(error) {
-    console.log('MongoDB 세션 스토어 오류:', error.message);
-  });
-} catch (error) {
-  console.log('MongoDB 스토어 생성 실패, 메모리 스토어를 사용합니다.');
-  store = null; // 메모리 스토어 사용
-}
+// MongoDB 스토어 설정 (연결 실패 시 메모리 스토어 사용)
+// 에러가 발생해도 서버가 종료되지 않도록 메모리 스토어를 기본값으로 사용
+let store = null;
+console.log('메모리 세션 스토어를 사용합니다.');
 
 // 세션 설정
 const sessionConfig = {
