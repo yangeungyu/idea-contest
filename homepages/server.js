@@ -15,6 +15,9 @@ const { isAdmin } = require('./admin-middleware');
 const app = express();
 const PORT = process.env.PORT || 10000;
 
+// Render 같은 프록시 환경에서 HTTPS 신뢰 설정 (필수!)
+app.set('trust proxy', 1);
+
 // 데이터베이스 연결 상태 및 로컬 저장소
 let isMongoConnected = false;
 let localDataStore = null;
@@ -94,7 +97,9 @@ const sessionConfig = {
   cookie: {
     maxAge: 1000 * 60 * 60 * 24, // 1일
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production' // 프로덕션에서는 true
+    secure: process.env.NODE_ENV === 'production', // 프로덕션에서 HTTPS 사용
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // CORS 허용
+    path: '/' // 모든 경로에서 쿠키 사용
   }
 };
 
