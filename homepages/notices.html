@@ -333,10 +333,10 @@
     }
     
     // 공지사항 수정 처리
-    function handleEditNotice(e) {
+    async function handleEditNotice(e) {
       e.preventDefault();
       
-      const noticeId = parseInt(document.getElementById('editNoticeId').value);
+      const noticeId = document.getElementById('editNoticeId').value;
       const formData = {
         title: document.getElementById('editNoticeTitle').value,
         content: document.getElementById('editNoticeContent').value,
@@ -344,24 +344,28 @@
         isPinned: document.getElementById('editIsPinned').checked
       };
       
-      const notice = allNotices.find(n => n.id === noticeId);
-      if (!notice) return;
-      
-      // 공지사항 업데이트
-      notice.title = formData.title;
-      notice.content = formData.content;
-      notice.category = formData.category;
-      notice.pinned = formData.isPinned;
-      
-      // 로컬 스토리지에 저장하여 새로고침 시에도 유지
-      localStorage.setItem('notices', JSON.stringify(allNotices));
-      
-      // 필터된 목록도 업데이트
-      filteredNotices = [...allNotices];
-      
-      alert('공지사항이 성공적으로 수정되었습니다!');
-      closeEditModal();
-      renderNotices();
+      try {
+        const response = await fetch(`/api/notices/${noticeId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify(formData)
+        });
+        
+        if (response.ok) {
+          alert('공지사항이 성공적으로 수정되었습니다!');
+          closeEditModal();
+          await loadNotices(); // 서버에서 다시 불러오기
+        } else {
+          const error = await response.json();
+          alert(error.message || '공지사항 수정에 실패했습니다.');
+        }
+      } catch (error) {
+        console.error('공지사항 수정 중 오류:', error);
+        alert('공지사항 수정 중 오류가 발생했습니다.');
+      }
     }
 
     // 공지사항 목록 로드 (로컬 스토리지에서 불러오기)
@@ -487,40 +491,38 @@
     }
     
     // 새 공지사항 작성
-    function createNotice(formData) {
-      // 새 ID 생성 (기존 최대 ID + 1)
-      const maxId = allNotices.length > 0 ? Math.max(...allNotices.map(n => n.id)) : 0;
-      const newId = maxId + 1;
-      
-      // 새 공지사항 생성
-      const newNotice = {
-        id: newId,
-        title: formData.title,
-        content: formData.content,
-        category: formData.category,
-        author: currentUser.username, // 현재 로그인된 사용자
-        createdAt: new Date().toISOString().split('T')[0],
-        views: 0,
-        pinned: formData.isPinned || false
-      };
-      
-      // 배열 맨 앞에 추가
-      allNotices.unshift(newNotice);
-      
-      // 로컬 스토리지에 저장하여 새로고침 시에도 유지
-      localStorage.setItem('notices', JSON.stringify(allNotices));
-      
-      // 필터된 목록도 업데이트
-      filteredNotices = [...allNotices];
-      
-      alert('공지사항이 성공적으로 작성되었습니다!');
-      closeCreateModal();
-      renderNotices(); // 목록 새로고침
-      renderPagination(); // 페이지네이션 업데이트
+    async function createNotice(formData) {
+      try {
+        const response = await fetch('/api/notices', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            title: formData.title,
+            content: formData.content,
+            category: formData.category,
+            isPinned: formData.isPinned || false
+          })
+        });
+        
+        if (response.ok) {
+          alert('공지사항이 성공적으로 작성되었습니다!');
+          closeCreateModal();
+          await loadNotices(); // 서버에서 다시 불러오기
+        } else {
+          const error = await response.json();
+          alert(error.message || '공지사항 작성에 실패했습니다.');
+        }
+      } catch (error) {
+        console.error('공지사항 작성 중 오류:', error);
+        alert('공지사항 작성 중 오류가 발생했습니다.');
+      }
     }
     
     // 공지사항 고정/해제
-    function togglePin(noticeId) {
+    async function togglePin(noticeId) {
       const notice = allNotices.find(n => n.id === noticeId);
       if (!notice) return;
       
@@ -529,13 +531,29 @@
         return;
       }
       
-      notice.pinned = !notice.pinned;
-      
-      // 필터된 목록도 업데이트
-      filteredNotices = [...allNotices];
-      
-      alert(notice.pinned ? '공지사항이 상단에 고정되었습니다.' : '공지사항 고정이 해제되었습니다.');
-      renderNotices(); // 목록 새로고침
+      try {
+        const response = await fetch(`/api/notices/${noticeId}/pin`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            isPinned: !notice.pinned
+          })
+        });
+        
+        if (response.ok) {
+          alert(!notice.pinned ? '공지사항이 상단에 고정되었습니다.' : '공지사항 고정이 해제되었습니다.');
+          await loadNotices(); // 서버에서 다시 불러오기
+        } else {
+          const error = await response.json();
+          alert(error.message || '고정 상태 변경에 실패했습니다.');
+        }
+      } catch (error) {
+        console.error('고정 상태 변경 중 오류:', error);
+        alert('고정 상태 변경 중 오류가 발생했습니다.');
+      }
     }
     
     // 공지사항 삭제
@@ -800,7 +818,7 @@
     }
     
     // 폼 제출 처리
-    function handleCreateNotice(e) {
+    async function handleCreateNotice(e) {
       e.preventDefault();
       
       const formData = {
@@ -810,7 +828,7 @@
         isPinned: document.getElementById('isPinned').checked
       };
       
-      createNotice(formData);
+      await createNotice(formData);
     }
     
     // 사용자 정보 로드
