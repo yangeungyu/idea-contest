@@ -891,16 +891,38 @@
         renderPagination();
       });
       
-      // 공지사항 작성 폼 제출 (폼이 존재하는 경우에만)
-      const noticeForm = document.getElementById('noticeForm');
-      if (noticeForm) {
-        noticeForm.addEventListener('submit', handleCreateNotice);
+      // 공지사항 작성 버튼 클릭
+      const createNoticeBtn = document.getElementById('createNoticeBtn');
+      if (createNoticeBtn) {
+        createNoticeBtn.addEventListener('click', openCreateModal);
       }
       
-      // 공지사항 수정 폼 제출 (폼이 존재하는 경우에만)
+      // 공지사항 작성 폼 제출
+      const createNoticeForm = document.getElementById('createNoticeForm');
+      if (createNoticeForm) {
+        createNoticeForm.addEventListener('submit', handleCreateNotice);
+      }
+      
+      // 공지사항 수정 폼 제출
       const editNoticeForm = document.getElementById('editNoticeForm');
       if (editNoticeForm) {
         editNoticeForm.addEventListener('submit', handleEditNotice);
+      }
+      
+      // 모달 닫기 버튼
+      const closeModalBtn = document.getElementById('closeModal');
+      if (closeModalBtn) {
+        closeModalBtn.addEventListener('click', closeCreateModal);
+      }
+      
+      const cancelBtn = document.getElementById('cancelBtn');
+      if (cancelBtn) {
+        cancelBtn.addEventListener('click', closeCreateModal);
+      }
+      
+      const cancelEditBtn = document.getElementById('cancelEditBtn');
+      if (cancelEditBtn) {
+        cancelEditBtn.addEventListener('click', closeEditModal);
       }
     });
   </script>
