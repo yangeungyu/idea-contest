@@ -766,6 +766,8 @@
     // 게시글 작성
     async function createPost(formData) {
       try {
+        console.log('게시글 작성 요청:', formData);
+        
         const response = await fetch('/api/community/posts', {
           method: 'POST',
           headers: {
@@ -779,12 +781,20 @@
           })
         });
         
+        console.log('서버 응답 상태:', response.status);
+        
         if (response.ok) {
+          const result = await response.json();
+          console.log('게시글 작성 성공:', result);
           alert('게시글이 성공적으로 작성되었습니다!');
           closeCreateModal();
+          
+          console.log('게시글 목록 재로드 시작...');
           await loadPosts(); // 서버에서 다시 불러오기
+          console.log('게시글 목록 재로드 완료');
         } else {
           const error = await response.json();
+          console.error('게시글 작성 실패:', error);
           alert(error.message || '게시글 작성에 실패했습니다.');
         }
       } catch (error) {
