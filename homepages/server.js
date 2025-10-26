@@ -57,10 +57,34 @@ const connectToDatabase = async () => {
 
 connectToDatabase();
 
-// MongoDB 스토어 설정 (연결 실패 시 메모리 스토어 사용)
-// 에러가 발생해도 서버가 종료되지 않도록 메모리 스토어를 기본값으로 사용
-let store = null;
-console.log('메모리 세션 스토어를 사용합니다.');
+// MongoDB 세션 스토어 설정 (프로덕션 환경을 위한 영구 저장소)
+let store;
+try {
+  store = new MongoDBStore({
+    uri: process.env.MONGODB_URI || 'mongodb://localhost:27017/hongcheon-academy',
+    collection: 'sessions',
+    expires: 1000 * 60 * 60 * 24, // 1일
+    connectionOptions: {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 10000
+    }
+  });
+  
+  store.on('error', function(error) {
+    console.error('MongoDB 세션 스토어 오류:', error);
+  });
+  
+  store.on('connected', function() {
+    console.log('MongoDB 세션 스토어가 연결되었습니다.');
+  });
+  
+  console.log('MongoDB 세션 스토어를 사용합니다.');
+} catch (error) {
+  console.error('MongoDB 세션 스토어 생성 실패:', error);
+  console.log('메모리 세션 스토어를 사용합니다. (경고: 프로덕션 환경에 적합하지 않음)');
+  store = null;
+}
 
 // 세션 설정
 const sessionConfig = {
@@ -70,7 +94,7 @@ const sessionConfig = {
   cookie: {
     maxAge: 1000 * 60 * 60 * 24, // 1일
     httpOnly: true,
-    secure: false // 개발환경에서는 false
+    secure: process.env.NODE_ENV === 'production' // 프로덕션에서는 true
   }
 };
 
@@ -140,7 +164,7 @@ const chatMessageSchema = new mongoose.Schema({
 const noticeSchema = new mongoose.Schema({
   title: { type: String, required: true },
   content: { type: String, required: true },
-  category: { type: String, enum: ['important', 'general', 'event', 'maintenance'], default: 'general' },
+  category: { type: String, enum: ['important', 'general', 'event', 'maintenance', 'update'], default: 'general' },
   author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   isPinned: { type: Boolean, default: false },
   views: { type: Number, default: 0 },
@@ -650,7 +674,11 @@ app.get('/api/notices', async (req, res) => {
 
     const count = await Notice.countDocuments(query);
 
-    res.json(notices);
+    res.json({
+      notices,
+      totalPages: Math.ceil(count / limit),
+      currentPage: page
+    });
   } catch (error) {
     console.error('공지사항 목록 조회 오류:', error);
     res.status(500).json({ message: '공지사항 목록을 불러오는 중 오류가 발생했습니다.' });
@@ -661,6 +689,8 @@ app.get('/api/notices', async (req, res) => {
 app.post('/api/notices', isAuthenticated, isAdmin, async (req, res) => {
   try {
     const { title, content, category, isPinned } = req.body;
+    
+    console.log('공지사항 작성 요청:', { title, content, category, isPinned });
     
     if (!title || !content || !category) {
       return res.status(400).json({ message: '제목, 내용, 카테고리는 필수입니다.' });
@@ -674,12 +704,15 @@ app.post('/api/notices', isAuthenticated, isAdmin, async (req, res) => {
       author: req.session.user.id
     });
     
+    console.log('공지사항 저장 시도...');
     await notice.save();
+    console.log('공지사항 저장 성공:', notice._id);
     
     res.json({ success: true, notice });
   } catch (error) {
     console.error('공지사항 작성 오류:', error);
-    res.status(500).json({ message: '공지사항 작성 중 오류가 발생했습니다.' });
+    console.error('오류 상세:', error.message);
+    res.status(500).json({ message: '공지사항 작성 중 오류가 발생했습니다.', error: error.message });
   }
 });
 

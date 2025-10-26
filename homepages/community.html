@@ -376,10 +376,26 @@
 
     // 페이지 로드 시 초기화
     document.addEventListener('DOMContentLoaded', async function() {
-      await loadUserInfo();
-      await loadSidebar();
-      await loadPosts();
-      setupEventListeners();
+      console.log('DOMContentLoaded 이벤트 발생');
+      try {
+        console.log('사용자 정보 로드 시작...');
+        await loadUserInfo();
+        console.log('사용자 정보 로드 완료:', currentUser);
+        
+        console.log('사이드바 로드 시작...');
+        await loadSidebar();
+        console.log('사이드바 로드 완료');
+        
+        console.log('게시글 로드 시작...');
+        await loadPosts();
+        console.log('게시글 로드 완료');
+        
+        console.log('이벤트 리스너 설정 시작...');
+        setupEventListeners();
+        console.log('초기화 완료!');
+      } catch (error) {
+        console.error('초기화 중 오류:', error);
+      }
     });
     
     // 사이드바 로드
@@ -400,29 +416,69 @@
     
     // 이벤트 리스너 설정
     function setupEventListeners() {
+      console.log('이벤트 리스너 설정 시작...');
+      
       // 검색 기능
-      document.getElementById('searchInput').addEventListener('input', searchPosts);
+      const searchInput = document.getElementById('searchInput');
+      if (searchInput) {
+        searchInput.addEventListener('input', searchPosts);
+        console.log('검색 입력 리스너 설정 완료');
+      } else {
+        console.error('searchInput 요소를 찾을 수 없습니다.');
+      }
       
       // 카테고리 필터
-      document.getElementById('categoryFilter').addEventListener('change', handleCategoryFilter);
+      const categoryFilter = document.getElementById('categoryFilter');
+      if (categoryFilter) {
+        categoryFilter.addEventListener('change', handleCategoryFilter);
+        console.log('카테고리 필터 리스너 설정 완료');
+      }
       
       // 모달 관련
-      document.getElementById('createPostBtn').addEventListener('click', openCreateModal);
-      document.getElementById('closeModal').addEventListener('click', closeCreateModal);
-      document.getElementById('cancelBtn').addEventListener('click', closeCreateModal);
-      document.getElementById('createPostForm').addEventListener('submit', handleCreatePost);
+      const createPostBtn = document.getElementById('createPostBtn');
+      if (createPostBtn) {
+        createPostBtn.addEventListener('click', openCreateModal);
+        console.log('글 작성 버튼 리스너 설정 완료');
+      } else {
+        console.error('createPostBtn 요소를 찾을 수 없습니다.');
+      }
+      
+      const closeModal = document.getElementById('closeModal');
+      if (closeModal) closeModal.addEventListener('click', closeCreateModal);
+      
+      const cancelBtn = document.getElementById('cancelBtn');
+      if (cancelBtn) cancelBtn.addEventListener('click', closeCreateModal);
+      
+      const createPostForm = document.getElementById('createPostForm');
+      if (createPostForm) {
+        createPostForm.addEventListener('submit', handleCreatePost);
+        console.log('글 작성 폼 리스너 설정 완료');
+      } else {
+        console.error('createPostForm 요소를 찾을 수 없습니다.');
+      }
       
       // 상세 모달 관련
-      document.getElementById('closeDetailModal').addEventListener('click', closeDetailModal);
-      document.getElementById('closeDetailModalBtn').addEventListener('click', closeDetailModal);
+      const closeDetailModal = document.getElementById('closeDetailModal');
+      if (closeDetailModal) closeDetailModal.addEventListener('click', closeDetailModal);
+      
+      const closeDetailModalBtn = document.getElementById('closeDetailModalBtn');
+      if (closeDetailModalBtn) closeDetailModalBtn.addEventListener('click', closeDetailModal);
       
       // 수정 모달 관련
-      document.getElementById('closeEditModal').addEventListener('click', closeEditModal);
-      document.getElementById('cancelEditBtn').addEventListener('click', closeEditModal);
-      document.getElementById('editPostForm').addEventListener('submit', handleEditPost);
+      const closeEditModal = document.getElementById('closeEditModal');
+      if (closeEditModal) closeEditModal.addEventListener('click', closeEditModal);
+      
+      const cancelEditBtn = document.getElementById('cancelEditBtn');
+      if (cancelEditBtn) cancelEditBtn.addEventListener('click', closeEditModal);
+      
+      const editPostForm = document.getElementById('editPostForm');
+      if (editPostForm) editPostForm.addEventListener('submit', handleEditPost);
       
       // 댓글 관련
-      document.getElementById('submitComment').addEventListener('click', submitComment);
+      const submitComment = document.getElementById('submitComment');
+      if (submitComment) submitComment.addEventListener('click', submitComment);
+      
+      console.log('모든 이벤트 리스너 설정 완료');
     }
 
     // 게시글 데이터 로드
