@@ -305,9 +305,20 @@
     // 게시글 데이터 로드 (서버에서 불러오기)
     async function loadPosts() {
       try {
-        const response = await fetch('/api/community/posts');
+        const response = await fetch('/api/community/posts?limit=1000');
         if (response.ok) {
-          allPosts = await response.json();
+          const data = await response.json();
+          // 서버 응답이 { posts: [...] } 형태일 경우
+          allPosts = data.posts || data;
+          
+          // MongoDB _id를 id로 변환
+          allPosts = allPosts.map(post => ({
+            ...post,
+            id: post._id,
+            author: post.author?.name || post.author,
+            authorUsername: post.author?.username || post.authorUsername,
+            createdAt: new Date(post.createdAt).toLocaleDateString('ko-KR')
+          }));
         } else {
           console.error('게시글 로드 실패:', response.status);
           allPosts = [];
@@ -523,18 +534,18 @@
             <td class="px-4 py-3">
               <div class="flex items-center justify-between">
                 <div class="flex items-center flex-1">
-                  <button onclick="openPostDetail(${post.id})" class="text-left hover:text-green-600 transition-colors">
+                  <button onclick="openPostDetail('${post.id}')" class="text-left hover:text-green-600 transition-colors">
                     <div class="font-medium text-gray-900">${post.title}</div>
                   </button>
                 </div>
                 <div class="flex items-center space-x-2 ml-4">
                   ${currentUser && canEditPost(post) ? `
-                    <button onclick="editPost(${post.id})" class="text-xs px-2 py-1 bg-blue-100 text-blue-600 rounded hover:bg-blue-200 transition-colors" title="수정">
+                    <button onclick="editPost('${post.id}')" class="text-xs px-2 py-1 bg-blue-100 text-blue-600 rounded hover:bg-blue-200 transition-colors" title="수정">
                       <span class="material-icons text-xs">edit</span>
                     </button>
                   ` : ''}
                   ${currentUser && canDeletePost(post) ? `
-                    <button onclick="deletePost(${post.id})" class="text-xs px-2 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200 transition-colors" title="삭제">
+                    <button onclick="deletePost('${post.id}')" class="text-xs px-2 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200 transition-colors" title="삭제">
                       <span class="material-icons text-xs">delete</span>
                     </button>
                   ` : ''}

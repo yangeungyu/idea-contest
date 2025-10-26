@@ -368,12 +368,21 @@
       }
     }
 
-    // 공지사항 목록 로드 (로컬 스토리지에서 불러오기)
+    // 공지사항 목록 로드
     async function loadNotices() {
       try {
-        const response = await fetch('/api/notices');
+        const response = await fetch('/api/notices?limit=1000');
         if (response.ok) {
-          allNotices = await response.json();
+          const data = await response.json();
+          // 서버 응답이 { notices: [...] } 형태일 경우
+          allNotices = data.notices || data;
+          
+          // MongoDB _id를 id로 변환
+          allNotices = allNotices.map(notice => ({
+            ...notice,
+            id: notice._id,
+            createdAt: notice.createdAt || new Date().toISOString()
+          }));
         } else {
           console.error('공지사항 로드 실패:', response.status);
           allNotices = [];
@@ -431,8 +440,8 @@
         };
         
         const category = categoryInfo[notice.category] || categoryInfo.general;
-        // 번호는 게시물의 고유 ID를 사용 (게시된 순서대로 고정)
-        const noticeNumber = notice.id;
+        // 번호는 전체 목록에서의 순서 번호
+        const noticeNumber = startIndex + index + 1;
         
         return `
           <tr class="hover:bg-gray-50 transition-colors ${notice.pinned ? 'bg-yellow-50' : ''}">
@@ -444,7 +453,7 @@
             </td>
             <td class="px-4 py-3 text-sm text-gray-900">
               <div class="flex items-center justify-between">
-                <div class="cursor-pointer hover:text-green-600 transition-colors flex-1" onclick="openNoticeDetail(${notice.id})">
+                <div class="cursor-pointer hover:text-green-600 transition-colors flex-1" onclick="openNoticeDetail('${notice.id}')">
                   <div class="font-medium flex items-center">
                     ${notice.pinned ? '<span class="material-icons text-red-500 text-sm mr-2">push_pin</span>' : ''}
                     ${notice.title}
@@ -452,13 +461,13 @@
                 </div>
                 <div class="flex items-center space-x-2 ml-4">
                   ${isAdmin() ? `
-                    <button onclick="editNotice(${notice.id})" class="text-xs px-2 py-1 bg-blue-100 text-blue-600 rounded hover:bg-blue-200 transition-colors" title="수정">
+                    <button onclick="editNotice('${notice.id}')" class="text-xs px-2 py-1 bg-blue-100 text-blue-600 rounded hover:bg-blue-200 transition-colors" title="수정">
                       <span class="material-icons text-xs">edit</span>
                     </button>
-                    <button onclick="togglePin(${notice.id})" class="text-xs px-2 py-1 rounded ${notice.pinned ? 'bg-red-100 text-red-600 hover:bg-red-200' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'} transition-colors" title="${notice.pinned ? '고정 해제' : '상단 고정'}">
+                    <button onclick="togglePin('${notice.id}')" class="text-xs px-2 py-1 rounded ${notice.pinned ? 'bg-red-100 text-red-600 hover:bg-red-200' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'} transition-colors" title="${notice.pinned ? '고정 해제' : '상단 고정'}">
                       <span class="material-icons text-xs">push_pin</span>
                     </button>
-                    <button onclick="deleteNotice(${notice.id})" class="text-xs px-2 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200 transition-colors" title="삭제">
+                    <button onclick="deleteNotice('${notice.id}')" class="text-xs px-2 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200 transition-colors" title="삭제">
                       <span class="material-icons text-xs">delete</span>
                     </button>
                   ` : ''}
