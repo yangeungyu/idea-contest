@@ -305,28 +305,51 @@
     // 게시글 데이터 로드 (서버에서 불러오기)
     async function loadPosts() {
       try {
+        console.log('=== 게시글 로드 시작 ===');
         const response = await fetch('/api/community/posts?limit=1000');
+        console.log('서버 응답 상태:', response.status);
+        
         if (response.ok) {
           const data = await response.json();
+          console.log('서버 응답 데이터:', data);
+          console.log('data.posts:', data.posts);
+          
           // 서버 응답이 { posts: [...] } 형태일 경우
           allPosts = data.posts || data;
+          console.log('추출된 게시글 배열:', allPosts);
+          console.log('게시글 개수:', allPosts.length);
           
           // MongoDB _id를 id로 변환
-          allPosts = allPosts.map(post => ({
-            ...post,
-            id: post._id,
-            author: post.author?.name || post.author,
-            authorUsername: post.author?.username || post.authorUsername,
-            createdAt: new Date(post.createdAt).toLocaleDateString('ko-KR')
-          }));
+          allPosts = allPosts.map((post, index) => {
+            const mappedPost = {
+              ...post,
+              id: post._id,
+              author: post.author?.name || post.author,
+              authorId: post.author?._id || post.author,
+              createdAt: new Date(post.createdAt).toLocaleDateString('ko-KR'),
+              views: post.views || 0
+            };
+            if (index === 0) {
+              console.log('첫 번째 게시글 매핑 예시:', mappedPost);
+            }
+            return mappedPost;
+          });
+          
+          console.log('변환된 게시글 개수:', allPosts.length);
         } else {
           console.error('게시글 로드 실패:', response.status);
+          const errorText = await response.text();
+          console.error('오류 내용:', errorText);
           allPosts = [];
         }
         
         filteredPosts = [...allPosts];
+        console.log('필터링된 게시글 개수:', filteredPosts.length);
+        console.log('renderPosts() 호출 전');
         renderPosts();
+        console.log('renderPosts() 호출 후');
         renderPagination();
+        console.log('=== 게시글 로드 완료 ===');
       } catch (error) {
         console.error('게시글 로드 중 오류:', error);
         allPosts = [];
