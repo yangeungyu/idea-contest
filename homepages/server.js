@@ -301,9 +301,18 @@ app.post('/api/login', async (req, res) => {
       registrationDate: user.registrationDate
     };
     
-    res.json({ success: true, user: req.session.user });
+    // 세션 명시적 저장
+    req.session.save((err) => {
+      if (err) {
+        console.error('세션 저장 오류:', err);
+        return res.status(500).json({ success: false, message: '로그인 중 오류가 발생했습니다.' });
+      }
+      console.log('로그인 성공:', user.username);
+      console.log('세션 ID:', req.sessionID);
+      res.json({ success: true, user: req.session.user });
+    });
   } catch (error) {
-    console.error(error);
+    console.error('로그인 오류:', error);
     res.status(500).json({ success: false, message: '서버 오류가 발생했습니다.' });
   }
 });
