@@ -795,7 +795,9 @@
     
     // 폼 제출 처리
     async function handleCreatePost(e) {
+      console.log('=== handleCreatePost 호출됨 ===');
       e.preventDefault();
+      console.log('폼 제출 이벤트 방지됨');
       
       const formData = {
         title: document.getElementById('postTitle').value,
@@ -803,7 +805,17 @@
         category: document.getElementById('postCategory').value
       };
       
+      console.log('폼 데이터 수집 완료:', formData);
+      
+      if (!formData.title || !formData.content || !formData.category) {
+        console.error('필수 항목 누락:', formData);
+        alert('제목, 내용, 카테고리를 모두 입력해주세요.');
+        return;
+      }
+      
+      console.log('createPost 함수 호출 시작...');
       await createPost(formData);
+      console.log('createPost 함수 호출 완료');
     }
     
     // 게시글 수정
