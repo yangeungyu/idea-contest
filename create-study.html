@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>스터디 개설 - 무화과</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-50">
+  <!-- 헤더 -->
+  <header class="bg-white shadow-md fixed w-full z-50 top-0">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <a href="/" class="flex items-center">
+        <img src="logo.png" alt="무화과" class="h-8 w-auto">
+      </a>
+      
+      <!-- 네비게이션 메뉴 -->
+      <nav class="hidden md:flex space-x-6">
+        <a href="/" class="text-gray-700 hover:text-green-600 transition-colors">홈</a>
+        <a href="studies.html" class="text-gray-700 hover:text-green-600 transition-colors">스터디</a>
+        <a href="community.html" class="text-gray-700 hover:text-green-600 transition-colors">커뮤니티</a>
+        <a href="notices.html" class="text-gray-700 hover:text-green-600 transition-colors">공지사항</a>
+      </nav>
+      
+      <!-- 사용자 메뉴 -->
+      <div class="flex items-center space-x-4">
+        <div id="userMenu" class="hidden">
+          <span id="userName" class="text-gray-700 mr-2"></span>
+          <a href="mypage.html" class="text-gray-700 hover:text-green-600 mr-2">
+            <i class="material-icons align-middle">person</i>
+          </a>
+          <button id="logoutBtn" class="text-gray-700 hover:text-green-600">
+            <i class="material-icons align-middle">logout</i>
+          </button>
+        </div>
+        <div id="authButtons" class="space-x-2">
+          <a href="login.html" class="text-gray-700 hover:text-green-600">로그인</a>
+          <a href="register.html" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">회원가입</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 메인 콘텐츠 -->
+  <main class="pt-20 pb-12">
+    <div class="container mx-auto px-4 max-w-4xl">
+      <!-- 페이지 헤더 -->
+      <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <div class="flex items-center mb-4">
+          <a href="studies.html" class="text-gray-500 hover:text-gray-700 mr-4">
+            <i class="material-icons">arrow_back</i>
+          </a>
+          <h1 class="text-2xl font-bold text-gray-800">스터디 개설하기</h1>
+        </div>
+        <p class="text-gray-600">새로운 스터디를 개설하고 함께 공부할 멤버들을 모집해보세요.</p>
+      </div>
+
+      <!-- 스터디 생성 폼 -->
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <form id="createStudyForm" class="space-y-6">
+          <!-- 기본 정보 -->
+          <div class="border-b border-gray-200 pb-6">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+              <i class="material-icons mr-2 text-green-600">info</i>
+              기본 정보
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- 스터디 제목 -->
+              <div class="md:col-span-2">
+                <label for="title" class="block text-sm font-medium text-gray-700 mb-2">
+                  스터디 제목 <span class="text-red-500">*</span>
+                </label>
+                <input type="text" id="title" name="title" required
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  placeholder="예: 토익 900점 달성 스터디">
+              </div>
+              
+              <!-- 카테고리 -->
+              <div>
+                <label for="category" class="block text-sm font-medium text-gray-700 mb-2">
+                  카테고리 <span class="text-red-500">*</span>
+                </label>
+                <select id="category" name="category" required
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                  <option value="">카테고리를 선택하세요</option>
+                  <option value="어학">어학</option>
+                  <option value="자격증">자격증</option>
+                  <option value="취업준비">취업준비</option>
+                  <option value="프로그래밍">프로그래밍</option>
+                  <option value="독서">독서</option>
+                  <option value="기타">기타</option>
+                </select>
+              </div>
+              
+              <!-- 최대 인원 -->
+              <div>
+                <label for="maxMembers" class="block text-sm font-medium text-gray-700 mb-2">
+                  최대 인원 <span class="text-red-500">*</span>
+                </label>
+                <input type="number" id="maxMembers" name="maxMembers" required min="2" max="20" value="5"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent">
+              </div>
+            </div>
+            
+            <!-- 스터디 설명 -->
+            <div class="mt-6">
+              <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
+                스터디 설명 <span class="text-red-500">*</span>
+              </label>
+              <textarea id="description" name="description" required rows="4"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="스터디 목표, 진행 방식, 참여 조건 등을 자세히 설명해주세요."></textarea>
+            </div>
+          </div>
+
+          <!-- 일정 정보 -->
+          <div class="border-b border-gray-200 pb-6">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+              <i class="material-icons mr-2 text-green-600">schedule</i>
+              일정 정보
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- 모집 마감일 -->
+              <div>
+                <label for="deadline" class="block text-sm font-medium text-gray-700 mb-2">
+                  모집 마감일 <span class="text-red-500">*</span>
+                </label>
+                <input type="date" id="deadline" name="deadline" required
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent">
+              </div>
+              
+              <!-- 시작일 -->
+              <div>
+                <label for="startDate" class="block text-sm font-medium text-gray-700 mb-2">
+                  시작일 <span class="text-red-500">*</span>
+                </label>
+                <input type="date" id="startDate" name="startDate" required
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent">
+              </div>
+              
+              <!-- 진행 기간 -->
+              <div>
+                <label for="duration" class="block text-sm font-medium text-gray-700 mb-2">
+                  진행 기간 (주) <span class="text-red-500">*</span>
+                </label>
+                <input type="number" id="duration" name="duration" required min="1" max="52" value="4"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent">
+              </div>
+              
+              <!-- 진행 방식 -->
+              <div>
+                <label for="meetingType" class="block text-sm font-medium text-gray-700 mb-2">
+                  진행 방식 <span class="text-red-500">*</span>
+                </label>
+                <select id="meetingType" name="meetingType" required
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                  <option value="">진행 방식을 선택하세요</option>
+                  <option value="online">온라인</option>
+                  <option value="offline">오프라인</option>
+                  <option value="both">온라인/오프라인 병행</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- 추가 정보 -->
+          <div class="pb-6">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+              <i class="material-icons mr-2 text-green-600">add_circle</i>
+              추가 정보
+            </h2>
+            
+            <div class="space-y-6">
+              <!-- 위치 -->
+              <div id="locationField" class="hidden">
+                <label for="location" class="block text-sm font-medium text-gray-700 mb-2">
+                  모임 장소
+                </label>
+                <input type="text" id="location" name="location"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  placeholder="예: 홍천군 도서관 2층 스터디룸">
+              </div>
+              
+              <!-- 태그 -->
+              <div>
+                <label for="tags" class="block text-sm font-medium text-gray-700 mb-2">
+                  태그 (쉼표로 구분)
+                </label>
+                <input type="text" id="tags" name="tags"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  placeholder="예: 토익, 영어, 시험준비">
+                <p class="text-sm text-gray-500 mt-1">태그를 입력하면 다른 사용자들이 스터디를 쉽게 찾을 수 있습니다.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- 버튼 -->
+          <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+            <button type="button" onclick="history.back()" 
+              class="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors">
+              취소
+            </button>
+            <button type="submit" id="submitBtn"
+              class="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center">
+              <i class="material-icons mr-2">add</i>
+              스터디 개설하기
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <!-- 로딩 모달 -->
+  <div id="loadingModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 text-center">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+      <p class="text-gray-700">스터디를 생성하는 중...</p>
+    </div>
+  </div>
+
+  <script src="common.js"></script>
+  <script>
+    // 페이지 로드 시 사용자 인증 확인
+    document.addEventListener('DOMContentLoaded', function() {
+      checkAuthStatus();
+      setupForm();
+      setMinDates();
+    });
+
+    // 사용자 인증 상태 확인
+    async function checkAuthStatus() {
+      try {
+        const response = await fetch('/api/current-user', {
+          credentials: 'include'
+        });
+        const data = await response.json();
+        
+        if (!data.isAuthenticated) {
+          alert('로그인이 필요합니다.');
+          window.location.href = 'login.html';
+          return;
+        }
+        
+        updateUserMenu(data.user);
+      } catch (error) {
+        console.error('인증 확인 오류:', error);
+        window.location.href = 'login.html';
+      }
+    }
+
+    // 사용자 메뉴 업데이트
+    function updateUserMenu(user) {
+      const userMenu = document.getElementById('userMenu');
+      const authButtons = document.getElementById('authButtons');
+      const userName = document.getElementById('userName');
+      
+      if (user) {
+        userName.textContent = user.name;
+        userMenu.classList.remove('hidden');
+        authButtons.classList.add('hidden');
+      } else {
+        userMenu.classList.add('hidden');
+        authButtons.classList.remove('hidden');
+      }
+    }
+
+    // 폼 설정
+    function setupForm() {
+      const meetingTypeSelect = document.getElementById('meetingType');
+      const locationField = document.getElementById('locationField');
+      
+      // 진행 방식에 따른 위치 필드 표시/숨김
+      meetingTypeSelect.addEventListener('change', function() {
+        if (this.value === 'offline' || this.value === 'both') {
+          locationField.classList.remove('hidden');
+          document.getElementById('location').required = this.value === 'offline';
+        } else {
+          locationField.classList.add('hidden');
+          document.getElementById('location').required = false;
+        }
+      });
+
+      // 폼 제출 처리
+      document.getElementById('createStudyForm').addEventListener('submit', handleSubmit);
+    }
+
+    // 최소 날짜 설정
+    function setMinDates() {
+      const today = new Date();
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      
+      const deadlineInput = document.getElementById('deadline');
+      const startDateInput = document.getElementById('startDate');
+      
+      deadlineInput.min = today.toISOString().split('T')[0];
+      startDateInput.min = tomorrow.toISOString().split('T')[0];
+      
+      // 마감일 변경 시 시작일 최소값 업데이트
+      deadlineInput.addEventListener('change', function() {
+        const deadlineDate = new Date(this.value);
+        const minStartDate = new Date(deadlineDate);
+        minStartDate.setDate(minStartDate.getDate() + 1);
+        
+        startDateInput.min = minStartDate.toISOString().split('T')[0];
+        
+        // 시작일이 마감일보다 이전이면 초기화
+        if (startDateInput.value && new Date(startDateInput.value) <= deadlineDate) {
+          startDateInput.value = '';
+        }
+      });
+    }
+
+    // 폼 제출 처리
+    async function handleSubmit(e) {
+      e.preventDefault();
+      
+      const submitBtn = document.getElementById('submitBtn');
+      const loadingModal = document.getElementById('loadingModal');
+      
+      // 유효성 검사
+      if (!validateForm()) {
+        return;
+      }
+      
+      // 로딩 상태 표시
+      submitBtn.disabled = true;
+      loadingModal.classList.remove('hidden');
+      loadingModal.classList.add('flex');
+      
+      try {
+        const formData = new FormData(e.target);
+        const studyData = {};
+        
+        // 폼 데이터 수집
+        for (let [key, value] of formData.entries()) {
+          if (key === 'tags') {
+            studyData[key] = value.split(',').map(tag => tag.trim()).filter(tag => tag);
+          } else if (key === 'maxMembers' || key === 'duration') {
+            studyData[key] = parseInt(value);
+          } else {
+            studyData[key] = value;
+          }
+        }
+        
+        console.log('전송할 스터디 데이터:', studyData);
+        
+        const response = await fetch('/api/studies', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include',
+          body: JSON.stringify(studyData)
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+          alert('스터디가 성공적으로 개설되었습니다!');
+          window.location.href = `study-detail.html?id=${result.studyId}`;
+        } else {
+          throw new Error(result.message || '스터디 생성에 실패했습니다.');
+        }
+      } catch (error) {
+        console.error('스터디 생성 오류:', error);
+        alert('스터디 생성 중 오류가 발생했습니다: ' + error.message);
+      } finally {
+        submitBtn.disabled = false;
+        loadingModal.classList.add('hidden');
+        loadingModal.classList.remove('flex');
+      }
+    }
+
+    // 폼 유효성 검사
+    function validateForm() {
+      const title = document.getElementById('title').value.trim();
+      const description = document.getElementById('description').value.trim();
+      const category = document.getElementById('category').value;
+      const maxMembers = parseInt(document.getElementById('maxMembers').value);
+      const deadline = document.getElementById('deadline').value;
+      const startDate = document.getElementById('startDate').value;
+      const duration = parseInt(document.getElementById('duration').value);
+      const meetingType = document.getElementById('meetingType').value;
+      const location = document.getElementById('location').value.trim();
+
+      // 필수 필드 검사
+      if (!title) {
+        alert('스터디 제목을 입력해주세요.');
+        document.getElementById('title').focus();
+        return false;
+      }
+
+      if (!description) {
+        alert('스터디 설명을 입력해주세요.');
+        document.getElementById('description').focus();
+        return false;
+      }
+
+      if (!category) {
+        alert('카테고리를 선택해주세요.');
+        document.getElementById('category').focus();
+        return false;
+      }
+
+      if (!maxMembers || maxMembers < 2 || maxMembers > 20) {
+        alert('최대 인원은 2명 이상 20명 이하로 설정해주세요.');
+        document.getElementById('maxMembers').focus();
+        return false;
+      }
+
+      if (!deadline) {
+        alert('모집 마감일을 선택해주세요.');
+        document.getElementById('deadline').focus();
+        return false;
+      }
+
+      if (!startDate) {
+        alert('시작일을 선택해주세요.');
+        document.getElementById('startDate').focus();
+        return false;
+      }
+
+      if (!duration || duration < 1 || duration > 52) {
+        alert('진행 기간은 1주 이상 52주 이하로 설정해주세요.');
+        document.getElementById('duration').focus();
+        return false;
+      }
+
+      if (!meetingType) {
+        alert('진행 방식을 선택해주세요.');
+        document.getElementById('meetingType').focus();
+        return false;
+      }
+
+      // 날짜 유효성 검사
+      const deadlineDate = new Date(deadline);
+      const startDateObj = new Date(startDate);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      if (deadlineDate < today) {
+        alert('모집 마감일은 오늘 이후로 설정해주세요.');
+        document.getElementById('deadline').focus();
+        return false;
+      }
+
+      if (startDateObj <= deadlineDate) {
+        alert('시작일은 모집 마감일 이후로 설정해주세요.');
+        document.getElementById('startDate').focus();
+        return false;
+      }
+
+      // 오프라인 모임인 경우 위치 필수
+      if (meetingType === 'offline' && !location) {
+        alert('오프라인 모임의 경우 모임 장소를 입력해주세요.');
+        document.getElementById('location').focus();
+        return false;
+      }
+
+      return true;
+    }
+
+    // 로그아웃 처리
+    document.getElementById('logoutBtn').addEventListener('click', async function() {
+      try {
+        const response = await fetch('/api/logout', {
+          method: 'POST',
+          credentials: 'include'
+        });
+        
+        if (response.ok) {
+          window.location.href = '/';
+        }
+      } catch (error) {
+        console.error('로그아웃 오류:', error);
+      }
+    });
+  </script>
+</body>
+</html>

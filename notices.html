@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>공지사항 - 무화과</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            'sans': ['Pretendard Variable', 'Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'Roboto', 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { 
+      padding-top: 0px; 
+      background-color: #f8f9fa;
+    }
+    
+    .line-clamp-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    .line-clamp-3 {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    .animate-float {
+      animation: float 3s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 lg:ml-20" data-page="notices">
+
+  <!-- 사이드바 include -->
+  <div id="sidebar-container"></div>
+
+  <!-- 메인 콘텐츠 -->
+  <main class="min-h-screen flex flex-col items-center justify-center px-4 py-16">
+    <!-- 페이지 컨테이너 -->
+    <div class="w-full max-w-5xl mx-auto">
+      <!-- 페이지 헤더 -->
+      <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-gray-900 mb-3">공지사항</h1>
+        <p class="text-gray-600 text-lg">무화과의 최신 소식과 중요한 공지사항을 확인하세요</p>
+      </div>
+      
+      <!-- 검색 및 필터 섹션 -->
+      <div class="mb-8">
+        <div class="flex flex-col sm:flex-row gap-4 items-center justify-between">
+          <div class="flex flex-col sm:flex-row gap-4 items-center flex-1">
+            <div class="relative">
+              <input type="text" id="searchInput" placeholder="검색어를 입력하세요" 
+                     class="w-full sm:w-80 pl-10 pr-4 py-2 border-b-2 border-gray-300 bg-transparent focus:outline-none focus:border-[#6B4E71]">
+              <span class="material-icons absolute left-2 top-2.5 text-gray-400">search</span>
+            </div>
+            <div class="flex gap-2">
+              <select id="categoryFilter" class="px-3 py-2 border-b-2 border-gray-300 bg-transparent focus:outline-none focus:border-[#6B4E71]">
+                <option value="">전체</option>
+                <option value="general">일반</option>
+                <option value="event">이벤트</option>
+                <option value="update">업데이트</option>
+                <option value="important">중요</option>
+                <option value="maintenance">점검</option>
+              </select>
+            </div>
+          </div>
+          
+          <button id="createNoticeBtn" class="bg-gradient-to-r from-[#6B4E71] to-[#5A3D5F] text-white px-6 py-3 rounded-lg hover:from-[#5A3D5F] hover:to-[#4A2D4F] transition-all duration-300 flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5" style="display: none;">
+            <span class="material-icons text-sm">edit</span>
+            새 공지 작성
+          </button>
+        </div>
+      </div>
+    
+      <!-- 공지사항 목록 -->
+      <div class="mb-8">
+        <div class="bg-white">
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead class="border-b-2 border-gray-200">
+                <tr>
+                  <th class="px-4 py-3 text-center text-sm font-medium text-gray-600 w-16">번호</th>
+                  <th class="px-4 py-3 text-center text-sm font-medium text-gray-600 w-28">분류</th>
+                  <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">제목</th>
+                  <th class="px-4 py-3 text-center text-sm font-medium text-gray-600 w-24">작성일</th>
+                  <th class="px-4 py-3 text-center text-sm font-medium text-gray-600 w-16">조회</th>
+                </tr>
+              </thead>
+              <tbody id="noticesList" class="divide-y divide-gray-100">
+                <!-- 공지사항들이 여기에 동적으로 로드됩니다 -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    
+      <!-- 페이지네이션 -->
+      <div id="pagination" class="flex justify-center">
+        <!-- 동적으로 생성됨 -->
+      </div>
+    </div>
+  </main>
+
+  <!-- 푸터 -->
+  <footer class="mt-16 py-6 border-t border-gray-200">
+    <div class="container mx-auto px-4 text-center text-gray-600 text-sm">
+      <p>&copy; 2025 무화과. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- 공지사항 상세 보기 모달 -->
+  <div id="noticeDetailModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4" onclick="closeDetailModal()">
+    <div class="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+      <!-- 모달 헤더 -->
+      <div class="flex items-center justify-between p-6 border-b border-gray-200">
+        <div class="flex items-center space-x-3">
+          <span id="detailCategory" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"></span>
+          <span id="detailPinned" class="material-icons text-red-500 text-lg hidden">push_pin</span>
+        </div>
+        <button id="closeDetailModal" class="text-gray-400 hover:text-gray-600 transition-colors" onclick="closeDetailModal()">
+          <span class="material-icons text-2xl">close</span>
+        </button>
+      </div>
+      
+      <!-- 모달 내용 -->
+      <div class="p-6">
+        <h2 id="detailTitle" class="text-2xl font-bold text-gray-900 mb-4"></h2>
+        
+        <div class="flex items-center space-x-6 text-sm text-gray-500 mb-6">
+          <div class="flex items-center space-x-1">
+            <span class="material-icons text-sm">schedule</span>
+            <span id="detailDate"></span>
+          </div>
+          <div class="flex items-center space-x-1">
+            <span class="material-icons text-sm">visibility</span>
+            <span id="detailViews"></span>
+          </div>
+        </div>
+        
+        <div id="detailContent" class="prose max-w-none text-gray-700 leading-relaxed whitespace-pre-wrap"></div>
+      </div>
+      
+      <!-- 모달 푸터 -->
+      <div class="flex justify-end p-6 border-t border-gray-200">
+        <button id="closeDetailModalBtn" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors" onclick="closeDetailModal()">
+          닫기
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 공지사항 수정 모달 -->
+  <div id="editNoticeModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-screen overflow-y-auto">
+      <div class="p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h1 class="text-2xl font-bold text-gray-900">공지사항</h1>
+          <button id="createNoticeBtn" onclick="openCreateModal()" class="bg-[#6B4E71] hover:bg-[#5A3D5F] text-white px-4 py-2 rounded-lg transition-colors" style="display: none;">
+            <span class="material-icons text-sm mr-2">add</span>
+            공지사항 작성
+          </button>
+        </div>
+        
+        <form id="editNoticeForm" class="space-y-4">
+          <input type="hidden" id="editNoticeId">
+          
+          <div>
+            <label for="editNoticeTitle" class="block text-sm font-medium text-gray-700 mb-2">제목</label>
+            <input type="text" id="editNoticeTitle" name="title" required
+                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B4E71] focus:border-transparent">
+          </div>
+          
+          <div>
+            <label for="editNoticeCategory" class="block text-sm font-medium text-gray-700 mb-2">카테고리</label>
+            <select id="editNoticeCategory" name="category" required
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B4E71] focus:border-transparent">
+              <option value="general">일반</option>
+              <option value="event">이벤트</option>
+              <option value="maintenance">점검</option>
+              <option value="update">업데이트</option>
+            </select>
+          </div>
+          
+          <div>
+            <label for="editNoticeContent" class="block text-sm font-medium text-gray-700 mb-2">내용</label>
+            <textarea id="editNoticeContent" name="content" rows="8" required
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-vertical"></textarea>
+          </div>
+          
+          <div class="flex items-center">
+            <input type="checkbox" id="editIsPinned" name="isPinned" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+            <label for="editIsPinned" class="ml-2 block text-sm text-gray-900">상단 고정</label>
+          </div>
+          
+          <div class="flex justify-end space-x-3 pt-4">
+            <button type="button" id="cancelEditBtn" class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors">
+              취소
+            </button>
+            <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors">
+              수정하기
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 공지사항 작성 모달 -->
+  <div id="createNoticeModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-screen overflow-y-auto">
+      <div class="p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-bold text-gray-900">공지사항 작성</h2>
+          <button id="closeModal" class="text-gray-400 hover:text-gray-600">
+            <i class="material-icons">close</i>
+          </button>
+        </div>
+        
+        <form id="createNoticeForm">
+          <div class="mb-4">
+            <label for="noticeTitle" class="block text-sm font-medium text-green-700 mb-2">제목</label>
+            <input type="text" id="noticeTitle" name="title" required
+                   class="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+          </div>
+          
+          <div class="mb-4">
+            <label for="noticeCategory" class="block text-sm font-medium text-green-700 mb-2">카테고리</label>
+            <select id="noticeCategory" name="category" required
+                    class="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+              <option value="">카테고리 선택</option>
+              <option value="general">일반</option>
+              <option value="event">이벤트</option>
+              <option value="update">업데이트</option>
+              <option value="important">중요</option>
+              <option value="maintenance">점검</option>
+            </select>
+          </div>
+          
+          <div class="mb-4">
+            <label for="noticeContent" class="block text-sm font-medium text-green-700 mb-2">내용</label>
+            <textarea id="noticeContent" name="content" rows="8" required
+                      class="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"></textarea>
+          </div>
+          
+          <div class="mb-6">
+            <label class="flex items-center">
+              <input type="checkbox" id="isPinned" name="isPinned" class="rounded border-green-300 text-green-600 focus:ring-green-500">
+              <span class="ml-2 text-sm text-gray-700">상단 고정</span>
+            </label>
+          </div>
+          
+          <div class="flex justify-end space-x-3">
+            <button type="button" id="cancelBtn" class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors">
+              취소
+            </button>
+            <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors">
+              작성하기
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+
+  <script>
+    // 전역 변수
+    let allNotices = [];
+    let filteredNotices = [];
+    let currentPage = 1;
+    const noticesPerPage = 10;
+    
+    // 현재 사용자 정보
+    let currentUser = null;
+    
+    // 사용자 권한 확인 (서버에서 받아온 정보 사용)
+    function isAdmin() {
+      return currentUser && currentUser.role === 'admin';
+    }
+    
+    // 공지사항 관리 권한 확인 (작성자 또는 관리자)
+    function canManageNotice(notice) {
+      return notice.author === currentUser.username || isAdmin();
+    }
+    
+    // 공지사항 수정
+    function editNotice(noticeId) {
+      const notice = allNotices.find(n => n.id === noticeId);
+      if (!notice) return;
+      
+      if (!canManageNotice(notice)) {
+        alert('수정 권한이 없습니다.');
+        return;
+      }
+      
+      // 수정 폼에 기존 데이터 설정
+      document.getElementById('editNoticeId').value = notice.id;
+      document.getElementById('editNoticeTitle').value = notice.title;
+      document.getElementById('editNoticeCategory').value = notice.category;
+      document.getElementById('editNoticeContent').value = notice.content;
+      document.getElementById('editIsPinned').checked = notice.pinned;
+      
+      // 수정 모달 표시
+      document.getElementById('editNoticeModal').classList.remove('hidden');
+    }
+    
+    // 수정 모달 닫기
+    function closeEditModal() {
+      document.getElementById('editNoticeModal').classList.add('hidden');
+      document.getElementById('editNoticeForm').reset();
+    }
+    
+    // 공지사항 수정 처리
+    function handleEditNotice(e) {
+      e.preventDefault();
+      
+      const noticeId = parseInt(document.getElementById('editNoticeId').value);
+      const formData = {
+        title: document.getElementById('editNoticeTitle').value,
+        content: document.getElementById('editNoticeContent').value,
+        category: document.getElementById('editNoticeCategory').value,
+        isPinned: document.getElementById('editIsPinned').checked
+      };
+      
+      const notice = allNotices.find(n => n.id === noticeId);
+      if (!notice) return;
+      
+      // 공지사항 업데이트
+      notice.title = formData.title;
+      notice.content = formData.content;
+      notice.category = formData.category;
+      notice.pinned = formData.isPinned;
+      
+      // 로컬 스토리지에 저장하여 새로고침 시에도 유지
+      localStorage.setItem('notices', JSON.stringify(allNotices));
+      
+      // 필터된 목록도 업데이트
+      filteredNotices = [...allNotices];
+      
+      alert('공지사항이 성공적으로 수정되었습니다!');
+      closeEditModal();
+      renderNotices();
+    }
+
+    // 공지사항 목록 로드 (로컬 스토리지에서 불러오기)
+    async function loadNotices() {
+      try {
+        const response = await fetch('/api/notices');
+        if (response.ok) {
+          allNotices = await response.json();
+        } else {
+          console.error('공지사항 로드 실패:', response.status);
+          allNotices = [];
+        }
+        
+        // 필터된 목록 초기화
+        filteredNotices = [...allNotices];
+        
+        // 목록 렌더링
+        renderNotices();
+        renderPagination();
+      } catch (error) {
+        console.error('공지사항 로드 중 오류:', error);
+        allNotices = [];
+        filteredNotices = [];
+      }
+    }
+
+    // 공지사항 렌더링
+    function renderNotices() {
+      const noticesList = document.getElementById('noticesList');
+      
+      if (!filteredNotices || filteredNotices.length === 0) {
+        noticesList.innerHTML = `
+          <tr>
+            <td colspan="5" class="px-4 py-8 text-center text-gray-500">
+              등록된 공지사항이 없습니다.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+      
+      // 고정된 공지사항을 맨 위로, 나머지는 ID 역순으로 정렬
+      const sortedNotices = [...filteredNotices].sort((a, b) => {
+        // 고정된 공지사항이 우선
+        if (a.pinned && !b.pinned) return -1;
+        if (!a.pinned && b.pinned) return 1;
+        // 둘 다 고정되었거나 둘 다 고정되지 않은 경우 ID 역순
+        return b.id - a.id;
+      });
+      
+      // 페이지네이션 계산
+      const startIndex = (currentPage - 1) * noticesPerPage;
+      const endIndex = startIndex + noticesPerPage;
+      const paginatedNotices = sortedNotices.slice(startIndex, endIndex);
+      
+      noticesList.innerHTML = paginatedNotices.map((notice, index) => {
+        const categoryInfo = {
+          'general': { color: 'bg-gray-50 text-gray-700 border-gray-200', emoji: '📢', text: '일반' },
+          'event': { color: 'bg-blue-50 text-blue-700 border-blue-200', emoji: '🎉', text: '이벤트' },
+          'update': { color: 'bg-green-50 text-green-700 border-green-200', emoji: '🔄', text: '업데이트' },
+          'important': { color: 'bg-red-50 text-red-700 border-red-200', emoji: '🔴', text: '중요' },
+          'maintenance': { color: 'bg-yellow-50 text-yellow-700 border-yellow-200', emoji: '🔧', text: '점검' }
+        };
+        
+        const category = categoryInfo[notice.category] || categoryInfo.general;
+        // 번호는 게시물의 고유 ID를 사용 (게시된 순서대로 고정)
+        const noticeNumber = notice.id;
+        
+        return `
+          <tr class="hover:bg-gray-50 transition-colors ${notice.pinned ? 'bg-yellow-50' : ''}">
+            <td class="px-4 py-3 text-center text-sm text-gray-600">${noticeNumber}</td>
+            <td class="px-4 py-3 text-center">
+              <span class="inline-flex items-center px-2 py-1 text-xs font-medium ${category.color} whitespace-nowrap">
+                ${category.text}
+              </span>
+            </td>
+            <td class="px-4 py-3 text-sm text-gray-900">
+              <div class="flex items-center justify-between">
+                <div class="cursor-pointer hover:text-green-600 transition-colors flex-1" onclick="openNoticeDetail(${notice.id})">
+                  <div class="font-medium flex items-center">
+                    ${notice.pinned ? '<span class="material-icons text-red-500 text-sm mr-2">push_pin</span>' : ''}
+                    ${notice.title}
+                  </div>
+                </div>
+                <div class="flex items-center space-x-2 ml-4">
+                  ${isAdmin() ? `
+                    <button onclick="editNotice(${notice.id})" class="text-xs px-2 py-1 bg-blue-100 text-blue-600 rounded hover:bg-blue-200 transition-colors" title="수정">
+                      <span class="material-icons text-xs">edit</span>
+                    </button>
+                    <button onclick="togglePin(${notice.id})" class="text-xs px-2 py-1 rounded ${notice.pinned ? 'bg-red-100 text-red-600 hover:bg-red-200' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'} transition-colors" title="${notice.pinned ? '고정 해제' : '상단 고정'}">
+                      <span class="material-icons text-xs">push_pin</span>
+                    </button>
+                    <button onclick="deleteNotice(${notice.id})" class="text-xs px-2 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200 transition-colors" title="삭제">
+                      <span class="material-icons text-xs">delete</span>
+                    </button>
+                  ` : ''}
+                </div>
+              </div>
+            </td>
+            <td class="px-4 py-3 text-center text-sm text-gray-500">
+              ${new Date(notice.createdAt).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
+            </td>
+            <td class="px-4 py-3 text-center text-sm text-gray-500">
+              ${notice.views || 0}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+    
+    // 시간 경과 표시 함수
+    function getTimeAgo(dateString) {
+      const now = new Date();
+      const date = new Date(dateString);
+      const diffInSeconds = Math.floor((now - date) / 1000);
+      
+      if (diffInSeconds < 60) return '방금 전';
+      if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}분 전`;
+      if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}시간 전`;
+      if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}일 전`;
+      
+      return date.toLocaleDateString('ko-KR');
+    }
+    
+    // 새 공지사항 작성
+    function createNotice(formData) {
+      // 새 ID 생성 (기존 최대 ID + 1)
+      const maxId = allNotices.length > 0 ? Math.max(...allNotices.map(n => n.id)) : 0;
+      const newId = maxId + 1;
+      
+      // 새 공지사항 생성
+      const newNotice = {
+        id: newId,
+        title: formData.title,
+        content: formData.content,
+        category: formData.category,
+        author: currentUser.username, // 현재 로그인된 사용자
+        createdAt: new Date().toISOString().split('T')[0],
+        views: 0,
+        pinned: formData.isPinned || false
+      };
+      
+      // 배열 맨 앞에 추가
+      allNotices.unshift(newNotice);
+      
+      // 로컬 스토리지에 저장하여 새로고침 시에도 유지
+      localStorage.setItem('notices', JSON.stringify(allNotices));
+      
+      // 필터된 목록도 업데이트
+      filteredNotices = [...allNotices];
+      
+      alert('공지사항이 성공적으로 작성되었습니다!');
+      closeCreateModal();
+      renderNotices(); // 목록 새로고침
+      renderPagination(); // 페이지네이션 업데이트
+    }
+    
+    // 공지사항 고정/해제
+    function togglePin(noticeId) {
+      const notice = allNotices.find(n => n.id === noticeId);
+      if (!notice) return;
+      
+      if (!canManageNotice(notice)) {
+        alert('권한이 없습니다.');
+        return;
+      }
+      
+      notice.pinned = !notice.pinned;
+      
+      // 필터된 목록도 업데이트
+      filteredNotices = [...allNotices];
+      
+      alert(notice.pinned ? '공지사항이 상단에 고정되었습니다.' : '공지사항 고정이 해제되었습니다.');
+      renderNotices(); // 목록 새로고침
+    }
+    
+    // 공지사항 삭제
+    async function deleteNotice(noticeId) {
+      const notice = allNotices.find(n => n.id === noticeId);
+      if (!notice) return;
+      
+      if (!canManageNotice(notice)) {
+        alert('권한이 없습니다.');
+        return;
+      }
+      
+      if (!confirm('정말로 이 공지사항을 삭제하시겠습니까?')) {
+        return;
+      }
+      
+      try {
+        const response = await fetch(`/api/notices/${noticeId}`, {
+          method: 'DELETE'
+        });
+        
+        if (response.ok) {
+          // 배열에서 제거
+          const index = allNotices.findIndex(n => n.id === noticeId);
+          if (index > -1) {
+            allNotices.splice(index, 1);
+          }
+          
+          // 필터된 목록도 업데이트
+          filteredNotices = [...allNotices];
+          
+          alert('공지사항이 삭제되었습니다.');
+          renderNotices(); // 목록 새로고침
+          renderPagination(); // 페이지네이션 업데이트
+        } else {
+          const error = await response.json();
+          alert(error.message || '삭제 중 오류가 발생했습니다.');
+        }
+      } catch (error) {
+        console.error('삭제 중 오류:', error);
+        alert('삭제 중 오류가 발생했습니다.');
+      }
+    }
+
+    // 공지사항 상세 보기
+    function openNoticeDetail(noticeId) {
+      const notice = allNotices.find(n => n.id === noticeId);
+      if (!notice) return;
+      
+      // 조회수 증가
+      notice.views++;
+      
+      // 모달 내용 설정
+      const categoryColors = {
+        'general': 'bg-gray-100 text-gray-800',
+        'event': 'bg-blue-100 text-blue-800',
+        'update': 'bg-green-100 text-green-800',
+        'important': 'bg-red-100 text-red-800',
+        'maintenance': 'bg-yellow-100 text-yellow-800'
+      };
+      
+      const categoryTexts = {
+        'general': '일반',
+        'event': '이벤트',
+        'update': '업데이트',
+        'important': '중요',
+        'maintenance': '점검'
+      };
+      
+      document.getElementById('detailTitle').textContent = notice.title;
+      document.getElementById('detailContent').textContent = notice.content;
+      document.getElementById('detailDate').textContent = notice.createdAt;
+      document.getElementById('detailViews').textContent = `조회 ${notice.views}회`;
+      
+      const modalCategory = document.getElementById('detailCategory');
+      modalCategory.textContent = categoryTexts[notice.category] || '일반';
+      modalCategory.className = `px-3 py-1 rounded-full text-sm font-medium ${categoryColors[notice.category] || categoryColors.general}`;
+      
+      const modalPinned = document.getElementById('detailPinned');
+      if (notice.pinned) {
+        modalPinned.classList.remove('hidden');
+      } else {
+        modalPinned.classList.add('hidden');
+      }
+      
+      // 모달 표시
+      document.getElementById('noticeDetailModal').classList.remove('hidden');
+      
+      // 목록 업데이트 (조회수 반영)
+      renderNotices();
+    }
+    
+    // 상세 모달 닫기
+    function closeDetailModal() {
+      document.getElementById('noticeDetailModal').classList.add('hidden');
+    }
+    
+    // 고정 토글 함수 수정 - 데이터 지속성 보장
+    function togglePin(noticeId) {
+      const notice = allNotices.find(n => n.id === noticeId);
+      if (!notice) return;
+      
+      if (!canManageNotice(notice)) {
+        alert('권한이 없습니다.');
+        return;
+      }
+      
+      // 고정 상태 토글
+      notice.pinned = !notice.pinned;
+      
+      // 로컬 스토리지에 저장하여 새로고침 시에도 유지
+      localStorage.setItem('notices', JSON.stringify(allNotices));
+      
+      // 필터된 목록도 업데이트
+      filteredNotices = [...allNotices];
+      
+      // 화면 업데이트
+      renderNotices();
+      
+      alert(notice.pinned ? '공지사항이 상단에 고정되었습니다.' : '공지사항 고정이 해제되었습니다.');
+    }
+    
+    // 모달 관련 함수들
+    function openCreateModal() {
+      document.getElementById('createNoticeModal').classList.remove('hidden');
+    }
+    
+    function closeCreateModal() {
+      document.getElementById('createNoticeModal').classList.add('hidden');
+      document.getElementById('createNoticeForm').reset();
+    }
+    
+    // 한글 초성 추출 함수
+    function getChosung(str) {
+      const chosungList = ['ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'];
+      let result = '';
+      
+      for (let i = 0; i < str.length; i++) {
+        const code = str.charCodeAt(i) - 44032;
+        if (code > -1 && code < 11172) {
+          result += chosungList[Math.floor(code / 588)];
+        } else {
+          result += str.charAt(i);
+        }
+      }
+      return result;
+    }
+    
+    // 초성 검색 매칭 함수
+    function matchesChosung(text, searchTerm) {
+      const textChosung = getChosung(text.toLowerCase());
+      const searchChosung = getChosung(searchTerm.toLowerCase());
+      
+      // 일반 텍스트 검색
+      const normalMatch = text.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      // 초성 검색
+      const chosungMatch = textChosung.includes(searchChosung);
+      
+      return normalMatch || chosungMatch;
+    }
+    
+    // 검색 기능 (제목만 검색, 초성 검색 포함)
+    function searchNotices() {
+      const searchInput = document.getElementById('searchInput');
+      const categorySelect = document.getElementById('categoryFilter');
+      
+      if (!searchInput || !categorySelect) {
+        console.error('검색 요소를 찾을 수 없습니다');
+        return;
+      }
+      
+      const searchTerm = searchInput.value.trim();
+      const category = categorySelect.value;
+      
+      console.log('검색어:', `"${searchTerm}"`, '카테고리:', `"${category}"`);
+      console.log('전체 공지사항:', allNotices.length, '개');
+      
+      // 검색 필터링
+      filteredNotices = allNotices.filter(notice => {
+        // 제목 검색 (빈 검색어면 모든 제목 매칭, 초성 검색 포함)
+        const titleMatch = searchTerm === '' || matchesChosung(notice.title, searchTerm);
+        
+        // 카테고리 필터 (빈 카테고리면 모든 카테고리 매칭)
+        const categoryMatch = category === '' || notice.category === category;
+        
+        const result = titleMatch && categoryMatch;
+        
+        if (searchTerm !== '') {
+          console.log(`"${notice.title}" - 제목매칭: ${titleMatch}, 카테고리매칭: ${categoryMatch}, 최종: ${result}`);
+        }
+        
+        return result;
+      });
+      
+      console.log('필터된 결과:', filteredNotices.length, '개');
+      
+      // 첫 페이지로 이동
+      currentPage = 1;
+      
+      // 화면 업데이트
+      renderNotices();
+      renderPagination();
+    }
+    
+    // 페이지네이션 렌더링
+    function renderPagination() {
+      const totalPages = Math.ceil(filteredNotices.length / noticesPerPage);
+      const pagination = document.getElementById('pagination');
+      
+      if (totalPages <= 1) {
+        pagination.innerHTML = '';
+        return;
+      }
+      
+      let paginationHtml = '<nav class="flex items-center justify-center space-x-1 mt-8">';
+      
+      // 이전 버튼
+      if (currentPage > 1) {
+        paginationHtml += `
+          <button onclick="changePage(${currentPage - 1})" class="px-3 py-2 text-gray-500 hover:bg-gray-100 rounded-md transition-colors">
+            <span class="material-icons text-sm">chevron_left</span>
+          </button>
+        `;
+      }
+      
+      // 페이지 번호들
+      const startPage = Math.max(1, currentPage - 2);
+      const endPage = Math.min(totalPages, currentPage + 2);
+      
+      for (let i = startPage; i <= endPage; i++) {
+        const isActive = i === currentPage;
+        paginationHtml += `
+          <button onclick="changePage(${i})" class="px-3 py-2 rounded-md transition-colors ${
+            isActive 
+              ? 'bg-green-600 text-white' 
+              : 'text-gray-700 hover:bg-gray-100'
+          }">
+            ${i}
+          </button>
+        `;
+      }
+      
+      // 다음 버튼
+      if (currentPage < totalPages) {
+        paginationHtml += `
+          <button onclick="changePage(${currentPage + 1})" class="px-3 py-2 text-gray-500 hover:bg-gray-100 rounded-md transition-colors">
+            <span class="material-icons text-sm">chevron_right</span>
+          </button>
+        `;
+      }
+      
+      paginationHtml += '</nav>';
+      pagination.innerHTML = paginationHtml;
+    }
+    
+    // 페이지 변경
+    function changePage(page) {
+      currentPage = page;
+      renderNotices();
+      renderPagination();
+    }
+    
+    // 폼 제출 처리
+    function handleCreateNotice(e) {
+      e.preventDefault();
+      
+      const formData = {
+        title: document.getElementById('noticeTitle').value,
+        content: document.getElementById('noticeContent').value,
+        category: document.getElementById('noticeCategory').value,
+        isPinned: document.getElementById('isPinned').checked
+      };
+      
+      createNotice(formData);
+    }
+    
+    // 사용자 정보 로드
+    async function loadUserInfo() {
+      try {
+        const response = await fetch('/api/profile');
+        if (response.ok) {
+          currentUser = await response.json();
+        } else {
+          console.error('사용자 정보 로드 실패');
+          window.location.href = '/login.html';
+        }
+      } catch (error) {
+        console.error('사용자 정보 로드 중 오류:', error);
+        window.location.href = '/login.html';
+      }
+    }
+    
+    // 사이드바 로드
+    async function loadSidebar() {
+      try {
+        const response = await fetch('sidebar.html');
+        const sidebarHtml = await response.text();
+        document.getElementById('sidebar-container').innerHTML = sidebarHtml;
+        
+        // 사이드바 스크립트 실행
+        if (typeof initializeSidebar === 'function') {
+          initializeSidebar();
+        }
+      } catch (error) {
+        console.error('사이드바 로드 오류:', error);
+      }
+    }
+    
+    // 페이지 로드 시 초기화
+    document.addEventListener('DOMContentLoaded', async function() {
+      await loadUserInfo();
+      await loadSidebar();
+      await loadNotices();
+      
+      // 관리자만 공지 작성 버튼 표시
+      console.log('현재 사용자:', currentUser);
+      console.log('관리자 여부:', isAdmin());
+      if (isAdmin()) {
+        document.getElementById('createNoticeBtn').style.display = 'flex';
+        console.log('관리자 버튼 표시됨');
+      } else {
+        console.log('관리자가 아님 - 버튼 숨김');
+      }
+      
+      // 검색 기능
+      document.getElementById('searchInput').addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        if (searchTerm === '') {
+          filteredNotices = [...allNotices];
+        } else {
+          filteredNotices = allNotices.filter(notice => 
+            notice.title.toLowerCase().includes(searchTerm) ||
+            notice.content.toLowerCase().includes(searchTerm) ||
+            notice.category.toLowerCase().includes(searchTerm)
+          );
+        }
+        currentPage = 1; // 검색 시 첫 페이지로 이동
+        renderNotices();
+        renderPagination();
+      });
+      
+      // 카테고리 필터
+      document.getElementById('categoryFilter').addEventListener('change', function() {
+        const selectedCategory = this.value;
+        if (selectedCategory === '') {
+          filteredNotices = [...allNotices];
+        } else {
+          filteredNotices = allNotices.filter(notice => notice.category === selectedCategory);
+        }
+        currentPage = 1; // 필터 시 첫 페이지로 이동
+        renderNotices();
+        renderPagination();
+      });
+      
+      // 공지사항 작성 폼 제출 (폼이 존재하는 경우에만)
+      const noticeForm = document.getElementById('noticeForm');
+      if (noticeForm) {
+        noticeForm.addEventListener('submit', handleCreateNotice);
+      }
+      
+      // 공지사항 수정 폼 제출 (폼이 존재하는 경우에만)
+      const editNoticeForm = document.getElementById('editNoticeForm');
+      if (editNoticeForm) {
+        editNoticeForm.addEventListener('submit', handleEditNotice);
+      }
+    });
+  </script>
+  <script src="sidebar.js"></script>
+  <script src="common.js"></script>
+</body>
+</html>
